@@ -1,0 +1,47 @@
+<div class="blog-page">
+  <div class="blogs-container">
+    <h2>Entradas del Blog</h2>
+    
+    <!-- Lista de Blogs -->
+    <div *ngFor="let blog of blogs" class="blog-titulo" (click)="seleccionarBlog(blog)">
+      <div class="info-arriba">
+        <img src="assets/h3.avif" alt="icono blog" />
+        <div class="info-texto">
+          <span class="sitio">emhpsicoterapiaonline.com</span>
+        </div>
+      </div>
+      <h3>{{ blog.titulo }}</h3>
+    </div>
+  
+    <!-- Detalle del Blog Seleccionado -->
+    <div *ngIf="blogSeleccionado" class="detalle-blog">
+      <div class="detalle-contenido">
+        <button class="cerrar-btn" (click)="cerrarDetalle()">X</button>
+        
+        <!-- Información del Blog -->
+        <div class="info-arriba">
+          <img src="assets/h3.avif" alt="icono blog" />
+          <div class="info-texto">
+            <span class="sitio">emhpsicoterapiaonline.com</span>
+            <span class="fecha">{{ blogSeleccionado.fecha | date: 'longDate' }}</span>
+
+
+          </div>
+        </div>
+        <h3>{{ blogSeleccionado.titulo }}</h3>
+        <p>{{ blogSeleccionado.texto }}</p>
+        <img *ngIf="blogSeleccionado.imagen" [src]="blogSeleccionado.imagen" alt="Imagen del blog" />
+        <div *ngIf="blogSeleccionado.videoUrl" class="video-container">
+  <iframe
+    width="100%"
+    height="315"
+    [src]="sanitizarUrl(blogSeleccionado.videoUrl)"
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+</div>
+
+      </div>
+    </div>
+  </div>
+</div>

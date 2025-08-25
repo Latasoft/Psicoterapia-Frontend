@@ -1,0 +1,80 @@
+<div class="admin-container">
+  <h2 class="title">📚 Administrar Talleres</h2>
+  <div class="crear-taller-container">
+    <button routerLink="/crear-taller" class="btn-crear-taller">
+      ➕ Crear nuevo taller
+    </button>
+  </div>
+  <p class="info-text">* Solo se mostrará públicamente el taller más reciente que se haya subido.</p>
+
+  <ul class="talleres-list">
+    <li *ngFor="let taller of talleres" class="taller-item">
+      <strong class="subtitulo">{{ taller.subtitulo }}</strong>
+      <div class="acciones">
+        <button class="btn-editar" (click)="editarTaller(taller)">✏️ Editar</button>
+        <button class="btn-eliminar" (click)="eliminarTaller(taller.id)">🗑️ Eliminar</button>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Formulario de edición -->
+  <div *ngIf="modoEdicion" class="formulario-edicion">
+    <h3 class="subtitulo">📝 Editar Taller</h3>
+    <form [formGroup]="form" (ngSubmit)="guardarCambios()">
+      <label>Subtítulo:</label>
+      <input formControlName="subtitulo" type="text" class="input" />
+
+      <label>Fecha de Inicio:</label>
+      <input formControlName="fechaInicio" type="date" class="input" />
+
+      <label>Valor:</label>
+      <input formControlName="valor" type="number" class="input" />
+
+      <label>Facilitador:</label>
+      <input formControlName="facilitador" type="text" class="input" />
+
+      <label>Descripción del Servicio:</label>
+      <textarea formControlName="descripcionDeServicio" class="textarea"></textarea>
+
+      <h4>Próximas Sesiones:</h4>
+      <div formArrayName="proximasSesiones">
+        <div *ngFor="let sesion of proximasSesiones.controls; let i = index" [formGroupName]="i" class="sesion">
+          <hr />
+          <label>Día:</label>
+          <input formControlName="dia" type="text" class="input" />
+
+          <label>Fecha:</label>
+          <input formControlName="fecha" type="date" class="input" />
+
+          <label>Hora:</label>
+          <input formControlName="hora" type="time" class="input" />
+
+          <label>Duración (horas):</label>
+          <input formControlName="duracionHoras" type="number" class="input" />
+
+          <label>Duración (minutos):</label>
+          <input formControlName="duracionMinutos" type="number" class="input" />
+
+          <label>Profesional:</label>
+          <input formControlName="profesional" type="text" class="input" />
+
+          <button type="button" class="btn-eliminar-sesion" (click)="eliminarSesion(i)">Eliminar sesión</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-agregar" (click)="agregarSesion()">➕ Agregar sesión</button>
+
+      <label>Política de Cancelación:</label>
+      <textarea formControlName="politicaDeCancelacion" class="textarea"></textarea>
+
+      <label>Datos de Contacto:</label>
+      <textarea formControlName="datosDeContacto" class="textarea"></textarea>
+
+      <hr />
+      <div class="acciones">
+        <button type="submit" class="btn-guardar">💾 Guardar Cambios</button>
+        <button type="button" class="btn-cancelar" (click)="cancelarEdicion()">❌ Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

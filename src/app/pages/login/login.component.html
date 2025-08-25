@@ -1,0 +1,43 @@
+<!-- Loader de pantalla completa -->
+<div *ngIf="isLoading" class="full-screen-loader">
+  <div class="loader">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+</div>
+
+<!-- Tarjeta de error elegante -->
+<div *ngIf="errorMessage" class="error-overlay">
+  <div class="error-card-animated">
+    <div class="error-icon">⚠️</div>
+    <p class="error-text">{{ errorMessage }}</p>
+    <button class="error-button" (click)="errorMessage = ''">Cerrar</button>
+  </div>
+</div>
+
+<!-- Aquí tu contenido normal de login -->
+<div class="login-container" *ngIf="!isLoading">
+  <div class="login-card">
+    <div class="login-form-section">
+      <h2 class="login-title">Iniciar Sesión</h2>
+
+      <form (ngSubmit)="onLogin()" class="form">
+        <input type="email" [(ngModel)]="username" name="email" class="input" placeholder="E-mail" required />
+        <input type="password" [(ngModel)]="contrasena" name="password" class="input" placeholder="Contraseña" required />
+        <span class="forgot-password"><a href="#">¿Olvidaste tu contraseña?</a></span>
+
+        <input class="login-button" type="submit" value="Iniciar sesión" [disabled]="isLoading" />
+      </form>
+
+
+      <span class="agreement"><a href="/">EMHpsicoterapiaonline</a></span>
+    </div>
+
+    <div class="login-image-section">
+      <img src="assets/p1.svg" alt="Imagen de bienvenida" />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+
+/* You can add global styles to this file, and also import other style files */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Body general */
+  body {
+    font-family: Arial, sans-serif; /* Fuente limpia y legible */
+    line-height: 1.6;
+    background-color: #f4f4f4; /* Color de fondo general */
+    overflow-x: hidden; /* Evita desplazamiento horizontal */
+  }
+  
+  /* Asegura que el contenido ocupe toda la pantalla */
+  html, body {
+    height: 100%;
+  }
+
+ 
+/* Contenedor específico para el sello */
+.verified-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px; /* Ajusta el margen si es necesario */
+  background-color: transparent; /* Asegura que no tenga fondo */
+  padding: 0; /* Evita cualquier padding adicional */
+  border: none; /* Elimina el borde */
+  width: 100%; /* Asegura que ocupe el 100% del ancho si es necesario */
+}
+
+/* Sello de verificación */
+.sx-verified-seal {
+  display: block;
+  background-color: transparent !important; /* Asegura que el fondo sea transparente */
+  border: none !important; /* Asegura que no tenga bordes */
+  padding: 0 !important; /* Elimina cualquier padding */
+  margin: 0 !important; /* Elimina el margen */
+  width: auto; /* Ajusta el tamaño del sello */
+  height: auto;
+}
+
+
+  @media screen and (max-width: 600px) {
+    .sx-verified-seal {
+      top: 10px; /* Ajusta para pantallas pequeñas */
+      right: 10px;
+    }
+  }
+  

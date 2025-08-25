@@ -1,0 +1,54 @@
+<div class="admin-container">
+  <h2>Administrar Blogs</h2>
+  <!-- Botón para crear nuevo blog -->
+  <div class="crear-blog-container">
+    <button routerLink="/crear-blog" class="btn-crear-blog">
+      ➕ Crear nuevo blog
+    </button>
+  </div>
+
+
+  <div *ngIf="mensaje" class="mensaje">{{ mensaje }}</div>
+
+  <div *ngFor="let blog of blogs" class="blog-item">
+
+    <!-- Vista normal del blog -->
+    <div *ngIf="blogEditando?.id !== blog.id" class="blog-view">
+      <h3 class="blog-titulo">{{ blog.titulo }}</h3>
+      <p class="blog-texto">{{ blog.texto }}</p>
+
+      <img *ngIf="blog.imagen" [src]="blog.imagen" alt="Imagen del blog" class="imagen-blog" />
+
+      <p *ngIf="blog.video">Enlace video: <a href="{{ blog.video }}" target="_blank" rel="noopener">{{ blog.video }}</a></p>
+
+      <div *ngIf="blog.videoUrl && getVideoEmbedUrl(blog.videoUrl)" class="video-blog">
+        <iframe
+          width="100%"
+          height="315"
+          [src]="getVideoEmbedUrl(blog.videoUrl)"
+          frameborder="0"
+          allowfullscreen>
+        </iframe>
+      </div>
+
+      <div class="acciones">
+        <button (click)="editarBlog(blog)" class="btn-editar">✏️ Editar</button>
+        <button (click)="eliminarBlog(blog.id)" class="btn-eliminar">🗑️ Eliminar</button>
+      </div>
+    </div>
+
+    <!-- Modo edición del blog -->
+    <div *ngIf="blogEditando?.id === blog.id" class="form-edicion">
+      <input [(ngModel)]="blogEditando.titulo" placeholder="Título" class="input-edicion" />
+      <textarea [(ngModel)]="blogEditando.texto" placeholder="Texto" class="textarea-edicion"></textarea>
+      <input [(ngModel)]="blogEditando.imagen" placeholder="URL Imagen" class="input-edicion" />
+      <input [(ngModel)]="blogEditando.videoUrl" placeholder="URL Video" class="input-edicion" />
+
+      <div class="acciones">
+        <button (click)="guardarCambios()" class="btn-guardar">💾 Guardar</button>
+        <button (click)="cancelarEdicion()" class="btn-cancelar">❌ Cancelar</button>
+      </div>
+    </div>
+
+  </div>
+</div>

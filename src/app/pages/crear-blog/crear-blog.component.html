@@ -1,0 +1,62 @@
+<div class="form-container">
+  <h2>Crear Nuevo Blog</h2>
+
+  <div *ngIf="mensajeExito" class="mensaje-exito">
+      {{ mensajeExito }}
+  </div>
+
+  <form (ngSubmit)="crearBlog()">
+    <div class="form-group">
+      <label for="titulo">Título</label>
+      <input 
+        type="text" 
+        id="titulo" 
+        [(ngModel)]="titulo" 
+        name="titulo" 
+        required 
+        class="form-input"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="texto">Texto</label>
+      <textarea 
+        id="texto" 
+        [(ngModel)]="texto" 
+        name="texto" 
+        required 
+        class="form-input"
+      ></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="imagen">URL Imagen (opcional)</label>
+      <input 
+        type="text" 
+        id="imagen" 
+        [(ngModel)]="imagen" 
+        name="imagen" 
+        class="form-input"
+      />
+    </div>
+    <div class="form-group">
+  <label for="video">Video (opcional)</label>
+  <input
+  type="text"
+  id="video"
+  class="form-input"
+  [(ngModel)]="videoUrl"
+  name="videoUrl "
+  placeholder="URL del video (ej: https://...)"
+/>
+
+</div>
+
+<div class="form-actions-row">
+  <button type="submit" class="submit-btn">Crear Blog</button>
+  <button type="button" class="cancel-btn" routerLink="/admin-blogs">Cancelar</button>
+</div>
+
+
+  </form>
+</div>

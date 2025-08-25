@@ -1,0 +1,697 @@
+.image-card-4 {
+  background-image: url('/assets/f9.jpg'); /* Imagen de fondo */
+  background-size: cover; /* Asegura que la imagen cubra todo el contenedor */
+  background-position: center; /* Centra la imagen */
+  background-repeat: no-repeat; /* No repite la imagen */
+  color: #9e9893;
+  font-family: 'Playfair Display', serif;
+  font-weight: 300;
+
+  width: 100%;  /* El card ocupa el 100% del ancho */
+  height: 500px;  /* Altura del card ajustable */
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  justify-content: space-between; /* Espacio entre el título y el botón */
+  align-items: center;
+  text-align: center;
+  padding: 10vw; /* Relleno ajustable para pantallas grandes */
+}
+.logo-container {
+  position: absolute; /* Posiciona el logo dentro del contenedor */
+  top: 10px; /* Ajusta la distancia desde la parte superior */
+  right: 10px; /* Ajusta la distancia desde la parte izquierda */
+}
+
+.logo {
+  width: 50px; /* Ajusta el tamaño del logo */
+  height: auto; /* Mantiene la proporción del logo */
+}
+/* Contenedor para el título */
+.card-content {
+  position: absolute;
+  right: 55%; /* Mueve el título a la izquierda */
+  top: 50%; /* Centra el título verticalmente */
+  transform: translateY(-50%); /* Ajusta el título al centro vertical */
+  font-size: 2rem;
+  line-height: 1.2; 
+  max-width: 50%; /* Ajusta el ancho del contenedor */
+  text-align: center; /* Alinea el texto a la izquierda */
+}
+@media (max-width: 768px) {
+  .image-card-4 {
+    max-width: 100%;  /* En pantallas pequeñas, el card ocupará todo el ancho */
+    padding: 5vw;     /* Reducción del padding en pantallas pequeñas */
+    height: 350px;    /* Reducir la altura en pantallas pequeñas */
+    flex-direction: column; /* Cambio a columna para adaptarse mejor en pantallas pequeñas */
+    justify-content: center; /* Centrar los elementos en la pantalla */
+  }
+  .card-content {
+    font-size: 1.5rem; /* Tamaño de fuente más pequeño */
+    max-width: 70%; /* Aumenta el ancho del contenedor */
+    left: 50%; /* Centra el título */
+    transform: translateX(-50%) translateY(-50%); /* Centra el título completamente */
+  }
+}
+
+@media (max-width: 480px) {
+  .image-card-4 {
+    height: 300px;  /* Ajuste adicional de altura para dispositivos muy pequeños */
+    padding: 8vw;   /* Ajuste de padding para dispositivos muy pequeños */
+  }
+  
+  .card-content {
+    font-size: 1.2rem; /* Tamaño de fuente aún más pequeño */
+    max-width: 90%; /* El título ocupa más ancho */
+    left: 50%; /* Centra el título */
+    transform: translateX(-50%) translateY(-50%); /* Centra el título completamente */
+  }
+}
+
+ 
+
+  
+/* card de primer video */
+  .text-section h2 {
+    font-size: 1.8rem;
+    font-family: 'Playfair Display', serif;
+    color:#9e9893;
+    font-weight: 300; 
+  } 
+  .text-section p {
+    font-size: 1rem;
+    margin: 10px 0;
+    color:#9e9893;
+    font-weight: 300; /* Letras más delgadas */
+  }
+  
+  /* Botón atractivo */
+  .cta-button {
+    background-color:#c8d7df;
+    color: white;
+    font-size: 1rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+  }
+  
+  .cta-button:hover {
+    background-color: #fae8da;
+    color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+  
+
+.psychologist-card video {
+  width: 11%; /* Establece el ancho al 100% para que ocupe todo el contenedor */
+  height: auto; /* Ajusta la altura automáticamente para mantener la proporción */
+  border-radius: 10px; /* Opcional, si quieres bordes redondeados */
+}
+
+@media (max-width: 768px) {
+  .psychologist-card video {
+    width: 40%; /* Ajusta el ancho en pantallas más pequeñas */
+    height: auto; /* Mantiene la proporción sin forzar la altura */
+  }
+  
+}
+
+@media (max-width: 480px) {
+  .psychologist-card video {
+    width: 40%; /* En pantallas más pequeñas, se ajusta al 100% */
+    height: auto; /* Mantiene la proporción */
+  }
+  
+}
+
+
+
+  
+  
+  
+
+
+
+/* Container de los blogs*/
+.blog-section {
+  background-image: url('/assets/f2.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 60px 20px;
+  color: white;
+  text-align: center;
+}
+
+.blog-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #9e9893;
+  font-family: 'Playfair Display', serif;
+}
+
+.blog-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.blog-card {
+  background-color: rgba(0, 0, 0, 0.30); /* fondo oscuro semitransparente */
+  padding: 10px;
+  border-radius: 12px;
+  text-align: left;
+  transition: transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(147, 145, 142, 0.3); /* Borde más marcado y oscuro */
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+}
+
+.blog-card-title {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.blog-card-link {
+  color: #eadbd4;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.blog-card-link:hover {
+  text-decoration: underline;
+}
+
+.blog-card-image {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+
+
+
+
+
+
+  
+  /* Contenedor general del card (ahora con esquinas en punta) */
+  .psychologist-card {
+    width: 100%;
+    max-width: 2000px;
+    margin: 2rem auto;
+    background-color:white; /* Color de fondo suave */
+    padding: 1.5rem;
+    border-radius: 0; /* Esquinas en punta */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Suaviza el diseño */
+  }
+  
+  /* Contenido del card */
+  .psychologist-card-content {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 20px;
+    background-color: transparent; /* Sin bordes ni fondo interno */
+  }
+  
+
+  
+  
+
+  .psychologist-card2 {
+    width: 100%;
+    max-width: 2000px;
+    margin: 2rem auto;
+    background-color: #D7D1CC; /* Color de fondo suave */
+    padding: 1.5rem;
+    border-radius: 0; /* Esquinas en punta */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Suaviza el diseño */
+  }
+  
+  
+  /* Contenedor principal con imagen de fondo */
+.container-cards {
+  width: 100%;
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+ 
+  background-size: cover;
+  background-position: center;
+  padding: 3rem 2rem;
+  position: relative;
+}
+
+/* Estilos de cada card */
+.card {
+  width: 320px;
+  min-height: 480px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(4px);
+  overflow: hidden;
+}
+
+/* Imagen dentro del card */
+.card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+/* Hover */
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* Título y texto del card */
+.card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #444;
+  margin-top: 0.5rem;
+}
+
+/* Lista dentro del card */
+.card-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.card-list li {
+  margin: 6px 0;
+}
+
+/* Botón dentro del card */
+.card .btn {
+  margin-top: auto;
+  padding: 10px 18px;
+  font-size: 1rem;
+  color: white;
+  background-color: #4e6b58;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.card .btn:hover {
+  background-color: #3b5144;
+}
+
+/* Cards con colores de fondo diferentes */
+.card:nth-child(1) {
+  background-color: #dbe7f2;
+}
+
+.card:nth-child(2) {
+  background-color: #f1ece6;
+}
+
+/* Información adicional */
+.card.additional-info {
+  background-color: #eadbd4;
+  width: 100%;
+  padding: 2rem;
+  margin-top: 2rem;
+}
+
+.additional-info h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.additional-info p {
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* Sección principal */
+.seccion-principal {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .container-cards {
+    padding: 2rem 1rem;
+  }
+}
+
+
+
+
+
+/* Estilo general para la sección principal */
+.seccion-principal {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem; /* Espacio entre los elementos */
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Estilo para los comentarios */
+.comentarios-card {
+  flex: 1 1 30%; /* Acomoda los comentarios a un 30% del contenedor */
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.comentarios-card h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.comentario {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.comentario p {
+  font-style: italic;
+  color: #555;
+}
+
+.comentario .info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9em;
+  color: #777;
+  margin-top: 8px;
+}
+
+.stars {
+  color: #f7c948;
+}
+
+.nuevo-comentario h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.nuevo-comentario textarea {
+  width: 100%;
+  height: 80px;
+  resize: none;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95em;
+}
+
+.nuevo-comentario button {
+  margin-top: 10px;
+  background-color: #5ca8a5;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.nuevo-comentario button:hover {
+  background-color: #498b8a;
+}
+
+/* Estilo para el contacto */
+.contacto-card {
+  flex: 1 1 30%; /* Acomoda el contacto a un 30% del contenedor */
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.contacto-card h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.contacto-card p {
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.contacto-card ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.contacto-card .contact-link button {
+  background-color: #fae8da;
+  border: 2px solid #9db3b4;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 1em;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.contacto-card .contact-link button:hover {
+  background-color: #9db3b4;
+  border-color: #333;
+  color: #fff;
+}
+
+.contacto-card .contact-link img {
+  width: 200px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  display: block;
+  margin: 10px auto;
+}
+
+.contacto-card .contact-link img:hover {
+  transform: scale(1.1);
+}
+
+/* Estilo para el video */
+.video-container {
+  flex: 1 1 30%; /* Acomoda el video a un 30% del contenedor */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 7%;
+}
+
+.video-container video {
+  width: 100%;
+  max-width: 350px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+
+  .whatsapp-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: transparent;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+  }
+  
+  .whatsapp-button img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .whatsapp-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .whatsapp-button:focus {
+    outline: none;
+  }
+  
+
+  
+  .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1800px;
+    height: 400px;
+    background-color: white;
+    border-radius: 16px;
+    padding: 20px 270px; /* 20px para arriba y abajo, 270px para los lados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  /* Efecto hover */
+  .card-container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .text-section1 {
+    flex: 2; /* Hace que esta sección ocupe más espacio horizontal */
+    display: flex;
+    flex-direction: column;
+    font-family: 'Playfair Display', serif;
+    justify-content: center; /* Centra el contenido dentro de la sección */
+    text-align: left;
+    align-items: flex-start; /* Alinea el texto al principio */
+  }
+  
+  .text-section1 h2 {
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+  }
+  
+  .btn {
+    display: inline-block;
+    text-align: center;
+    background-color: #9db3b4;
+    color: white;
+    font-weight: 700;
+    padding: 20px 120px; /* Ajusta el tamaño del padding */
+    border-radius: 120px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    width: auto; /* Hace que el botón se ajuste al contenido */
+    white-space: nowrap; /* Evita que el texto se divida */
+    margin-top: 8px; /* Añade un pequeño margen superior */
+  }
+  
+  .btn:hover {
+    background-color: #829d9e;
+  }
+  
+  .image-section {
+    margin-left: 10px; /* Añade un margen entre la imagen y el texto */
+    flex-shrink: 0; /* Para que la imagen no se encoja */
+    display: flex;
+    justify-content: center; /* Centra la imagen en su sección */
+  }
+  
+  /* Imagen en el contenedor */
+  .image-section img {
+    border-radius: 12px;
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+  }
+  
+  .sx-verified-seal {
+    display: inline-block;
+    width: 100px; /* Ajusta el tamaño según sea necesario */
+    height: auto;
+    margin: 20px auto;
+  }
+  
+  /* Responsive para pantallas pequeñas (768px y menores) */
+  @media (max-width: 768px) {
+    .card-container {
+      flex-direction: column; /* Cambia a columna cuando no cabe en fila */
+      align-items: center; /* Centra los elementos */
+      padding: 20px; /* Ajusta el padding para pantallas pequeñas */
+      height: auto; /* Ajusta la altura */
+    }
+  
+    .text-section1 {
+      align-items: center; /* Centra el texto en pantallas pequeñas */
+      text-align: center; /* Centra el texto */
+      width: 100%; /* Asegura que el texto ocupe todo el ancho disponible */
+    }
+  
+    .text-section1 h2 {
+      font-size: 1.1rem; /* Reduce el tamaño del título */
+      margin-bottom: 12px; /* Ajusta el espacio entre el título y el botón */
+    }
+  
+    .btn {
+      padding: 15px 60px; /* Ajusta el tamaño del botón */
+    }
+  
+    .image-section {
+      margin-left: 0; /* Elimina el margen izquierdo */
+      margin-top: 20px; /* Añade margen superior para separar de los textos */
+      width: 100%; /* Hace que la imagen ocupe el 100% del contenedor */
+      display: flex;
+      justify-content: center;
+    }
+  
+    .image-section img {
+      width: 80%; /* Ajusta la imagen al 80% del contenedor */
+      height: auto; /* Ajusta la altura proporcionalmente */
+    }
+  }
+  
+

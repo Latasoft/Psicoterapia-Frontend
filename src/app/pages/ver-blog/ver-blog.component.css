@@ -1,0 +1,148 @@
+.blog-page {
+  background-color: #f4f4f4; /* Fondo neutro y moderno */
+  padding: 2rem 0;
+}
+
+.blogs-container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 0; /* Eliminamos padding para que los cards se ubiquen sin contenedor */
+}
+
+h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #333;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 2.5rem;
+  letter-spacing: 1px;
+}
+
+.blog-titulo {
+  background: none; /* Eliminamos el fondo */
+  padding: 1.5rem;
+  margin-bottom: 2rem; /* Aumentamos el espacio entre los cards */
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+  border: 1px solid rgba(180, 180, 180, 0.3); /* Mantiene el borde sutil */
+  min-height: 300px; /* Aumentamos la altura mínima del card */
+  display: flex;
+  flex-direction: column; /* Asegura que el contenido se alinee verticalmente */
+  justify-content: flex-start; /* El contenido comienza desde arriba */
+}
+
+.blog-titulo:hover {
+  background: rgba(230, 230, 230, 0.8); /* Ligero fondo al pasar el ratón */
+  transform: scale(1.05); /* Efecto de escala más marcado */
+}
+
+.info-arriba {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.info-arriba img {
+  width: 40px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.info-texto {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem; /* Letras más delgadas */
+  color: #444;
+}
+
+.sitio {
+  font-weight: normal; /* Hacemos que el texto sea más delgado */
+  color: #2c3e50; /* Un color más oscuro y masculino */
+}
+
+.fecha {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.blog-titulo h3 {
+  margin: 0.5rem 0;
+  color: #34495e; /* Color de texto más oscuro y sobrio */
+  font-size: 1.8rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: normal; /* Hacemos la fuente más delgada */
+}
+
+.detalle-blog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo oscuro más pronunciado */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.detalle-contenido {
+  background-color: #fff;
+  width: 90%;
+  max-width: 650px;
+  padding: 25px 40px;
+  border-radius: 12px;
+  position: relative;
+  font-family: 'Playfair Display', serif;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh; /* Limita la altura del detalle para que no se estire demasiado */
+  overflow-y: auto; /* Permite desplazamiento vertical */
+}
+
+.cerrar-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: transparent;
+  border: none;
+  font-size: 28px;
+  color: #333;
+  cursor: pointer;
+}
+
+.cerrar-btn:hover {
+  color: #e74c3c; /* Rojo más sutil para el hover */
+}
+
+.detalle-contenido .info-texto {
+  text-align: left;
+}
+
+.detalle-contenido .info-arriba img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+
+.detalle-contenido img {
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  margin-top: 25px;
+  border-radius: 12px;
+}
+
+
+
+.detalle-contenido .info-arriba img {
+  width: 40px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 12px;
+}
+

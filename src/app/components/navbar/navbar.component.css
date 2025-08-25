@@ -1,0 +1,141 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #c8d7df;
+  padding: 10px 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  position: relative;
+  color: black;
+  height: 11%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.3rem;
+  gap: 10px;
+  color: #333;
+  flex: 1;
+}
+
+.logo img {
+  width: 30px;
+  height: 30px;
+}
+
+.logo span {
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.menu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 2;
+}
+
+.menu li a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+}
+
+.search-box input {
+  border: none;
+  background-color: #c8d7df;
+  border-bottom: 2px solid rgba(96, 90, 90, 0.338);
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  outline: none;
+  font-size: 1rem;
+  color: black;
+}
+
+.search-box input::placeholder {
+  color: #aaa;
+}
+
+.search-box button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: black;
+  font-size: 1.2rem;
+}
+
+.search-box i {
+  font-size: 1.2rem;
+  color: rgba(96, 90, 90, 0.338);
+}
+
+/* Menú hamburguesa */
+.menu-icon {
+  display: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+#menu-toggle {
+  display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .logo, .search-box {
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .menu {
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #c8d7df;
+    width: 100%;
+    display: none;
+    padding: 10px 0;
+    z-index: 10;
+  }
+
+  .menu li {
+    text-align: center;
+    margin: 10px 0;
+  }
+
+  .menu-icon {
+    display: block;
+    position: absolute;
+    right: 20px;
+    top: 15px;
+  }
+
+  #menu-toggle:checked ~ .menu {
+    display: flex;
+  }
+
+  .search-box input {
+    width: 70%;
+  }
+}

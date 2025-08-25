@@ -1,0 +1,30 @@
+<nav class="navbar">
+  <div class="logo">
+    <span>EMHpsicoterapiaonline</span>
+  </div>
+
+  <input type="checkbox" id="menu-toggle" />
+  <label for="menu-toggle" class="menu-icon">&#9776;</label>
+
+  <ul class="menu">
+    <!-- Estas opciones solo cuando NO esté logueado -->
+    <li *ngIf="!isLoggedIn"><a href="/">Inicio</a></li>
+    <li *ngIf="!isLoggedIn"><a href="/ver-blog">Blog</a></li>
+    <li *ngIf="!isLoggedIn"><a href="/formulario">Reserva Online</a></li>
+    <li *ngIf="!isLoggedIn"><a href="/sobremi">Sobre mí</a></li>
+    <li *ngIf="!isLoggedIn"><a href="/login">Login</a></li>
+
+    <!-- Estas opciones solo cuando SÍ esté logueado -->
+    <li *ngIf="isLoggedIn"><a href="/admin-citas">Citas</a></li>
+    <li *ngIf="isLoggedIn"><a href="/admin-blogs">Blogs</a></li>
+    <li *ngIf="isLoggedIn"><a href="/tratamientos">Tratamientos</a></li>
+    <li *ngIf="isLoggedIn"><a href="/admin-taller">Taller</a></li>
+    <li *ngIf="isLoggedIn"><a href="/horario">Horario</a></li>
+    <li *ngIf="isLoggedIn"><a href="#" (click)="logout()">Logout</a></li>
+
+    <li class="search-box">
+      <input type="text" placeholder="Buscar..." />
+      <button>🔍</button>
+    </li>
+  </ul>
+</nav>

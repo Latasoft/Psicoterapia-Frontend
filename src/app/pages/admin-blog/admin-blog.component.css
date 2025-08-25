@@ -1,0 +1,180 @@
+.admin-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.admin-container h2 {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  color: #007BBD;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.mensaje {
+  background-color: #e0f7fa;
+  border: 1px solid #b2ebf2;
+  color: #004d40;
+  padding: 15px;
+  border-radius: 12px;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Blog item */
+.blog-item {
+  background-color: #f1faff;
+  border: 1px solid #cce7f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0, 123, 189, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 123, 189, 0.2);
+}
+
+/* Vista normal */
+.blog-titulo {
+  color: #007BBD;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.blog-texto {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  white-space: pre-line;
+}
+
+.imagen-blog {
+  max-width: 100%;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.video-blog iframe {
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.blog-view p a {
+  color: #007BBD;
+  text-decoration: underline;
+}
+
+/* Botones de acciones */
+.acciones {
+  margin-top: 1rem;
+}
+
+.acciones button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-right: 12px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+/* Editar */
+.btn-editar {
+  background-color: #007BBD;
+  color: white;
+}
+
+.btn-editar:hover {
+  background-color: #005F8A;
+}
+
+/* Eliminar */
+.btn-eliminar {
+  background-color: #f44336;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background-color: #da190b;
+}
+
+/* Formulario de edición */
+.form-edicion {
+  display: flex;
+  flex-direction: column;
+}
+
+.input-edicion,
+.textarea-edicion {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid #d1c9e6;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f4f3f7;
+  font-family: 'Segoe UI', sans-serif;
+  resize: vertical;
+}
+
+.textarea-edicion {
+  min-height: 120px;
+}
+
+/* Botones de edición */
+.btn-guardar {
+  background-color: #007BBD;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-guardar:hover {
+  background-color: #005F8A;
+}
+
+.btn-cancelar {
+  background-color: #f44336;
+  color: white;
+  margin-top: 10px;
+}
+
+.btn-cancelar:hover {
+  background-color: #da190b;
+}
+
+
+.crear-blog-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.btn-crear-blog {
+  background-color: #007BBD;
+  color: white;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+

@@ -1,0 +1,184 @@
+<div class="image-card-4">
+  <div class="logo-container">
+    <img src="assets/h2.jpg" alt="Logo" class="logo" />
+  </div>
+  <div class="card-content">
+    <h2>Psicoterapia e Hipnoterapia Clínica Online</h2>
+  </div>
+</div>
+
+
+<div class="psychologist-card">
+  <div class="psychologist-card-content">
+      <video controls>
+        <source src="assets/videos/si1.mp4" type="video/mp4" />
+        Tu navegador no soporta la reproducción de video.
+      </video>
+
+    <div class="text-section">
+      <h2>Tu bienestar emocional es lo más importante</h2>
+      <p>Agenda una cita con nuestro especialista y comienza tu camino hacia el equilibrio mental.</p>
+      <a [routerLink]="'/formulario'" class="cta-button">Agendar cita</a>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="blog-section">
+  <h1 class="blog-title">BLOG</h1>
+
+  <div *ngIf="ultimosBlogs.length" class="blog-cards">
+    <div *ngFor="let blog of ultimosBlogs.slice(0, 4)" class="blog-card">
+      <img *ngIf="blog.imagen" [src]="blog.imagen" alt="{{ blog.titulo }}" class="blog-card-image" />
+      <div *ngIf="blog.videoUrl" class="video-container">
+  <iframe
+    width="100%"
+    height="200"
+    [src]="sanitizarUrl(blog.videoUrl)"
+    frameborder="0"
+    allowfullscreen>
+  </iframe>
+</div>
+      
+      <h3 class="blog-card-title">{{ blog.titulo }}</h3>
+      <p class="blog-card-description">{{ blog.descripcion | slice: 0:100 }}...</p>
+      <a [routerLink]="['/blog', blog.id]" class="blog-card-link">Leer más</a>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="psychologist-card2">
+  <div class="psychologist-card-content">
+    <div class="text-section">
+      <h2>Servicios</h2>
+      <p>Nuestros servicios.</p>
+    </div>
+  </div>
+</div>
+
+<div class="container-cards">
+  <!-- Card 1 -->
+  <div class="card">
+    <img src="assets/h11.png" alt="Bosque" />
+    <h2>Psicoterapia clínica individual online</h2>
+    <ul class="card-list">
+      <li>$40.000</li>
+      <hr />
+    </ul>
+    <a href="/formulario" class="btn">Agendar</a>
+  </div>
+  <!-- Card 2 -->
+  <div class="card">
+    <img src="assets/h12.avif" alt="Cordillera" />
+    <h2>Taller de Duelo</h2>
+    <ul class="card-list">
+      <li>$70.000</li>
+      <hr />
+      <li>Plazas disponibles</li>
+      <hr />
+    </ul>
+    <a href="/taller" class="btn">Ver mas</a>
+  </div>
+  
+  <div class="blog-titulo">
+    <div class="additional-info">
+      <h3>Convenios</h3>
+      <p>Contamos con convenios de reembolso de boletas con Banmédica y Vida 3...</p>
+    </div>
+  </div>
+  
+    
+
+<div class="card-container">
+  <div class="text-section1">
+    <h2>Descubre las respuestas que el universo tiene para ti. El tarot puede iluminar tu camino y brindarte la claridad que necesitas para avanzar con confianza</h2>
+    <a href="/tarotista" class="btn">Ver más</a>
+  </div>
+  <div class="image-section">
+    <img src="assets/tarot3.jpeg" alt="Imagen de Servicios" />
+  </div>
+</div>
+
+
+<div class="seccion-principal">
+  <!-- Comentarios -->
+  <div class="comentarios-card">
+    <h2>Comentarios de Pacientes</h2>
+
+    <div class="comentario">
+      <p>"El psicólogo fue muy empático y me ayudó a ver las cosas desde otra perspectiva. Muy recomendado."</p>
+      <div class="info">
+        <span>— Ana M.</span>
+        <span class="stars">★★★★★</span>
+      </div>
+    </div>
+
+    <div class="comentario">
+      <p>"Me sentí escuchado y comprendido en cada sesión. Excelente profesional."</p>
+      <div class="info">
+        <span>— Carlos R.</span>
+        <span class="stars">★★★★☆</span>
+      </div>
+    </div>
+
+    <div class="nuevo-comentario">
+      <h3>Deja tu comentario</h3>
+      <textarea placeholder="Escribe tu experiencia..."></textarea>
+      <button>Enviar</button>
+    </div>
+  </div>
+
+  <!-- Contacto -->
+  <div class="contacto-card">
+    <h2>Contacto</h2>
+    <p>+56 9 9473 9587</p>
+    <p>emhpsicoterapiaonlinegmail.com</p>
+    <p>contactoemhpsicoterapiaonline.com</p>
+    <p>Avenida La Paz, Queilen, Chiloé, Chile</p>
+
+    <h3>Encuéntranos también en:</h3>
+    <ul>
+      <li>
+        <a href="https://www.2x3.cl/profesional/emhpsicoterapiaonline" target="_blank" class="contact-link">
+          <button>2x3</button>
+        </a>
+      </li>
+
+      <li>
+        <a href="https://app.snabb.cl/#/profile/practitioner/13698609-0" target="_blank" class="contact-link">
+          <button>Perfil Snabb</button>
+        </a>
+      </li>
+
+      <li>
+        <a href="https://www.psicologosonline.cl/centros/eduardo-marquez-huerta?utm_source=451925&utm_medium=widget&utm_campaign=widget-company_stamp" target="_blank" class="contact-link">
+          <img src="assets/stamp.png" alt="Snabb App" class="snabb-image-btn">
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Video -->
+  <div class="video-container">
+    <video controls>
+      <source src="assets/videos/si2.mp4" type="video/mp4" />
+      Tu navegador no soporta la reproducción de video.
+    </video>
+  </div>
+</div>
+
+
+<a href="https://wa.me/56994739587?text=¡Hola!%20Me%20interesa%20tu%20servicio" target="_blank">
+  <button class="whatsapp-button">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" />
+  </button>
+</a>
+

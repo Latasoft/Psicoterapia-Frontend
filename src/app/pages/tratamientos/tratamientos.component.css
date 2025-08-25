@@ -1,0 +1,208 @@
+.admin-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  color: #007BBD;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.buscador-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 1.5rem;
+}
+
+.buscador {
+  padding: 0.75rem 1rem;
+  font-size: 1.1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 450px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.buscador:focus {
+  outline: none;
+  box-shadow: 0 2px 6px rgba(0, 123, 189, 0.3);
+}
+
+.buscar-btn {
+  padding: 0.6rem 1.2rem;
+  background-color: #007BBD;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.buscar-btn:hover {
+  background-color: #005F8A;
+}
+
+.buscar-btn:active {
+  background-color: #00497B;
+}
+
+.form-tratamientos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #007BBD;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  box-shadow: 0 0 6px #007BBD;
+}
+
+.form-buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.form-buttons button {
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-buttons button[type='submit'] {
+  background-color: #007BBD;
+  color: white;
+}
+
+.form-buttons button[type='submit']:hover {
+  background-color: #005F8A;
+}
+
+.form-buttons button[type='button'] {
+  background-color: #ddd;
+  color: #333;
+}
+
+.form-buttons button[type='button']:hover {
+  background-color: #bbb;
+}
+
+.empty-message {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #777;
+}
+
+/* Lista de tratamientos */
+.tratamientos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tratamiento-item {
+  background-color: #f1faff;
+  border: 1px solid #cce7f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 123, 189, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tratamiento-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 123, 189, 0.2);
+}
+
+.tratamiento-item p {
+  margin: 0.3rem 0;
+  color: #333;
+  font-size: 1rem;
+}
+
+.tratamiento-item strong {
+  color: #007BBD;
+}
+
+.tratamiento-item button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 1rem;
+  margin-right: 10px;
+  transition: background-color 0.3s ease;
+}
+
+.tratamiento-item button:nth-child(n+5):nth-child(odd) {
+  background-color: #007BBD;
+  color: white;
+}
+
+.tratamiento-item button:nth-child(n+5):nth-child(odd):hover {
+  background-color: #005F8A;
+}
+
+.tratamiento-item button:nth-child(n+6) {
+  background-color: #f44336;
+  color: white;
+}
+
+.tratamiento-item button:nth-child(n+6):hover {
+  background-color: #da190b;
+}
+.btn-nuevo {
+  padding: 0.8rem 2rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  background-color: #007BBD;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-nuevo:hover {
+  background-color: #005F8A;
+}

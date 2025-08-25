@@ -1,0 +1,38 @@
+/* pago-klap.component.css */
+.qr-container {
+    max-width: 480px;          /* ancho razonable para que todo quede centrado */
+    margin: 0 auto;            /* centra el bloque entero */
+    padding: 32px 16px;
+    display: flex;
+    flex-direction: column;    /* apila verticalmente los elementos */
+    align-items: center;       /* centra cada elemento horizontalmente */
+    text-align: center;
+  }
+  
+  .logo-top {
+    width: 220px;              /* logo superior más grande */
+    height: auto;
+    margin-bottom: 24px;
+  }
+  
+  .instruction{font-size:16px;margin:12px 0;}
+/* ———— nuevo estilo para hacerla “más grande y ancha” ———— */
+.instruction--large{
+  font-size:20px;        /* más grande */
+  font-weight:600;       /* un poco más gruesa */
+  letter-spacing:0.5px;  /* ligeramente más “ancha” visualmente */
+}
+  
+  .qr-image {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+  }
+  
+  .logo-bottom {
+    width: 100px;              /* logo inferior más pequeño */
+    height: auto;
+    margin-top: 24px;
+  }
+  

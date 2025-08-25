@@ -1,0 +1,49 @@
+<div *ngIf="ultimoTaller" class="taller-card">
+  <header class="taller-header">
+    <h2 class="taller-titulo">{{ ultimoTaller.titulo }}</h2>
+    <h3 class="taller-subtitulo">{{ ultimoTaller.subtitulo }}</h3>
+  </header>
+
+  <section class="info-basica">
+    <p><strong>Fecha de inicio:</strong> {{ ultimoTaller.fechaInicio | date:'longDate' }}</p>
+    <p><strong>Valor:</strong> ${{ formatearValor(ultimoTaller.valor) }}</p>
+    <p><strong>Facilitador:</strong> {{ ultimoTaller.facilitador }}</p>
+  </section>
+
+  <section class="descripcion-servicio">
+    <h4>Descripción del Servicio</h4>
+    <p>{{ ultimoTaller.descripcionDeServicio }}</p>
+  </section>
+
+  <section class="proximas-sesiones">
+    <h4>Próximas Sesiones</h4>
+    <ul>
+      <li *ngFor="let sesion of ultimoTaller.proximasSesiones" class="sesion-item">
+        <p><strong>Día:</strong> {{ sesion.dia }}</p>
+        <p><strong>Fecha:</strong> {{ sesion.fecha | date:'fullDate' }}</p>
+        <p><strong>Hora de inicio:</strong> {{ sesion.hora }}</p>
+        <p><strong>Duración:</strong> {{ sesion.duracionHoras }}h {{ sesion.duracionMinutos }}m</p>
+        <p><strong>Profesional:</strong> {{ sesion.profesional }}</p>
+        <hr />
+      </li>
+    </ul>
+  </section>
+
+  <section class="politica-cancelacion">
+    <h4>Política de Cancelación</h4>
+    <p>{{ ultimoTaller.politicaDeCancelacion }}</p>
+  </section>
+
+  <section class="datos-contacto">
+    <h4>Datos de Contacto</h4>
+    <p>{{ ultimoTaller.datosDeContacto }}</p>
+  </section>
+
+  <footer class="fecha-creacion">
+    <em>Publicado el {{ ultimoTaller.creadoEn | date:'medium' }}</em>
+  </footer>
+</div>
+
+<div *ngIf="!ultimoTaller" class="no-talleres">
+  <p>No hay talleres registrados aún.</p>
+</div>

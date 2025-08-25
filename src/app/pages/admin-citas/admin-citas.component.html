@@ -1,0 +1,78 @@
+<!-- admin-citas.component.html -->
+
+<div class="admin-container">
+  <h2 class="title">📅 Lista de Citas</h2>
+
+  <!-- Buscador -->
+  <div class="buscador-container">
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      placeholder="🔍 Buscar por nombre, correo o tratamiento..."
+      class="buscador"
+      (keyup)="buscarCitas()" 
+    />
+    <button (click)="buscarCitas()" class="buscar-btn">Buscar</button>
+  </div>
+
+  <!-- Mensaje si no hay citas -->
+  <div *ngIf="citasFiltradas.length === 0" class="empty-message">
+    No se encontraron citas.
+  </div>
+
+  <!-- Lista de citas filtradas -->
+  <ul *ngIf="citasFiltradas.length > 0" class="citas-list">
+    <li *ngFor="let cita of citasFiltradas" class="cita-item">
+      <p><strong>👤 Nombre:</strong> {{ cita.nombre }}</p>
+      <p><strong>📧 Correo:</strong> {{ cita.correo }}</p>
+      <p><strong>🕓 Fecha:</strong> 🕓 Fecha: {{ cita.fecha_hora | date:'dd/MM/yyyy - HH:mm' }}
+</p>
+      <p><strong>🧠 Tratamiento:</strong> {{ cita.tratamiento }}</p>
+    
+      <button (click)="editarCita(cita)">Reagendar</button>
+      <button
+      class="bg-red-500 text-white p-1 rounded ml-2"
+      (click)="confirmarCancelacion(cita)"
+    >
+      Cancelar
+    </button>
+    </li>
+  </ul>
+</div>
+
+
+<!-- Modal de confirmación -->
+<div *ngIf="showConfirmation" class="modal-overlay" (click)="cerrarConfirmacion()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>¡Confirmación!</h3>
+    <p>{{ mensajeConfirmacion }}</p>
+    <div class="mt-4 flex justify-end gap-2">
+      <button
+        class="bg-gray-500 text-white px-4 py-2 rounded"
+        (click)="cerrarConfirmacion()"
+      >
+        Cerrar
+      </button>
+      <button
+        class="bg-green-600 text-white px-4 py-2 rounded"
+        (click)="cancelarCita()"
+      >
+        Confirmar
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal para editar la cita -->
+<div *ngIf="citaAEditar" class="modal-overlay" (click)="cancelarEdicion()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Editar Cita</h3>
+    <label for="nuevaFechaHora">Nueva Fecha y Hora:</label>
+    <input [(ngModel)]="nuevaFechaHora" id="nuevaFechaHora" type="datetime-local" />
+    <div>
+      <button (click)="guardarCambios()">Guardar Cambios</button>
+      <button (click)="cancelarEdicion()">Cancelar</button>
+    </div>
+  </div>
+</div>

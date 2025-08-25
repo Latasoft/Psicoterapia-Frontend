@@ -1,0 +1,103 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-image: url('/assets/f6.jpg');
+  background-size: cover;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* Fondo general del formulario */
+form {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  max-width: 900px;
+  margin: 2rem auto;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Títulos de sección */
+h2,h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; /* un poco más elegante */
+  font-weight: 600;
+  text-align: center;
+  color: #2c2c2c;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px; /* separación ligera de letras */
+}
+
+/* Secciones del formulario */
+.form-section {
+  margin-bottom: 2rem;
+  background: linear-gradient(to right, #dbe5ef, #c2d4e8); /* azul-grisáceo suave */
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid #b0c4d8;
+}
+
+/* Etiquetas e inputs */
+label {
+  display: block;
+  margin-bottom: 1rem;
+  color: #1e3a5f;
+  font-weight: 600;
+}
+
+input, textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #a0aab0;
+  border-radius: 6px;
+  margin-top: 0.25rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+  background-color: #f7f9fc;
+}
+
+/* Textarea específico */
+textarea {
+  min-height: 200px;
+  resize: vertical;
+}
+
+/* Sesión individual */
+.sesion-box {
+  border: 1px solid #7d97aa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  background-color: #e3edf3;
+}
+
+/* Botones */
+button {
+  background-color: #2c5f8a; /* azul oscuro */
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #244f73;
+}
+
+button:disabled {
+  background-color: #aab4bc;
+  cursor: not-allowed;
+}
+
+/* Mensajes de error */
+.error {
+  color: #cc0000;
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.75rem;
+}

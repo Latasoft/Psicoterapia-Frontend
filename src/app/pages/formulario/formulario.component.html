@@ -1,0 +1,212 @@
+<div class="outer-container">
+  <!-- Imagen centrada y más grande -->
+  <div class="image-container">
+    <img src="assets/a2.avif" alt="Imagen Terapia" class="form-image" />
+  </div>
+
+  <!-- Sección Sobre mí -->
+  <div class="about-me">
+    <h2 class="about-title">Sobre mí</h2>
+    <p class="about-description">
+      22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo. <br />
+      Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales. <br />
+      Atención por FONASA y botón de pago por plataforma KLAP.
+    </p>
+  </div>
+
+  <!-- Cards de Confidencialidad, Profesionalismo y Responsabilidad -->
+  <div class="cards-container">
+    <div class="card">
+      <h3 class="card-title">Confidencialidad</h3>
+      <p class="card-description">
+        Todo lo compartido en las sesiones se mantiene en total confidencialidad, garantizando un espacio seguro para tu desarrollo personal.
+      </p>
+    </div>
+    <div class="card">
+      <h3 class="card-title">Profesionalismo</h3>
+      <p class="card-description">
+        Cuento con la formación y experiencia necesarias para ofrecer un servicio de calidad, basado en el respeto y la ética profesional.
+      </p>
+    </div>
+    <div class="card">
+      <h3 class="card-title">Responsabilidad</h3>
+      <p class="card-description">
+        Me comprometo a ofrecerte la mejor atención, siguiendo los estándares más altos de profesionalismo y dedicación.
+      </p>
+    </div>
+  </div>
+
+ <!-- Formulario de Reserva -->
+<!-- Formulario de Reserva -->
+<div class="form-container">
+  <h1 class="title">Agenda tu hora aquí</h1>
+
+  <!-- Indicadores de pasos -->
+  <div class="step-indicators">
+    <div
+      class="step"
+      [class.active]="step === 1"
+      [class.completed]="step > 1"
+    >
+      1
+    </div>
+    <div
+      class="step"
+      [class.active]="step === 2"
+      [class.completed]="step > 2"
+    >
+      2
+    </div>
+    <div
+      class="step"
+      [class.active]="step === 3"
+    >
+      3
+    </div>
+  </div>
+
+  <!-- Sección 1 -->
+<div *ngIf="step === 1" class="form-step">
+  <!-- Tratamiento -->
+  <div class="form-group">
+    <label for="tratamiento">Tratamiento</label>
+    <select
+      id="tratamiento"
+      [(ngModel)]="tratamiento"
+      name="tratamiento"
+      required
+      (change)="actualizarPrecio()"
+    >
+      <option value="" disabled selected>Selecciona un tratamiento</option>
+      <option *ngFor="let t of tratamientosDisponibles" [value]="t.nombre">
+        {{ t.nombre }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Precios -->
+  <p class="price" *ngIf="precio.nacional !== null">
+    Valor del tratamiento nacional:
+    <span class="amount">${{ precio.nacional | number: '1.0-0' }}</span>
+  </p>
+
+  <p class="price" *ngIf="precio.internacional !== null">
+    Valor del tratamiento internacional:
+    <span class="amount">${{ precio.internacional | number: '1.0-0' }} USD</span>
+  </p>
+
+  <p class="price" *ngIf="precio.sesiones !== null">
+    Número de sesiones:
+    <span class="amount">{{ precio.sesiones }}</span>
+  </p>
+
+  <!-- Nombre -->
+  <div class="form-group">
+    <label for="nombre">Nombre</label>
+    <input
+      id="nombre"
+      type="text"
+      [(ngModel)]="nombre"
+      name="nombre"
+      required
+      placeholder="Ingresa tu nombre"
+    />
+  </div>
+
+  <!-- Correo -->
+  <div class="form-group">
+    <label for="correo">Correo Electrónico</label>
+    <input
+      id="correo"
+      type="email"
+      [(ngModel)]="correo"
+      name="correo"
+      required
+      placeholder="Ingresa tu correo"
+    />
+  </div>
+
+  <!-- Botón siguiente -->
+  <button
+    (click)="goToStep(2)"
+    class="submit-btn"
+    [disabled]="!nombre || !correo || !tratamiento"
+  >
+    Siguiente
+  </button>
+</div>
+
+
+  <!-- Sección 2 -->
+  <div *ngIf="step === 2" class="form-step">
+    <div class="form-group">
+  <label for="fecha">Fecha</label>
+  <input
+    id="fecha"
+    type="date"
+    [(ngModel)]="fecha"
+    name="fecha"
+    required
+    [min]="fechaMinima"
+    (change)="validarFecha()"
+    [class.invalid]="errorMessage"
+  />
+</div>
+
+<!-- Campo hora -->
+<div class="form-group" *ngIf="horasDisponibles.length > 0">
+  <label for="hora">Hora</label>
+  <select id="hora" [(ngModel)]="hora" name="hora" required>
+    <option value="" disabled selected>Selecciona una hora</option>
+    <option *ngFor="let h of horasDisponibles" [value]="h">{{ h }}</option>
+  </select>
+</div>
+
+<!-- Mensaje si no hay horarios -->
+<div *ngIf="horasDisponibles.length === 0 && fecha">
+  <p class="error-message">No hay horas disponibles para esta fecha.</p>
+</div>
+
+    <button (click)="goToStep(1)" class="submit-btn">Anterior</button>
+    <button (click)="goToStep(3)" class="submit-btn" [disabled]="!esHorarioValido()">Siguiente</button>
+  </div>
+
+  <!-- Sección 3 -->
+  <div *ngIf="step === 3" class="form-step">
+    <p class="price" *ngIf="precio.nacional">
+      Valor del tratamiento nacional: <span class="amount">${{ precio.nacional | number:'1.0-0' }}</span>
+    </p>
+    
+    <p class="price" *ngIf="precio.internacional">
+      Valor del tratamiento internacional: <span class="amount">${{ precio.internacional | number:'1.0-0' }} USD</span>
+    </p>
+    
+    <p class="price" *ngIf="precio.sesiones">
+      Número de sesiones: <span class="amount">{{ precio.sesiones }}</span>
+    </p>
+    
+
+    <button (click)="goToStep(2)" class="submit-btn">Anterior</button>
+    <!-- Pago Webpay -->
+<!-- Webpay -->
+<button type="button" (click)="onSubmit('webpay')" class="submit-btn pago-btn">
+ 
+  Pagar con Webpay
+</button>
+
+<!-- Mercado Pago -->
+<button type="button" (click)="onSubmit('mercadopago')" class="submit-btn pago-btn">
+
+  Pagar con MercadoPago
+</button>
+
+<!-- Klap -->
+<button type="button" (click)="irAPagoKlap()" class="submit-btn pago-btn">
+
+  Pagar con Klap
+</button>
+
+
+
+  </div>
+</div>

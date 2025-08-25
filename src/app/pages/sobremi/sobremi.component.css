@@ -1,0 +1,48 @@
+.presentacion-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin-top: 2rem;
+    text-align: center;
+  }
+  
+  .foto-perfil {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    border: 4px solid #6495ed;
+  }
+  
+  .texto-perfil h3 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+  }
+  
+  .texto-perfil p {
+    color: #555;
+    font-size: 1rem;
+    margin: 0.3rem 0;
+  }
+  
+  .social-links {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .social-links a img {
+    width: 32px;
+    height: 32px;
+    transition: transform 0.2s ease;
+  }
+  
+  .social-links a:hover img {
+    transform: scale(1.2);
+  }
+  

@@ -1,0 +1,93 @@
+<div class="admin-container">
+  <h2 class="title">🌱 Gestión de Tratamientos</h2>
+
+  <div class="buscador-container">
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      placeholder="🔍 Buscar tratamientos por nombre..."
+      class="buscador"
+      (keyup)="buscarTratamientos()"
+    />
+    <button (click)="buscarTratamientos()" class="buscar-btn">Buscar</button>
+  </div>
+
+  <!-- Botón para mostrar el formulario -->
+  <div class="btn-nuevo-container" style="text-align: center; margin-bottom: 1rem;">
+    <button (click)="mostrarFormularioCrear()" class="btn-nuevo">
+      + Nuevo tratamiento
+    </button>
+  </div>
+
+  <!-- Formulario, visible solo si mostrarFormulario es true -->
+  <form
+    *ngIf="mostrarFormulario"
+    #formTratamientos="ngForm"
+    (ngSubmit)="guardarTratamiento(formTratamientos)"
+    novalidate
+    class="form-tratamientos"
+    #formularioElement
+  >
+    <!-- Campos igual que antes -->
+    <!-- ... -->
+    <div class="form-group">
+      <label for="nombre">Nombre</label>
+      <input id="nombre" name="nombre" [(ngModel)]="tratamientoForm.nombre" required />
+    </div>
+    <div class="form-group">
+      <label for="precioNacional">Precio Nacional</label>
+      <input
+        id="precioNacional"
+        name="precioNacional"
+        type="number"
+        [(ngModel)]="tratamientoForm.precioNacional"
+        required
+        min="0"
+      />
+    </div>
+    <div class="form-group">
+      <label for="precioInternacional">Precio Internacional (USD)</label>
+      <input
+        id="precioInternacional"
+        name="precioInternacional"
+        type="number"
+        [(ngModel)]="tratamientoForm.precioInternacional"
+        required
+        min="0"
+      />
+    </div>
+    <div class="form-group">
+      <label for="sesiones">Número de sesiones</label>
+      <input
+        id="sesiones"
+        name="sesiones"
+        type="number"
+        [(ngModel)]="tratamientoForm.sesiones"
+        required
+        min="1"
+      />
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit">{{ modoEdicion ? 'Actualizar' : 'Crear' }}</button>
+      <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+    </div>
+  </form>
+
+  <hr />
+
+  <!-- Lista de tratamientos igual que antes -->
+  <ul *ngIf="tratamientosFiltrados.length > 0" class="tratamientos-list">
+    <li *ngFor="let t of tratamientosFiltrados" class="tratamiento-item">
+      <p><strong>🌱 Nombre:</strong> {{ t.nombre }}</p>
+      <p><strong>💲 Precio Nacional:</strong> {{ t.precioNacional | currency:'CLP':'symbol':'1.0-0' }}</p>
+      <p><strong>💵 Precio Internacional:</strong> {{ t.precioInternacional | currency:'USD':'symbol':'1.0-0' }}</p>
+      <p><strong>🔢 Sesiones:</strong> {{ t.sesiones }}</p>
+
+      <button (click)="editarTratamiento(t)">Editar</button>
+      <button class="bg-red-500 text-white p-1 rounded ml-2" (click)="eliminarTratamiento(t.id)">
+        Eliminar
+      </button>
+    </li>
+  </ul>
+</div>

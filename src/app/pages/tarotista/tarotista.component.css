@@ -1,0 +1,486 @@
+/* tarot-card */
+.tarot-card {
+  position: relative;
+  width: 100vw;  /* Cambiado de 100% a 100vw para asegurar que cubra todo el ancho del viewport */
+  height: 280px;
+  overflow: hidden;
+  background-image: url('/assets/t1.webp');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 600px) {
+  .tarot-card {
+    width: 100%; /* Asegurarse de que en pantallas pequeñas también cubra el 100% del ancho */
+  }
+}
+
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay h2 {
+  color: #9db3b4;
+  font-size: 2.5rem;
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  padding: 0 20px;
+}
+
+
+
+
+
+
+
+
+
+
+.razones {
+  text-align: center;
+  background-color: white;
+  padding: 40px 20px;
+}
+
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  background-color: #fffaf0;
+  border: 1px solid #f1e5c6;
+  padding: 30px;
+  max-width: 1800px;
+  margin: 0 auto 50px auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  color: #9db3b4;
+}
+
+.razones-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columnas en pantallas grandes */
+  gap: 10px;
+  justify-content: center;
+  align-items: start;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 35px;
+  min-height: auto; /* Evita que el contenedor se contraiga demasiado */
+  align-items: stretch; 
+}
+
+/* Media query para pantallas pequeñas (celulares) */
+@media (max-width: 768px) {
+  .razones-cards {
+    grid-template-columns: 1fr !important; /* 1 columna en pantallas pequeñas */
+    gap: 20px !important; /* Espacio entre los cards */
+    padding: 0 15px !important; /* Ajuste del padding */
+  }
+}
+
+
+.card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  width: 330px;
+  height: 550px; /* Tamaño fijo para evitar cambios */
+  padding: 99px 50px 50px 50px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-image: url('/assets/t4.png');
+  background-size: 610px 580px;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* Distribución del contenido */
+  flex-shrink: 0; /* Evita que se reduzca */
+  flex-grow: 0;   /* Evita que se expanda */
+  overflow: hidden; /* Previene desbordes de contenido */
+  position: relative;
+}
+
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fae8da;
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 5px;
+}
+
+h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #9db3b4;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+  color: #5a5a5a;
+  flex-grow: 1;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* horoscopo.component.css */
+.horoscopo-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fffaf0;
+  padding: 40px 20px;
+  border-radius: 20px;
+  max-width: 1900px;
+  margin: 0 auto;
+  background-image: url('/assets/fondo1.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.horoscopo-section::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: inherit;
+  background-size: inherit;
+  background-position: inherit;
+  background-repeat: inherit;
+  filter: blur(5px);
+  z-index: -1;
+}
+
+.section-title1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  color: #9db3b4;
+  margin-bottom: 10px;
+  z-index: 1;
+}
+
+.horoscopo-description {
+  font-size: 1.2rem;
+  color: #5a5a5a;
+  margin-bottom: 30px;
+  max-width: 100%;
+  width: 800px;
+  z-index: 1;
+  position: relative;
+}
+
+.horoscopo-rueda {
+  position: relative;
+  flex: 0 0 35%;
+  z-index: 1;
+}
+
+.rueda-img {
+  width: 100%;
+  height: auto;
+  max-width: 300px;
+  transition: transform 5s linear;
+}
+
+.horoscopo-rueda:hover .rueda-img {
+  transform: rotate(360deg);
+}
+
+.signos-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+
+.whatsapp-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.whatsapp-button img {
+  width: 50px;
+  height: 50px;
+}
+
+.whatsapp-button:hover {
+  transform: scale(1.1);
+}
+
+.whatsapp-button:focus {
+  outline: none;
+}
+
+.whatsapp-button::after {
+  content: "Una ayuda complementaria a la salud del alma, pide tu hora al whatssap";
+  position: fixed;
+  bottom: 40px;
+  right: 60px;
+  background-color: white;
+  color: #333;
+  padding: 10px 15px;
+  border-radius: 15px;
+  font-size: 14px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out, visibility 0s 0.3s;
+  pointer-events: none;
+}
+
+.whatsapp-button:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease-in-out, visibility 0s;
+}
+
+
+
+
+
+
+
+
+.card2 {
+  background-color: #fffaf0;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 40px 20px;
+  max-width: 1800px;
+  margin: 20px auto;
+  position: relative;
+}
+
+.presentacion-contenido {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding-left: 12%;
+}
+
+.presentacion {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex: 1;
+  min-width: 300px;
+}
+
+.tarotista-img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  justify-content: center;
+}
+
+.nombre {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #3d3d3d;
+  margin-bottom: 10px;
+}
+
+.titulo {
+  font-size: 1.2rem;
+  color: #5a5a5a;
+  margin-bottom: 10px;
+}
+
+.social {
+  font-size: 1.1rem;
+  color: #007bff;
+}
+
+.social a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.social a:hover {
+  text-decoration: underline;
+}
+
+.video-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 300px;
+  padding-right: 30%;
+}
+
+.video-container video {
+  width: 50%;
+  height: 50%;
+  max-width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 50px;
+  height: auto;
+}
+
+
+
+
+
+
+/* Media Queries for Responsiveness */
+
+@media screen and (max-width: 1200px) {
+  .razones-cards {
+      grid-template-columns: repeat(3, 1fr); /* 3 columnas */
+      padding: 0 20px;
+  }
+
+  .card {
+      width: 300px; /* Reduce el tamaño de las tarjetas */
+  }
+
+  .horoscopo-section {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .horoscopo-rueda {
+      flex: 0 0 50%;
+      margin-top: 20px;
+  }
+
+  .signos-container {
+      flex-direction: column;
+  }
+
+}
+
+@media screen and (max-width: 768px) {
+  .razones-cards {
+      grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+  }
+
+  .card {
+      width: 100%; /* Hace las tarjetas 100% del ancho */
+  }
+
+  .horoscopo-description {
+      width: 100%;
+  }
+
+  .horoscopo-rueda {
+      flex: 0 0 60%;
+  }
+
+  .presentacion {
+      flex-direction: column;
+  }
+
+  .tarotista-img {
+      width: 120px;
+      height: 120px;
+  }
+
+  .info {
+      text-align: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .razones-cards {
+      grid-template-columns: 1fr; /* 1 columna */
+  }
+
+  .card {
+      width: 100%; /* Hace las tarjetas 100% del ancho */
+  }
+
+  .section-title {
+      font-size: 1.8rem;
+      padding: 20px;
+  }
+
+  .tarotista-img {
+      width: 100px;
+      height: 100px;
+  }
+
+  .info {
+      text-align: center;
+  }
+
+  .whatsapp-button {
+      bottom: 10px;
+      right: 10px;
+  }
+
+  .whatsapp-button::after {
+      bottom: 30px;
+      right: 50px;
+  }
+}
