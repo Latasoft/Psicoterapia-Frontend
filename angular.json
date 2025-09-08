@@ -26,6 +26,11 @@
                 "input": "src/assets",
                 "output": "assets"
   
+              },
+              {
+                "glob": "_redirects",
+                "input": "src",
+                "output": "."
               }
             ],
             "styles": [
@@ -87,6 +92,11 @@
                 "input": "src/assets",
                 "output": "assets"
   
+              },
+              {
+                "glob": "_redirects",
+                "input": "src",
+                "output": "."
               }
             ],
             "styles": [
