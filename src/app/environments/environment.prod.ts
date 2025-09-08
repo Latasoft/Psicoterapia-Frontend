@@ -1,5 +1,5 @@
 export const environment = {
-    production: true,
-    apiUrl: 'https://backend-psicologia-fckw.onrender.com/api'
+    production: false,
+    apiUrl: 'http://localhost:3000/api'
   };
   
