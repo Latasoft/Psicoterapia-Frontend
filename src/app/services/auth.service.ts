@@ -8,7 +8,7 @@ import { environment } from '../environments/environment.prod';
 })
 export class AuthService {
 
-  private apiUrl = `${environment.apiUrl}/login`;  // URL cambiar cuando haga push por esto   private apiUrl = `${environment.apiUrl}/login`; 
+  private apiUrl = `${environment.apiUrl}/api/login`;  // URL cambiar cuando haga push por esto   private apiUrl = `${environment.apiUrl}/login`; 
   private loggedIn = new BehaviorSubject<boolean>(false);
   public isLoggedIn$ = this.loggedIn.asObservable();
 
