@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ComentariosService {
-  private apiUrl = 'http://localhost:3000/api/comentarios'; // Ruta de tu backend
+  private apiUrl = 'https://psicoterapia-backend.onrender.com/api/comentarios'; // Ruta de tu backend
 
   constructor(private http: HttpClient) {}
 

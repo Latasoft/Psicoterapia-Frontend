@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class CitasService {
 
-  private apiUrl = 'http://localhost:3000/api/citas';
+  private apiUrl = 'https://psicoterapia-backend.onrender.com/api/citas';
 
 
   constructor(private http: HttpClient) { }
