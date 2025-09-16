@@ -1,4 +1,5 @@
-export const environment = {
+// const environment = {
+    
 //*<<<<<<< HEAD
    //* production: true,
    //* apiUrl: 'http://localhost:3000'
@@ -11,6 +12,6 @@ export const environment = {
 
  export const environment = {
     production: true,
-    apiUrl: 'http://localhost:3000/api'
+    apiUrl: 'http://localhost:3000'
 };
   
