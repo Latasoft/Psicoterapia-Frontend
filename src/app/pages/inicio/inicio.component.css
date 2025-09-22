@@ -66,6 +66,116 @@
   }
 }
 
+/* Estilos para los controles de administración */
+.admin-editing {
+  border: 2px dashed #007bff;
+  padding: 10px;
+  margin: 5px 0;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.admin-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 5px 0;
+  box-sizing: border-box;
+}
+
+.admin-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 5px 0;
+  min-height: 100px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.admin-contact-editor,
+.service-item-editor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.admin-link-editor {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.admin-btn {
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background-color 0.3s;
+}
+
+.admin-btn:hover {
+  opacity: 0.8;
+}
+
+.admin-btn.add-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-btn.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-btn.delete-btn.small {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.delete-service-btn {
+  background-color: #dc3545;
+  color: white;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.add-service-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+  margin: 10px;
+}
+
+.add-service-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.contact-item-editor .admin-input {
+  flex: 1;
+}
+
+.admin-link-editor .admin-input {
+  flex: 1;
+}
+
  
 
   
@@ -297,6 +407,29 @@
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Suaviza el diseño */
   }
   
+  .psychologist-card2 .psychologist-card-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px; /* ajusta según necesites */
+  min-height: 180px;   /* asegura que tenga altura para centrar verticalmente */
+}
+
+.psychologist-card2 .psychologist-card-content .text-section {
+  max-width: 900px;
+  width: 100%;
+}
+
+.psychologist-card2 .psychologist-card-content .text-section h2 {
+  margin-bottom: 8px;
+  font-size: 2rem;
+}
+
+.psychologist-card2 .psychologist-card-content .text-section p {
+  margin: 0;
+  color: #666;
+}
   
   /* Contenedor principal con imagen de fondo */
 .container-cards {
@@ -848,27 +981,85 @@
   background: #c82333;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .admin-panel {
-    top: 10px;
-    right: 10px;
-  }
-  
-  .admin-toggle-btn {
-    padding: 8px 15px;
-    font-size: 12px;
-  }
-  
-  .admin-controls {
-    flex-direction: column;
-    gap: 4px;
-  }
-  
-  .admin-btn {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
+/* Estilos para los controles de administración */
+.admin-editing {
+  border: 2px dashed #007bff;
+  padding: 10px;
+  margin: 5px 0;
+}
+
+.admin-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+.admin-textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  margin: 5px 0;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.admin-contact-editor,
+.service-item-editor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.admin-link-editor {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.admin-btn.add-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin-btn.delete-btn.small {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.delete-service-btn {
+  background-color: #dc3545;
+  color: white;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.add-service-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  border: 2px dashed #007bff;
+  border-radius: 8px;
+}
+
+.add-service-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 

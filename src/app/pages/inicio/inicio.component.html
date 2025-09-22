@@ -103,88 +103,105 @@
   </div>
 </div>
 
+<!-- Cards de Servicios Dinámicos -->
 <div class="container-cards">
-  <!-- Card 1 -->
-  <div class="card">
+  <div *ngFor="let service of services; let i = index" class="card">
     <div class="media-wrapper" [class.admin-active]="adminMode">
-      <img [src]="getMediaSrc('service1-image')" alt="Bosque" />
+      <img [src]="getMediaSrc(service.imageKey)" [alt]="service.title" />
       
-      <!-- Controles de admin para imagen servicio 1 -->
+      <!-- Controles de admin para imagen -->
       <div *ngIf="adminMode" class="admin-controls">
         <input type="file" 
-               #service1Input 
+               #serviceInput
                accept="image/*" 
-               (change)="onFileSelected($event, 'service1-image')"
+               (change)="onFileSelected($event, service.imageKey)"
                style="display: none;">
         
-        <button (click)="service1Input.click()" 
-                [disabled]="isUploading('service1-image')"
+        <button (click)="serviceInput.click()" 
+                [disabled]="isUploading(service.imageKey)"
                 class="admin-btn upload-btn">
           <i class="fas fa-upload"></i>
         </button>
         
-        <button (click)="deleteMedia('service1-image')" 
+        <button (click)="deleteMedia(service.imageKey)" 
                 class="admin-btn delete-btn">
           <i class="fas fa-trash"></i>
         </button>
       </div>
     </div>
     
-    <h2>Psicoterapia clínica individual online</h2>
+    <!-- Título editable -->
+    <h2 *ngIf="!adminMode">{{ service.title }}</h2>
+    <h2 *ngIf="adminMode">
+      <input type="text" [(ngModel)]="service.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título del servicio">
+    </h2>
+    
+    <!-- Lista de precios/información editable -->
     <ul class="card-list">
-      <li>$40.000</li>
-      <hr />
-    </ul>
-    <a href="/formulario" class="btn">Agendar</a>
-  </div>
-  
-  <!-- Card 2 -->
-  <div class="card">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <img [src]="getMediaSrc('service2-image')" alt="Cordillera" />
+      <li *ngFor="let item of service.items; let j = index">
+        <span *ngIf="!adminMode">{{ item }}</span>
+        <div *ngIf="adminMode" class="service-item-editor">
+          <input type="text" [(ngModel)]="service.items[j]" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Información del servicio">
+          <button (click)="removeServiceItem(i, j)" class="admin-btn delete-btn small">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <hr />
+      </li>
       
-      <!-- Controles de admin para imagen servicio 2 -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #service2Input 
-               accept="image/*" 
-               (change)="onFileSelected($event, 'service2-image')"
-               style="display: none;">
-        
-        <button (click)="service2Input.click()" 
-                [disabled]="isUploading('service2-image')"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
+      <!-- Botón para agregar items en modo admin -->
+      <li *ngIf="adminMode">
+        <button (click)="addServiceItem(i)" class="admin-btn add-btn">
+          <i class="fas fa-plus"></i> Agregar item
         </button>
-        
-        <button (click)="deleteMedia('service2-image')" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
+      </li>
+    </ul>
+    
+    <!-- URL editable -->
+    <a *ngIf="!adminMode" [href]="service.link" class="btn">{{ service.buttonText }}</a>
+    <div *ngIf="adminMode" class="admin-link-editor">
+      <input type="text" [(ngModel)]="service.link" (ngModelChange)="onContentChange()" class="admin-input" placeholder="URL del enlace">
+      <input type="text" [(ngModel)]="service.buttonText" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Texto del botón">
     </div>
     
-    <h2>Taller de Duelo</h2>
-    <ul class="card-list">
-      <li>$70.000</li>
-      <hr />
-      <li>Plazas disponibles</li>
-      <hr />
-    </ul>
-    <a href="/taller" class="btn">Ver mas</a>
+    <!-- Botón para eliminar servicio completo -->
+    <button *ngIf="adminMode" (click)="removeService(i)" class="admin-btn delete-service-btn">
+      <i class="fas fa-trash"></i> Eliminar servicio
+    </button>
   </div>
   
+  <!-- Botón para agregar nuevo servicio -->
+  <div *ngIf="adminMode" class="add-service-card">
+    <button (click)="addService()" class="admin-btn add-service-btn">
+      <i class="fas fa-plus"></i> Agregar nuevo servicio
+    </button>
+  </div>
+  
+  <!-- Sección de Convenios Editable -->
   <div class="blog-titulo">
-    <div class="additional-info">
-      <h3>Convenios</h3>
-      <p>Contamos con convenios de reembolso de boletas con Banmédica y Vida 3...</p>
+    <div class="additional-info" [class.admin-editing]="adminMode">
+      <h3 *ngIf="!adminMode">{{ conveniosInfo.title }}</h3>
+      <h3 *ngIf="adminMode">
+        <input type="text" [(ngModel)]="conveniosInfo.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título de convenios">
+      </h3>
+      
+      <p *ngIf="!adminMode">{{ conveniosInfo.description }}</p>
+      <p *ngIf="adminMode">
+        <textarea [(ngModel)]="conveniosInfo.description" (ngModelChange)="onContentChange()" class="admin-textarea" placeholder="Descripción de convenios"></textarea>
+      </p>
     </div>
   </div>
 </div>
 
+
+
+<!-- Texto de Tarot Editable -->
 <div class="card-container">
   <div class="text-section1">
-    <h2>Descubre las respuestas que el universo tiene para ti. El tarot puede iluminar tu camino y brindarte la claridad que necesitas para avanzar con confianza</h2>
+    <h2 *ngIf="!adminMode">{{ tarotText.content }}</h2>
+    <h2 *ngIf="adminMode">
+      <textarea [(ngModel)]="tarotText.content" (ngModelChange)="onContentChange()" class="admin-textarea" placeholder="Texto del tarot"></textarea>
+    </h2>
     <a href="/tarotista" class="btn">Ver más</a>
   </div>
   
@@ -217,6 +234,7 @@
   </div>
 </div>
 
+<!-- Sección de Comentarios -->
 <div class="seccion-principal">
   <!-- Comentarios -->
   <div class="comentarios-card">
@@ -245,37 +263,53 @@
     </div>
   </div>
 
-  <!-- Contacto -->
-  <div class="contacto-card">
-    <h2>Contacto</h2>
-    <p>+56 9 9473 9587</p>
-    <p>emhpsicoterapiaonlinegmail.com</p>
-    <p>contactoemhpsicoterapiaonline.com</p>
-    <p>Avenida La Paz, Queilen, Chiloé, Chile</p>
-
-    <h3>Encuéntranos también en:</h3>
-    <ul>
-      <li>
-        <a href="https://www.2x3.cl/profesional/emhpsicoterapiaonline" target="_blank" class="contact-link">
-          <button>2x3</button>
-        </a>
-      </li>
-
-      <li>
-        <a href="https://app.snabb.cl/#/profile/practitioner/13698609-0" target="_blank" class="contact-link">
-          <button>Perfil Snabb</button>
-        </a>
-      </li>
-
-      <li>
-        <a href="https://www.psicologosonline.cl/centros/eduardo-marquez-huerta?utm_source=451925&utm_medium=widget&utm_campaign=widget-company_stamp" target="_blank" class="contact-link">
-          <img src="assets/stamp.png" alt="Snabb App" class="snabb-image-btn">
-        </a>
-      </li>
-    </ul>
+  <!-- Información de Contacto Editable (Unificada) -->
+<div class="contacto-card">
+  <div [class.admin-editing]="adminMode" class="editable-section">
+    <h2 *ngIf="!adminMode">{{ contactInfo.title }}</h2>
+    <h2 *ngIf="adminMode">
+      <input type="text" [(ngModel)]="contactInfo.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título de contacto">
+    </h2>
+    
+    <div *ngIf="!adminMode">
+      <p *ngFor="let contact of contactInfo.items">{{ contact }}</p>
+    </div>
+    
+    <div *ngIf="adminMode" class="admin-contact-editor">
+      <div *ngFor="let contact of contactInfo.items; let i = index" class="contact-item-editor">
+        <input type="text" [(ngModel)]="contactInfo.items[i]" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Información de contacto">
+        <button (click)="removeContactItem(i)" class="admin-btn delete-btn">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+      <button (click)="addContactItem()" class="admin-btn add-btn">
+        <i class="fas fa-plus"></i> Agregar contacto
+      </button>
+    </div>
   </div>
 
-  <!-- Video -->
+  <h3>Encuéntranos también en:</h3>
+  <ul>
+    <li>
+      <a href="https://www.2x3.cl/profesional/emhpsicoterapiaonline" target="_blank" class="contact-link">
+        <button>2x3</button>
+      </a>
+    </li>
+
+    <li>
+      <a href="https://app.snabb.cl/#/profile/practitioner/13698609-0" target="_blank" class="contact-link">
+        <button>Perfil Snabb</button>
+      </a>
+    </li>
+
+    <li>
+      <a href="https://www.psicologosonline.cl/centros/eduardo-marquez-huerta?utm_source=451925&utm_medium=widget&utm_campaign=widget-company_stamp" target="_blank" class="contact-link">
+        <img src="assets/stamp.png" alt="Snabb App" class="snabb-image-btn">
+      </a>
+    </li>
+  </ul>
+</div>
+
   <!-- Video con controles de admin -->
   <div class="video-container">
     <div class="media-wrapper" [class.admin-active]="adminMode">
@@ -307,6 +341,7 @@
       </div>
     </div>
   </div>
+</div>
 
 
 <a href="https://wa.me/56994739587?text=¡Hola!%20Me%20interesa%20tu%20servicio" target="_blank">

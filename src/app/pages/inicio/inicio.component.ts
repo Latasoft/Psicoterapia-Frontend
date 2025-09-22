@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { BlogService } from '../../services/blog.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
+import { PageContentService } from '../../services/page-content.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -44,10 +45,17 @@ export class InicioComponent implements OnInit {
   selectedFile: File | null = null;
   uploadingItem: string | null = null;
 
+  // Propiedades para los datos editables - se cargan del backend
+  contactInfo: any = {};
+  tarotText: any = {};
+  services: any[] = [];
+  conveniosInfo: any = {};
+
   constructor(
     private blogService: BlogService,
     private authService: AuthService,
     private imageService: ImageService,
+    private pageContentService: PageContentService,
     private sanitizer: DomSanitizer
   ) {}
 
@@ -55,6 +63,7 @@ export class InicioComponent implements OnInit {
     this.cargarUltimosBlogs();
     this.checkAdminStatus();
     this.loadMediaFromStorage();
+    this.loadPageContent();
     this.testImageService(); // Añadir esta línea
   }
 
@@ -255,5 +264,127 @@ export class InicioComponent implements OnInit {
         console.log('3. Ruta /api/images/test existe');
       }
     });
+  }
+
+  // Cargar contenido de la página desde el backend
+  loadPageContent() {
+    this.pageContentService.getPageContent('inicio').subscribe({
+      next: (data) => {
+        this.contactInfo = data.contactInfo || { title: 'Contacto', items: [] };
+        this.tarotText = data.tarotText || { content: '' };
+        this.services = data.services || [];
+        this.conveniosInfo = data.conveniosInfo || { title: 'Convenios', description: '' };
+      },
+      error: (error) => {
+        console.error('Error al cargar contenido:', error);
+        // Cargar valores por defecto en caso de error
+        this.setDefaultContent();
+      }
+    });
+  }
+
+  // Establecer contenido por defecto
+  setDefaultContent() {
+    this.contactInfo = {
+      title: 'Contacto',
+      items: [
+        '+56 9 9473 9587',
+        'emhpsicoterapiaonlinegmail.com',
+        'contactoemhpsicoterapiaonline.com',
+        'Avenida La Paz, Queilen, Chiloé, Chile'
+      ]
+    };
+    this.tarotText = {
+      content: 'Descubre las respuestas que el universo tiene para ti. El tarot puede iluminar tu camino y brindarte la claridad que necesitas para avanzar con confianza'
+    };
+    this.services = [
+      {
+        imageKey: 'service1-image',
+        title: 'Psicoterapia clínica individual online',
+        items: ['$40.000'],
+        link: '/formulario',
+        buttonText: 'Agendar'
+      },
+      {
+        imageKey: 'service2-image',
+        title: 'Taller de Duelo',
+        items: ['$70.000', 'Plazas disponibles'],
+        link: '/taller',
+        buttonText: 'Ver mas'
+      }
+    ];
+    this.conveniosInfo = {
+      title: 'Convenios',
+      description: 'Contamos con convenios de reembolso de boletas con Banmédica y Vida 3...'
+    };
+  }
+
+  // Guardar contenido de la página
+  savePageContent() {
+    const content = {
+      contactInfo: this.contactInfo,
+      tarotText: this.tarotText,
+      services: this.services,
+      conveniosInfo: this.conveniosInfo
+    };
+
+    this.pageContentService.updatePageContent('inicio', content).subscribe({
+      next: () => {
+        console.log('Contenido guardado exitosamente');
+      },
+      error: (error) => {
+        console.error('Error al guardar contenido:', error);
+      }
+    });
+  }
+
+  // Método para guardar cambios cuando el usuario termine de editar
+  onContentChange() {
+    clearTimeout(this.saveTimeout);
+    this.saveTimeout = setTimeout(() => {
+      this.savePageContent();
+    }, 1000);
+  }
+
+  private saveTimeout: any;
+
+  // Métodos para manejar los datos editables
+  addContactItem() {
+    this.contactInfo.items.push('');
+    this.savePageContent();
+  }
+
+  removeContactItem(index: number) {
+    this.contactInfo.items.splice(index, 1);
+    this.savePageContent();
+  }
+
+  addServiceItem(serviceIndex: number) {
+    this.services[serviceIndex].items.push('');
+    this.savePageContent();
+  }
+
+  removeServiceItem(serviceIndex: number, itemIndex: number) {
+    this.services[serviceIndex].items.splice(itemIndex, 1);
+    this.savePageContent();
+  }
+
+  addService() {
+    const newService = {
+      imageKey: `service${this.services.length + 1}-image`,
+      title: 'Nuevo Servicio',
+      items: ['Precio'],
+      link: '#',
+      buttonText: 'Ver más'
+    };
+    this.services.push(newService);
+    this.savePageContent();
+  }
+
+  removeService(index: number) {
+    if (confirm('¿Estás seguro de que quieres eliminar este servicio?')) {
+      this.services.splice(index, 1);
+      this.savePageContent();
+    }
   }
 }
