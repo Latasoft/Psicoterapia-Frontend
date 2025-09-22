@@ -6,10 +6,8 @@
   color: #9e9893;
   font-family: 'Playfair Display', serif;
   font-weight: 300;
-
   width: 100%;  /* El card ocupa el 100% del ancho */
   height: 500px;  /* Altura del card ajustable */
-  overflow: hidden;
   position: relative;
   display: flex;
   justify-content: space-between; /* Espacio entre el título y el botón */
@@ -110,28 +108,86 @@
   
 
 .psychologist-card video {
-  width: 11%; /* Establece el ancho al 100% para que ocupe todo el contenedor */
+  width: 11%; /* Cambiar de 11% a 50% */
   height: auto; /* Ajusta la altura automáticamente para mantener la proporción */
   border-radius: 10px; /* Opcional, si quieres bordes redondeados */
+  max-width: 400px; /* Añadir un ancho máximo */
+  min-width: 200px; /* Añadir un ancho mínimo */
+}
+
+/* Mejorar el contenedor del video */
+.psychologist-card-content {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  gap: 20px;
+  background-color: transparent;
+  flex-wrap: wrap; /* Permitir que se ajuste en pantallas pequeñas */
+}
+
+/* Media query para tablets */
+@media (max-width: 1024px) {
+  .psychologist-card video {
+    width: 60%; /* Aumentar en tablets */
+    max-width: 500px;
+  }
 }
 
 @media (max-width: 768px) {
   .psychologist-card video {
-    width: 40%; /* Ajusta el ancho en pantallas más pequeñas */
+    width: 80%; /* Aumentar de 40% a 80% en pantallas más pequeñas */
+    max-width: 400px;
     height: auto; /* Mantiene la proporción sin forzar la altura */
   }
   
+  .psychologist-card-content {
+    flex-direction: column; /* Cambiar a columna en móviles */
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
   .psychologist-card video {
-    width: 40%; /* En pantallas más pequeñas, se ajusta al 100% */
+    width: 95%; /* Aumentar de 40% a 95% en pantallas muy pequeñas */
+    max-width: 350px;
     height: auto; /* Mantiene la proporción */
   }
-  
 }
 
+/* Estilos para el video de contacto también */
+.video-container {
+  flex: 1 1 30%; /* Acomoda el video a un 30% del contenedor */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 7%;
+}
 
+.video-container video {
+  width: 100%;
+  max-width: 450px; /* Aumentar de 350px a 450px */
+  min-width: 250px; /* Añadir ancho mínimo */
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive para video de contacto */
+@media (max-width: 768px) {
+  .video-container {
+    flex: 1 1 100%;
+    padding-top: 2%;
+  }
+  
+  .video-container video {
+    max-width: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .video-container video {
+    max-width: 300px;
+  }
+}
 
   
   
@@ -543,7 +599,8 @@
 
 .video-container video {
   width: 100%;
-  max-width: 350px;
+  max-width: 350px; /* Aumentar de 350px a 450px */
+  min-width: 160px; /* Añadir ancho mínimo */
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -693,5 +750,125 @@
       height: auto; /* Ajusta la altura proporcionalmente */
     }
   }
+
+  /* Admin Panel Styles */
+.admin-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.admin-toggle-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.admin-toggle-btn.active {
+  background: #dc3545;
+}
+
+.admin-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.media-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.media-wrapper.admin-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 123, 255, 0.1);
+  border: 2px dashed #007bff;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.admin-controls {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.media-wrapper:hover .admin-controls {
+  opacity: 1;
+}
+
+.admin-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.upload-btn {
+  background: #28a745;
+  color: white;
+}
+
+.upload-btn:hover {
+  background: #218838;
+}
+
+.upload-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c82333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-panel {
+    top: 10px;
+    right: 10px;
+  }
   
+  .admin-toggle-btn {
+    padding: 8px 15px;
+    font-size: 12px;
+  }
+  
+  .admin-controls {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .admin-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
 

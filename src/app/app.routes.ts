@@ -46,7 +46,7 @@ export const routes: Routes = [
       {
   path: 'tratamientos',
   component: TratamientosComponent
-}
+},
 
       
       

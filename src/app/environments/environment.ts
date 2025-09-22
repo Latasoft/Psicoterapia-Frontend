@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://psicoterapia-backend.onrender.com',
+  apiUrl: 'http://localhost:3000',
   firebase: {
     apiKey: "AIzaSyB20a_8NRHpl0HL6Cjq9iovs0ffLVPoDRk",
     authDomain: "psicoterapia-7fb0d.firebaseapp.com",
