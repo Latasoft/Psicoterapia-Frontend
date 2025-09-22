@@ -273,3 +273,152 @@
     width: 100%;
   }
 }
+
+/* Estilos de administración */
+.admin-panel {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.admin-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-toggle-btn:hover {
+  background-color: #0056b3;
+}
+
+.admin-toggle-btn.active {
+  background-color: #dc3545;
+}
+
+.admin-toggle-btn i {
+  font-size: 16px;
+}
+
+/* Estilos para elementos editables */
+.admin-active {
+  position: relative;
+  border: 2px dashed #ccc;
+  padding: 8px;
+  margin: -8px;
+  border-radius: 4px;
+}
+
+.edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.admin-active:hover .edit-overlay {
+  opacity: 1;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+  background: #f8f9fa;
+  transform: scale(1.05);
+}
+
+[contentEditable="true"] {
+  padding: 5px;
+  border: 1px dashed #ccc;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+[contentEditable="true"]:hover {
+  background: rgba(0,0,0,0.05);
+  border-color: #007bff;
+}
+
+[contentEditable="true"]:focus {
+  outline: none;
+  border-color: #007bff;
+  background: white;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* Estilos para controles de administración */
+.admin-controls {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.admin-active:hover .admin-controls {
+  opacity: 1;
+}
+
+.admin-btn {
+  padding: 8px 16px;
+  background: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.admin-btn.upload-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.admin-btn.delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.admin-btn:hover {
+  transform: scale(1.05);
+}
+
+.admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

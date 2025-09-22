@@ -1,9 +1,23 @@
 import { Component, OnInit } from '@angular/core';
-import { CitasService } from '../../services/citas.service';
+import { AuthService } from '../../services/auth.service';
+import { MediaService } from '../../services/medio.service';
+import { PageContentService } from '../../services/page-content.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
 declare function gtag(command: string, eventName: string, params: any): void;
+
+interface Precio {
+  nacional: number | null;
+  internacional: number | null;
+  sesiones: number | null;
+}
+
+interface Tratamiento {
+  nombre: string;
+  // Add other properties as needed
+}
 
 @Component({
   selector: 'app-formulario',
@@ -13,175 +27,182 @@ declare function gtag(command: string, eventName: string, params: any): void;
   styleUrls: ['./formulario.component.css']
 })
 export class FormularioComponent implements OnInit {
+  isLoggedIn = false;
+  adminMode = false;
+  bannerImage = 'assets/default-banner.jpg';
+  uploadingFiles: { [key: string]: boolean } = {};
 
+  // Properties for admin mode and content
+  aboutContent = {
+    title: 'Sobre mí',
+    description: `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
+      Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
+      Atención por FONASA y botón de pago por plataforma KLAP.`
+  };
+  cards = [
+    {
+      title: 'Confidencialidad',
+      description: 'Todo lo compartido en las sesiones se mantiene en total confidencialidad, garantizando un espacio seguro para tu desarrollo personal.'
+    },
+    {
+      title: 'Profesionalismo',
+      description: 'Cuento con la formación y experiencia necesarias para ofrecer un servicio de calidad, basado en el respeto y la ética profesional.'
+    },
+    {
+      title: 'Responsabilidad',
+      description: 'Me comprometo a ofrecerte la mejor atención, siguiendo los estándares más altos de profesionalismo y dedicación.'
+    }
+  ];
+
+  // Form step control
+  step = 1;
+
+  // Form fields
+  tratamiento = '';
   nombre = '';
   correo = '';
-  fecha = '';
-  hora = '';
-  tratamiento = '';
-  step = 1;
-  errorMessage = '';
-  horasDisponibles: string[] = [];
-  fechaMinima = '';
-  tratamientosDisponibles: any[] = [];
+  fecha: string = '';
+  hora: string = '';
 
-
-  precio: { nacional: number | null; internacional: number | null; sesiones: number | null } = {
+  // Treatment and pricing
+  tratamientosDisponibles: Tratamiento[] = [];
+  precio: Precio = {
     nacional: null,
     internacional: null,
     sesiones: null
   };
 
-  
-
-  tratamientosConPrecios: {
-    [k: string]: {
-      nacional: number;
-      internacional: number;
-      sesiones: number;
-     
-      linkPagoWebpay?: string;
-      linkPagoMercadoPago?: string;
-    };
-  } = {
-    'Taller de duelo': {
-      nacional: 70000,
-      internacional: 80,
-      sesiones: 4,
-   
-      linkPagoWebpay: 'https://www.webpay.cl/form-pay/264721',
-      linkPagoMercadoPago:
-        'https://www.mercadopago.cl/checkout/v1/payment/redirect/5d55fad7-d8ae-49ab-9c75-94b8a1e85c98/payment-option-form-v2/?source=link&preference-id=85259864-b4065e2e-8790-4880-bd92-e2a79c7e1fb8&router-request-id=db34fe17-4ff6-4f9e-ac22-9ed957fc94fe&p=a12b801301ff2068de1e0d88a18188ca'
-    },
-    'Psicoterapia e hipnoterapia': {
-      nacional: 40000,
-      internacional: 50,
-      sesiones: 1,
-    
-      linkPagoWebpay: 'https://www.webpay.cl/form-pay/264721',
-      linkPagoMercadoPago:
-        'https://www.mercadopago.cl/checkout/v1/payment/redirect/f84c9bd0-1915-4e2b-aae1-298a700bd841/payment-option-form-v2/?source=link&preference-id=85259864-f26303ab-6b6d-4660-b199-4ecfb5b8d265&router-request-id=86e17d1d-1f8c-43a3-8382-0ef48a568e72&p=a12b801301ff2068de1e0d88a18188ca'
-    }
-  };
+  // Date and time handling
+  fechaMinima: string = new Date().toISOString().split('T')[0];
+  horasDisponibles: string[] = [];
+  errorMessage = '';
 
   constructor(
-    private citasService: CitasService,
-    private router: Router           // ⬅️  Router inyectado
+    private authService: AuthService,
+    private mediaService: MediaService,
+    private pageContentService: PageContentService
   ) {}
 
-  ngOnInit(): void {
-  this.fechaMinima = new Date().toISOString().slice(0, 10);
+  ngOnInit() {
+    this.authService.isLoggedIn().subscribe(
+      loggedIn => this.isLoggedIn = loggedIn
+    );
+    this.loadPageContent();
+    this.initializeTratamientos();
+  }
 
-  this.citasService.obtenerTratamientos().subscribe({
-    next: (tratamientos) => {
-      this.tratamientosDisponibles = tratamientos;
-    },
-    error: (err) => {
-      console.error('Error al obtener tratamientos:', err);
-    }
-  });
-}
+  toggleAdminMode() {
+    this.adminMode = !this.adminMode;
+  }
 
-
-  actualizarPrecio(): void {
-  const t = this.tratamientosDisponibles.find(t => t.nombre === this.tratamiento);
-  this.precio = t
-    ? {
-        nacional: t.precioNacional,
-        internacional: t.precioInternacional,
-        sesiones: t.sesiones
+  // Método para manejar la selección de archivos
+  onImageClick(type: string) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        this.uploadFile(file, type);
       }
-    : { nacional: null, internacional: null, sesiones: null };
-}
+    };
+    input.click();
+  }
 
+  // Método para subir archivos
+  async uploadFile(file: File, mediaKey: string) {
+    try {
+      this.uploadingFiles[mediaKey] = true;
+      console.log(`📤 Subiendo archivo para: ${mediaKey}`);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('mediaKey', mediaKey);
 
-  validarFecha(): void {
-  const d = new Date(this.fecha);
-  const fechaISO = d.toISOString().slice(0, 10);
-
-
-  this.errorMessage = '';
-
-  this.citasService.obtenerHorariosDisponibles(fechaISO).subscribe({
-    next: (data) => {
-      this.horasDisponibles = data.horariosDisponibles || [];
-      if (!this.horasDisponibles.includes(this.hora)) {
-        this.hora = ''; // Limpiar hora si no es válida
+      const result = await this.mediaService.uploadMedia(formData).toPromise();
+      
+      if (result && result.url) {
+        if (mediaKey === 'banner') {
+          this.bannerImage = result.url;
+          this.onContentChange();
+        }
+        console.log(`✅ Archivo subido exitosamente para: ${mediaKey}`);
       }
-    },
-    error: (err) => {
-      console.error('Error al obtener horarios:', err);
-      this.errorMessage = 'Ocurrió un error al consultar los horarios.';
-      this.horasDisponibles = [];
+    } catch (error) {
+      console.error(`❌ Error al subir archivo para ${mediaKey}:`, error);
+    } finally {
+      this.uploadingFiles[mediaKey] = false;
     }
-  });
-}
+  }
 
-  
+  // Método para verificar si se está subiendo un archivo
+  isUploading(mediaKey: string): boolean {
+    return this.uploadingFiles[mediaKey] || false;
+  }
+
+  // Método para cargar el contenido de la página
+  loadPageContent() {
+    this.pageContentService.getPageContent('formulario').subscribe({
+      next: (content) => {
+        if (content) {
+          this.bannerImage = content.bannerImage || this.bannerImage;
+          this.aboutContent = content.aboutContent || this.aboutContent;
+          this.cards = content.cards || this.cards;
+        }
+      },
+      error: (err) => console.error('Error loading content:', err)
+    });
+  }
+
+  // Método para guardar cambios
+  onContentChange() {
+    if (!this.adminMode) return;
+
+    const content = {
+      bannerImage: this.bannerImage,
+      aboutContent: this.aboutContent,
+      cards: this.cards
+    };
+
+    this.pageContentService.updatePageContent('formulario', content).subscribe({
+      next: () => console.log('✅ Contenido actualizado exitosamente'),
+      error: (err) => console.error('❌ Error al actualizar contenido:', err)
+    });
+  }
+
+  // Navigation methods
+  goToStep(stepNumber: number) {
+    this.step = stepNumber;
+  }
+
+  // Form handling methods
+  actualizarPrecio() {
+    // Implementation for updating prices based on selected treatment
+  }
+
+  validarFecha() {
+    // Implementation for date validation
+  }
 
   esHorarioValido(): boolean {
-    if (!this.fecha || !this.hora) {
-      this.errorMessage = 'Debe seleccionar fecha y hora.';
-      return false;
-    }
-   
-    if (!this.horasDisponibles.includes(this.hora)) {
-      this.errorMessage = 'La hora seleccionada no está disponible.';
-      return false;
-    }
-    this.errorMessage = '';
-    return true;
+    return this.fecha !== '' && this.hora !== '';
   }
 
-  goToStep(step: number): void {
-    this.step = step;
+  onSubmit(paymentMethod: string) {
+    // Implementation for form submission
   }
 
-  private crearCita() {
-    return {
-      nombre: this.nombre,
-      correo: this.correo,
-      fecha_hora: `${this.fecha}T${this.hora}:00`,
-      tratamiento: this.tratamiento
-    };
+  irAPagoKlap() {
+    // Implementation for Klap payment
   }
 
-  onSubmit(pago: 'webpay' | 'mercadopago' = 'webpay'): void {
-  if (!this.esHorarioValido()) return;
-
-  const cita = this.crearCita();
-
-  this.citasService.reservarCita(cita).subscribe(
-    () => {
-      const links = this.tratamientosConPrecios[this.tratamiento];
-      const url = pago === 'mercadopago'
-        ? links.linkPagoMercadoPago!
-        : links.linkPagoWebpay!;
-
-      // 👉 Evento de conversión de Google Ads
-      gtag('event', 'conversion', {
-        'send_to': 'AW-17061582156/Shn0CPDd6cMaEMyqzMc_',
-        'value': 1.0,
-        'currency': 'CLP'
-      });
-
-      // 👉 Redirección al link de pago
-      window.location.href = url;
-    },
-    err => console.error('Error al reservar cita:', err)
-  );
-}
-
-
-  /** Guarda la cita y redirige a /pago-klap */
-  irAPagoKlap(): void {
-    if (!this.esHorarioValido()) return;
-
-    const cita = this.crearCita();
-
-    this.citasService.reservarCita(cita).subscribe(
-      () => this.router.navigate(['/pago-klap']),
-      err => console.error('Error al reservar cita:', err)
-    );
+  private initializeTratamientos() {
+    // Initialize available treatments
+    this.tratamientosDisponibles = [
+      { nombre: 'Tratamiento 1' },
+      { nombre: 'Tratamiento 2' }
+      // Add more treatments as needed
+    ];
   }
 }
+

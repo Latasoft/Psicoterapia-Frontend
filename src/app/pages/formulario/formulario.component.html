@@ -1,37 +1,38 @@
 <div class="outer-container">
-  <!-- Imagen centrada y más grande -->
-  <div class="image-container">
-    <img src="assets/a2.avif" alt="Imagen Terapia" class="form-image" />
+  <!-- Panel de Administración -->
+  <div *ngIf="isLoggedIn" class="admin-panel">
+    <button (click)="toggleAdminMode()" class="admin-toggle-btn" [class.active]="adminMode">
+      <i class="fas fa-cog"></i>
+      {{ adminMode ? 'Salir del modo admin' : 'Modo administración' }}
+    </button>
   </div>
 
-  <!-- Sección Sobre mí -->
+  <!-- Imagen editable -->
+  <div class="image-container" [class.admin-active]="adminMode">
+    <img [src]="bannerImage" alt="Imagen Terapia" class="form-image" />
+    <div *ngIf="adminMode" class="edit-overlay">
+      <button (click)="onImageClick('banner')" class="edit-btn">
+        <i class="fas fa-edit"></i> Cambiar imagen
+      </button>
+    </div>
+  </div>
+
+  <!-- Sección Sobre mí editable -->
   <div class="about-me">
-    <h2 class="about-title">Sobre mí</h2>
-    <p class="about-description">
-      22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo. <br />
-      Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales. <br />
-      Atención por FONASA y botón de pago por plataforma KLAP.
+    <h2 class="about-title" [contentEditable]="adminMode">{{ aboutContent.title }}</h2>
+    <p class="about-description" [contentEditable]="adminMode" (blur)="onContentChange()">
+      {{ aboutContent.description }}
     </p>
   </div>
 
-  <!-- Cards de Confidencialidad, Profesionalismo y Responsabilidad -->
+  <!-- Cards editables -->
   <div class="cards-container">
-    <div class="card">
-      <h3 class="card-title">Confidencialidad</h3>
-      <p class="card-description">
-        Todo lo compartido en las sesiones se mantiene en total confidencialidad, garantizando un espacio seguro para tu desarrollo personal.
-      </p>
-    </div>
-    <div class="card">
-      <h3 class="card-title">Profesionalismo</h3>
-      <p class="card-description">
-        Cuento con la formación y experiencia necesarias para ofrecer un servicio de calidad, basado en el respeto y la ética profesional.
-      </p>
-    </div>
-    <div class="card">
-      <h3 class="card-title">Responsabilidad</h3>
-      <p class="card-description">
-        Me comprometo a ofrecerte la mejor atención, siguiendo los estándares más altos de profesionalismo y dedicación.
+    <div class="card" *ngFor="let card of cards; let i = index">
+      <h3 class="card-title" [contentEditable]="adminMode" (blur)="onCardChange()">
+        {{ card.title }}
+      </h3>
+      <p class="card-description" [contentEditable]="adminMode" (blur)="onCardChange()">
+        {{ card.description }}
       </p>
     </div>
   </div>
