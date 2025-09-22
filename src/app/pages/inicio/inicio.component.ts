@@ -268,56 +268,37 @@ export class InicioComponent implements OnInit {
 
   // Cargar contenido de la página desde el backend
   loadPageContent() {
-    this.pageContentService.getPageContent('inicio').subscribe({
-      next: (data) => {
-        this.contactInfo = data.contactInfo || { title: 'Contacto', items: [] };
-        this.tarotText = data.tarotText || { content: '' };
-        this.services = data.services || [];
-        this.conveniosInfo = data.conveniosInfo || { title: 'Convenios', description: '' };
+    console.log('🔄 Loading page content...');
+    
+    this.pageContentService.getPageContent('inicio').pipe(
+      catchError(error => {
+        console.error('❌ Error loading page content:', {
+          status: error.status,
+          message: error.message,
+          url: error.url
+        });
+        
+        // Return default values as fallback
+        return of({
+          contactInfo: { title: 'Contacto', items: [] },
+          tarotText: { content: '' },
+          services: [],
+          conveniosInfo: { title: 'Convenios', description: '' }
+        });
+      })
+    ).subscribe({
+      next: (content) => {
+        console.log('✅ Page content loaded:', content);
+        this.contactInfo = content.contactInfo || {};
+        this.tarotText = content.tarotText || {};
+        this.services = content.services || [];
+        this.conveniosInfo = content.conveniosInfo || {};
       },
-      error: (error) => {
-        console.error('Error al cargar contenido:', error);
-        // Cargar valores por defecto en caso de error
-        this.setDefaultContent();
-      }
+      error: (err) => console.error('💥 Unexpected error:', err),
+      complete: () => console.log('🏁 Page content load complete')
     });
   }
 
-  // Establecer contenido por defecto
-  setDefaultContent() {
-    this.contactInfo = {
-      title: 'Contacto',
-      items: [
-        '+56 9 9473 9587',
-        'emhpsicoterapiaonlinegmail.com',
-        'contactoemhpsicoterapiaonline.com',
-        'Avenida La Paz, Queilen, Chiloé, Chile'
-      ]
-    };
-    this.tarotText = {
-      content: 'Descubre las respuestas que el universo tiene para ti. El tarot puede iluminar tu camino y brindarte la claridad que necesitas para avanzar con confianza'
-    };
-    this.services = [
-      {
-        imageKey: 'service1-image',
-        title: 'Psicoterapia clínica individual online',
-        items: ['$40.000'],
-        link: '/formulario',
-        buttonText: 'Agendar'
-      },
-      {
-        imageKey: 'service2-image',
-        title: 'Taller de Duelo',
-        items: ['$70.000', 'Plazas disponibles'],
-        link: '/taller',
-        buttonText: 'Ver mas'
-      }
-    ];
-    this.conveniosInfo = {
-      title: 'Convenios',
-      description: 'Contamos con convenios de reembolso de boletas con Banmédica y Vida 3...'
-    };
-  }
 
   // Guardar contenido de la página
   savePageContent() {

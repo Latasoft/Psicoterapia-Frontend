@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CitasService {
 
-  private apiUrl = 'https://psicoterapia-backend.onrender.com/api/citas';
+  private apiUrl = `${environment.apiUrl}/api/citas`;
 
 
   constructor(private http: HttpClient) { }
