@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { MediaService } from '../../services/media.service';
+import { ImageService } from '../../services/image.service'; // Cambiado a ImageService
 import { PageContentService } from '../../services/page-content.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Observable, of, lastValueFrom } from 'rxjs';
+
 declare function gtag(command: string, eventName: string, params: any): void;
 
 interface Precio {
@@ -16,7 +17,15 @@ interface Precio {
 
 interface Tratamiento {
   nombre: string;
-  // Add other properties as needed
+}
+
+interface MediaItem {
+  id: string;
+  type: 'image' | 'video';
+  src: string;
+  alt?: string;
+  section: string;
+  publicId?: string;
 }
 
 @Component({
@@ -29,8 +38,9 @@ interface Tratamiento {
 export class FormularioComponent implements OnInit {
   isLoggedIn = false;
   adminMode = false;
-  bannerImage = ''; // Removido valor por defecto
-  uploadingFiles: { [key: string]: boolean } = {};
+  bannerImage = 'assets/a2.avif';
+  uploadingMedia = false;
+  selectedFile: File | null = null;
 
   // Properties for admin mode and content
   aboutContent = {
@@ -81,7 +91,7 @@ export class FormularioComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private mediaService: MediaService,
+    private imageService: ImageService, // Cambiado a ImageService
     private pageContentService: PageContentService,
     private router: Router
   ) {}
@@ -107,39 +117,71 @@ export class FormularioComponent implements OnInit {
     input.onchange = (event: any) => {
       const file = event.target.files[0];
       if (file) {
-        this.uploadFile(file, type);
+        this.selectedFile = file;
+        this.uploadFile(type);
       }
     };
     input.click();
   }
 
-  // Método para subir archivos
-  async uploadFile(file: File, mediaKey: string) {
+  // Método para subir archivos (actualizado al estilo de inicio.component)
+  async uploadFile(mediaKey: string) {
+    if (!this.selectedFile) return;
+    
     try {
-      this.uploadingFiles[mediaKey] = true;
+      this.uploadingMedia = true;
       console.log(`📤 Subiendo archivo para: ${mediaKey}`);
       
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('mediaKey', mediaKey);
-
-      const result = await lastValueFrom(this.mediaService.uploadMedia(formData)) as { url?: string };
+      // Usar el mismo método que inicio.component
+      const uploadResponse = await lastValueFrom(
+        this.imageService.uploadImage(this.selectedFile, 'formulario')
+      );
       
-      if (result && result.url) {
+      if (uploadResponse && uploadResponse.secure_url) {
+        console.log(`✅ Archivo subido exitosamente:`, uploadResponse);
+        
+        // Guardar la URL y el publicId
+        const mediaItem: MediaItem = {
+          id: mediaKey,
+          type: 'image',
+          src: uploadResponse.secure_url,
+          alt: 'Imagen formulario',
+          section: 'formulario',
+          publicId: uploadResponse.public_id
+        };
+        
+        // Actualizar la imagen del banner
         if (mediaKey === 'banner') {
-          this.bannerImage = result.url;
+          this.bannerImage = uploadResponse.secure_url;
+          this.saveMediaToStorage(mediaItem);
           await this.saveContentChanges();
         }
-        console.log(`✅ Archivo subido exitosamente para: ${mediaKey}`);
       }
     } catch (error) {
-      console.error(`❌ Error al subir archivo para ${mediaKey}:`, error);
+      console.error(`❌ Error al subir archivo:`, error);
     } finally {
-      this.uploadingFiles[mediaKey] = false;
+      this.uploadingMedia = false;
+      this.selectedFile = null;
     }
   }
 
-  // New method to handle content saving
+  // Método para guardar media en localStorage (como en inicio.component)
+  saveMediaToStorage(mediaItem: MediaItem) {
+    let storedMedia = localStorage.getItem('mediaItems');
+    let mediaItems: MediaItem[] = storedMedia ? JSON.parse(storedMedia) : [];
+    
+    // Actualizar o agregar el nuevo item
+    const existingIndex = mediaItems.findIndex(item => item.id === mediaItem.id);
+    if (existingIndex >= 0) {
+      mediaItems[existingIndex] = mediaItem;
+    } else {
+      mediaItems.push(mediaItem);
+    }
+    
+    localStorage.setItem('mediaItems', JSON.stringify(mediaItems));
+  }
+
+  // Método para guardar cambios de contenido
   private async saveContentChanges() {
     if (!this.adminMode) return;
 
@@ -152,10 +194,7 @@ export class FormularioComponent implements OnInit {
       cards: this.cards
     };
 
-    console.log('💾 Guardando cambios:', {
-      title: content.aboutContent.title,
-      description: content.aboutContent.description
-    });
+    console.log('💾 Guardando cambios:', content);
 
     try {
       const result = await lastValueFrom(
@@ -237,38 +276,34 @@ export class FormularioComponent implements OnInit {
     ];
   }
 
-  // Method to load page content for admin mode
+  // Método actualizado para cargar el contenido de la página
   private async loadPageContent() {
     try {
       const defaultDescription = `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
         Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
         Atención por FONASA y botón de pago por plataforma KLAP.`;
 
+      // Cargar media items de localStorage
+      let storedMedia = localStorage.getItem('mediaItems');
+      let mediaItems: MediaItem[] = storedMedia ? JSON.parse(storedMedia) : [];
+      const bannerItem = mediaItems.find(item => item.id === 'banner' && item.section === 'formulario');
+      
+      if (bannerItem) {
+        this.bannerImage = bannerItem.src;
+      }
+
       const content = await lastValueFrom(this.pageContentService.getPageContent('formulario'));
       if (content) {
-        this.bannerImage = content.bannerImage || '';
+        // Si hay contenido en Firebase, tiene prioridad sobre localStorage
+        this.bannerImage = content.bannerImage || this.bannerImage;
         this.aboutContent = {
           title: content.aboutContent?.title || 'Sobre mí',
           description: content.aboutContent?.description || defaultDescription
         };
-        this.cards = content.cards || [];
-      } else {
-        console.log('⚠️ No se encontró contenido, usando valores por defecto');
-        this.aboutContent = {
-          title: 'Sobre mí',
-          description: defaultDescription
-        };
+        this.cards = content.cards || this.cards;
       }
     } catch (error) {
       console.error('❌ Error al cargar el contenido de la página:', error);
-      // En caso de error, también usamos los valores por defecto
-      const defaultDescription = `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
-        Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
-        Atención por FONASA y botón de pago por plataforma KLAP.`;
-      this.aboutContent = {
-        title: 'Sobre mí',
-        description: defaultDescription
-      };
     }
   }
 
