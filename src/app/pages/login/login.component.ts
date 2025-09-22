@@ -26,7 +26,7 @@ export class LoginComponent {
       next: (response) => {
         localStorage.setItem('token', response.token); // Guarda el token
         this.isLoading = false; // Ocultar loader
-        this.router.navigateByUrl('/menu-admin', { replaceUrl: true }); // Redirigir
+        this.router.navigateByUrl('/', { replaceUrl: true }); // Redirigir
       },
       error: (error) => {
         this.errorMessage = error.error?.message || 'Error al iniciar sesión.';
