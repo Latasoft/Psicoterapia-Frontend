@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
-import { MediaService } from '../../services/medio.service';
+import { MediaService } from '../../services/media.service';
 import { PageContentService } from '../../services/page-content.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Observable, of, lastValueFrom } from 'rxjs';
 declare function gtag(command: string, eventName: string, params: any): void;
 
 interface Precio {
@@ -29,16 +29,15 @@ interface Tratamiento {
 export class FormularioComponent implements OnInit {
   isLoggedIn = false;
   adminMode = false;
-  bannerImage = 'assets/default-banner.jpg';
+  bannerImage = ''; // Removido valor por defecto
   uploadingFiles: { [key: string]: boolean } = {};
 
   // Properties for admin mode and content
   aboutContent = {
-    title: 'Sobre mí',
-    description: `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
-      Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
-      Atención por FONASA y botón de pago por plataforma KLAP.`
+    title: '',
+    description: ''
   };
+
   cards = [
     {
       title: 'Confidencialidad',
@@ -77,17 +76,22 @@ export class FormularioComponent implements OnInit {
   horasDisponibles: string[] = [];
   errorMessage = '';
 
+  // Debounce timeout
+  private saveTimeout: any;
+
   constructor(
     private authService: AuthService,
     private mediaService: MediaService,
-    private pageContentService: PageContentService
+    private pageContentService: PageContentService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.authService.isLoggedIn().subscribe(
-      loggedIn => this.isLoggedIn = loggedIn
-    );
-    this.loadPageContent();
+    const loggedIn = this.authService.isLoggedIn();
+    this.isLoggedIn = loggedIn;
+    if (loggedIn) {
+      this.loadPageContent();
+    }
     this.initializeTratamientos();
   }
 
@@ -119,12 +123,12 @@ export class FormularioComponent implements OnInit {
       formData.append('file', file);
       formData.append('mediaKey', mediaKey);
 
-      const result = await this.mediaService.uploadMedia(formData).toPromise();
+      const result = await lastValueFrom(this.mediaService.uploadMedia(formData)) as { url?: string };
       
       if (result && result.url) {
         if (mediaKey === 'banner') {
           this.bannerImage = result.url;
-          this.onContentChange();
+          await this.saveContentChanges();
         }
         console.log(`✅ Archivo subido exitosamente para: ${mediaKey}`);
       }
@@ -135,39 +139,68 @@ export class FormularioComponent implements OnInit {
     }
   }
 
-  // Método para verificar si se está subiendo un archivo
-  isUploading(mediaKey: string): boolean {
-    return this.uploadingFiles[mediaKey] || false;
-  }
-
-  // Método para cargar el contenido de la página
-  loadPageContent() {
-    this.pageContentService.getPageContent('formulario').subscribe({
-      next: (content) => {
-        if (content) {
-          this.bannerImage = content.bannerImage || this.bannerImage;
-          this.aboutContent = content.aboutContent || this.aboutContent;
-          this.cards = content.cards || this.cards;
-        }
-      },
-      error: (err) => console.error('Error loading content:', err)
-    });
-  }
-
-  // Método para guardar cambios
-  onContentChange() {
+  // New method to handle content saving
+  private async saveContentChanges() {
     if (!this.adminMode) return;
 
     const content = {
       bannerImage: this.bannerImage,
-      aboutContent: this.aboutContent,
+      aboutContent: {
+        title: this.aboutContent.title,
+        description: this.aboutContent.description
+      },
       cards: this.cards
     };
 
-    this.pageContentService.updatePageContent('formulario', content).subscribe({
-      next: () => console.log('✅ Contenido actualizado exitosamente'),
-      error: (err) => console.error('❌ Error al actualizar contenido:', err)
+    console.log('💾 Guardando cambios:', {
+      title: content.aboutContent.title,
+      description: content.aboutContent.description
     });
+
+    try {
+      const result = await lastValueFrom(
+        this.pageContentService.updatePageContent('formulario', content)
+      );
+      console.log('✅ Contenido actualizado exitosamente:', result);
+    } catch (err) {
+      console.error('❌ Error al actualizar contenido:', err);
+    }
+  }
+
+  onContentChange() {
+    console.log('🔄 Detectado cambio en el contenido');
+    if (!this.adminMode) {
+      console.log('❌ Modo admin no activo, ignorando cambios');
+      return;
+    }
+    
+    console.log('📦 Contenido actual:', {
+      description: this.aboutContent.description,
+      title: this.aboutContent.title
+    });
+    
+    // Debounce para no hacer muchas llamadas seguidas
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+    
+    this.saveTimeout = setTimeout(() => {
+      this.saveContentChanges();
+    }, 1000);
+  }
+
+  onTextChange(event: any, field: string) {
+    if (!this.adminMode) return;
+    
+    console.log('📝 Cambio detectado en:', field);
+    
+    if (field === 'description') {
+      this.aboutContent.description = event.target.innerText;
+    } else if (field === 'title') {
+      this.aboutContent.title = event.target.innerText;
+    }
+    
+    this.onContentChange();
   }
 
   // Navigation methods
@@ -197,12 +230,52 @@ export class FormularioComponent implements OnInit {
   }
 
   private initializeTratamientos() {
-    // Initialize available treatments
     this.tratamientosDisponibles = [
-      { nombre: 'Tratamiento 1' },
-      { nombre: 'Tratamiento 2' }
-      // Add more treatments as needed
+      { nombre: 'Psicoterapia Individual' },
+      { nombre: 'Terapia de Pareja' },
+      { nombre: 'Hipnoterapia' }
     ];
+  }
+
+  // Method to load page content for admin mode
+  private async loadPageContent() {
+    try {
+      const defaultDescription = `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
+        Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
+        Atención por FONASA y botón de pago por plataforma KLAP.`;
+
+      const content = await lastValueFrom(this.pageContentService.getPageContent('formulario'));
+      if (content) {
+        this.bannerImage = content.bannerImage || '';
+        this.aboutContent = {
+          title: content.aboutContent?.title || 'Sobre mí',
+          description: content.aboutContent?.description || defaultDescription
+        };
+        this.cards = content.cards || [];
+      } else {
+        console.log('⚠️ No se encontró contenido, usando valores por defecto');
+        this.aboutContent = {
+          title: 'Sobre mí',
+          description: defaultDescription
+        };
+      }
+    } catch (error) {
+      console.error('❌ Error al cargar el contenido de la página:', error);
+      // En caso de error, también usamos los valores por defecto
+      const defaultDescription = `22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo.
+        Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.
+        Atención por FONASA y botón de pago por plataforma KLAP.`;
+      this.aboutContent = {
+        title: 'Sobre mí',
+        description: defaultDescription
+      };
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
   }
 }
 

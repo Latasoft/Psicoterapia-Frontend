@@ -9,7 +9,7 @@
 
   <!-- Imagen editable -->
   <div class="image-container" [class.admin-active]="adminMode">
-    <img [src]="bannerImage" alt="Imagen Terapia" class="form-image" />
+    <img [src]="bannerImage || 'assets/default-banner.jpg'" alt="Imagen Terapia" class="form-image" />
     <div *ngIf="adminMode" class="edit-overlay">
       <button (click)="onImageClick('banner')" class="edit-btn">
         <i class="fas fa-edit"></i> Cambiar imagen
@@ -20,7 +20,10 @@
   <!-- Sección Sobre mí editable -->
   <div class="about-me">
     <h2 class="about-title" [contentEditable]="adminMode">{{ aboutContent.title }}</h2>
-    <p class="about-description" [contentEditable]="adminMode" (blur)="onContentChange()">
+    <p class="about-description" 
+       [contentEditable]="adminMode" 
+       (blur)="onContentChange()"
+       (input)="onTextChange($event, 'description')">
       {{ aboutContent.description }}
     </p>
   </div>
@@ -28,10 +31,10 @@
   <!-- Cards editables -->
   <div class="cards-container">
     <div class="card" *ngFor="let card of cards; let i = index">
-      <h3 class="card-title" [contentEditable]="adminMode" (blur)="onCardChange()">
+      <h3 class="card-title" >
         {{ card.title }}
       </h3>
-      <p class="card-description" [contentEditable]="adminMode" (blur)="onCardChange()">
+      <p class="card-description" >
         {{ card.description }}
       </p>
     </div>
