@@ -105,6 +105,10 @@ export class FormularioComponent implements OnInit, OnDestroy {
   // Propiedades para el popup de Webpay
   mostrarPopupWebpay = false;
 
+  // Propiedades para MercadoPago (igual que Webpay)
+  mostrarFormularioMercadoPago = false;
+  mostrarPopupMercadoPago = false;
+
   constructor(
     private authService: AuthService,
     private imageService: ImageService,
@@ -609,6 +613,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
 
   private async procesarPagoMercadoPago(citaId: string) {
     try {
+      console.log('=== PROCESANDO PAGO MERCADOPAGO ===');
       console.log('Procesando pago MercadoPago para cita:', citaId);
       console.log('Monto del tratamiento:', this.precio.nacional);
       
@@ -622,16 +627,32 @@ export class FormularioComponent implements OnInit, OnDestroy {
       
       // Determinar URL según el monto
       if (monto === 40000) {
-        mercadoPagoUrl = 'https://www.mercadopago.cl/checkout/v1/payment/redirect/06638f34-c958-4e65-a8ec-18bc2af158f1/payment-option-form/?preference-id=85259864-f26303ab-6b6d-4660-b199-4ecfb5b8d265&router-request-id=bead2b8b-580f-4e8f-b696-9ca3fc7daf27&source=link&p=d07bceff09d85d30681c53fb5aac6bb3';
+        mercadoPagoUrl = 'https://mpago.la/1cJ4Rht';
       } else if (monto === 70000) {
-        mercadoPagoUrl = 'https://mercadopago.cl/checkout/v1/payment/redirect/?source=link&preference-id=85259864-b4065e2e-8790-4880-bd92-e2a79c7e1fb8&router-request-id=6b4e86d2-2326-4fea-b7db-3f50c7c83129';
+        mercadoPagoUrl = 'https://mpago.la/1BPFfVT';
       } else {
         throw new Error(`MercadoPago solo está disponible para montos de $40.000 y $70.000. Monto actual: $${monto.toLocaleString()}`);
       }
       
+      // Guardar datos en localStorage (igual que Webpay)
+      const transactionInfo = {
+        mercadoPagoUrl,
+        citaId,
+        amount: monto,
+        tratamiento: this.tratamiento,
+        fecha: this.fecha,
+        hora: this.hora,
+        nombre: this.nombre,
+        correo: this.correo,
+        metodoPago: 'MercadoPago'
+      };
+      
+      localStorage.setItem('mercadopago_transaction', JSON.stringify(transactionInfo));
+      console.log('Datos guardados en localStorage para MercadoPago:', transactionInfo);
+      
       console.log('Redirigiendo a MercadoPago URL:', mercadoPagoUrl);
       
-      // Redirigir directamente a MercadoPago (igual que Webpay)
+      // Mostrar vista de procesamiento y luego redirigir (igual que Webpay)
       window.location.href = mercadoPagoUrl;
       
     } catch (error) {
@@ -664,6 +685,20 @@ export class FormularioComponent implements OnInit, OnDestroy {
 
   cancelarPago() {
     this.mostrarFormularioWebpay = false;
+  }
+
+  // Funciones para MercadoPago (iguales que Webpay)
+  mostrarMercadoPago() {
+    this.mostrarFormularioMercadoPago = true;
+  }
+
+  cancelarPagoMercadoPago() {
+    this.mostrarFormularioMercadoPago = false;
+  }
+
+  abrirMercadoPago(url: string) {
+    console.log('Abriendo MercadoPago en:', url);
+    window.open(url, '_blank');
   }
 
   abrirPopupWebpay() {

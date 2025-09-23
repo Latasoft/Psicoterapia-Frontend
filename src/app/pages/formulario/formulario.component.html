@@ -313,9 +313,81 @@
             </div>
           </div>
 
+          <!-- MercadoPago Vista (igual que Webpay) -->
+          <div *ngIf="mostrarFormularioMercadoPago" class="webpay-iframe-container">
+            <h3>Pago con MercadoPago</h3>
+            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
+            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
+            
+            <div class="mercadopago-info">
+              <div class="payment-card">
+                <h4>🔗 Enlace de Pago MercadoPago</h4>
+                <p *ngIf="tratamiento === 'Psicoterapia e hipnoterapia'">
+                  <strong>Link para $40.000:</strong><br>
+                  <button 
+                    type="button"
+                    (click)="abrirMercadoPago('https://www.mercadopago.cl/checkout/v1/payment/redirect/d36cfce6-9d1b-4fc1-83c4-da4503134202/payment-option-form/?preference-id=85259864-f26303ab-6b6d-4660-b199-4ecfb5b8d265&router-request-id=7af10d48-1adf-4e40-9bdb-d0fa69c3fdb3&source=link&p=d07bceff09d85d30681c53fb5aac6bb3')" 
+                    class="payment-link-btn">
+                    🔗 Ir a MercadoPago - $40.000
+                  </button>
+                </p>
+                <p *ngIf="tratamiento === 'Taller de duelo'">
+                  <strong>Link para $70.000:</strong><br>
+                  <button 
+                    type="button"
+                    (click)="abrirMercadoPago('https://www.mercadopago.cl/checkout/v1/payment/redirect/4882cf38-5686-47c8-8346-bb0463fa82a8/payment-option-form/?preference-id=85259864-b4065e2e-8790-4880-bd92-e2a79c7e1fb8&router-request-id=6b4e86d2-2326-4fea-b7db-3f50c7c83129&source=link&p=d07bceff09d85d30681c53fb5aac6bb3')" 
+                    class="payment-link-btn">
+                    🔗 Ir a MercadoPago - $70.000
+                  </button>
+                </p>
+                
+                <!-- Mostrar ambos enlaces si no se puede determinar el tratamiento -->
+                <div *ngIf="!tratamiento || (tratamiento !== 'Psicoterapia e hipnoterapia' && tratamiento !== 'Taller de duelo')">
+                  <p><strong>Enlaces disponibles:</strong></p>
+                  <button 
+                    type="button"
+                    (click)="abrirMercadoPago('https://mpago.la/1cJ4Rht')" 
+                    class="payment-link-btn">
+                    🔗 Psicoterapia - $40.000
+                  </button>
+                  <br><br>
+                  <button 
+                    type="button"
+                    (click)="abrirMercadoPago('https://mpago.la/1BPFfVT')" 
+                    class="payment-link-btn">
+                    🔗 Taller de duelo - $70.000
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="payment-instructions">
+              <p>📋 <strong>Instrucciones:</strong></p>
+              <ol>
+                <li>Haz clic en el enlace de MercadoPago arriba</li>
+                <li>Realiza el pago por el monto de <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
+                <li>Una vez completado, regresa aquí y confirma el pago</li>
+              </ol>
+              
+              <button 
+                type="button" 
+                (click)="confirmarPagoManual()" 
+                class="btn btn-primary">
+                ✅ Confirmar Pago Realizado
+              </button>
+              
+              <button 
+                type="button" 
+                (click)="cancelarPagoMercadoPago()" 
+                class="btn btn-secondary">
+                ❌ Cancelar
+              </button>
+            </div>
+          </div>
+
           <!-- Botón para mostrar el formulario -->
           <button 
-            *ngIf="!mostrarFormularioWebpay"
+            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago"
             type="button" 
             (click)="mostrarWebpay()" 
             [disabled]="procesandoPago"
@@ -329,8 +401,9 @@
 
           <!-- MercadoPago -->
           <button 
+            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago"
             type="button" 
-            (click)="onSubmit('mercadopago')" 
+            (click)="mostrarMercadoPago()" 
             [disabled]="procesandoPago || !esMercadoPagoDisponible()"
             class="btn btn-payment mercadopago">
             <div class="payment-content">
