@@ -1,223 +1,463 @@
 <div class="outer-container">
   <!-- Panel de Administración -->
   <div *ngIf="isLoggedIn" class="admin-panel">
-    <button (click)="toggleAdminMode()" class="admin-toggle-btn" [class.active]="adminMode">
+    <button 
+      (click)="toggleAdminMode()" 
+      class="admin-toggle-btn" 
+      [class.active]="adminMode">
       <i class="fas fa-cog"></i>
       {{ adminMode ? 'Salir del modo admin' : 'Modo administración' }}
     </button>
   </div>
 
-  <!-- Imagen editable -->
+  <!-- Imagen Banner -->
   <div class="image-container" [class.admin-active]="adminMode">
-    <img [src]="bannerImage || 'assets/default-banner.jpg'" alt="Imagen Terapia" class="form-image" />
+    <img 
+      [src]="bannerImage" 
+      alt="Psicoterapia Banner" 
+      class="form-image"
+      (error)="bannerImage = 'assets/a2.avif'" />
+    
     <div *ngIf="adminMode" class="edit-overlay">
-      <button (click)="onImageClick('banner')" class="edit-btn">
-        <i class="fas fa-edit"></i> Cambiar imagen
+      <button 
+        (click)="onImageClick('banner')" 
+        class="edit-btn"
+        [disabled]="uploadingMedia">
+        <i class="fas fa-edit"></i> 
+        {{ uploadingMedia ? 'Subiendo...' : 'Cambiar imagen' }}
       </button>
     </div>
   </div>
 
-  <!-- Sección Sobre mí editable -->
+  <!-- Sección Sobre mí -->
   <div class="about-me">
-    <h2 class="about-title" [contentEditable]="adminMode">{{ aboutContent.title }}</h2>
-    <p class="about-description" 
-       [contentEditable]="adminMode" 
-       (blur)="onContentChange()"
-       (input)="onTextChange($event, 'description')">
+    <h2 
+      class="about-title" 
+      [contentEditable]="adminMode"
+      (blur)="onTextChange($event, 'title')">
+      {{ aboutContent.title }}
+    </h2>
+    <p 
+      class="about-description" 
+      [contentEditable]="adminMode" 
+      (blur)="onTextChange($event, 'description')">
       {{ aboutContent.description }}
     </p>
   </div>
 
-  <!-- Cards editables -->
+  <!-- Cards de características -->
   <div class="cards-container">
     <div class="card" *ngFor="let card of cards; let i = index">
-      <h3 class="card-title" >
-        {{ card.title }}
-      </h3>
-      <p class="card-description" >
-        {{ card.description }}
-      </p>
+      <h3 class="card-title">{{ card.title }}</h3>
+      <p class="card-description">{{ card.description }}</p>
     </div>
   </div>
 
- <!-- Formulario de Reserva -->
-<!-- Formulario de Reserva -->
-<div class="form-container">
-  <h1 class="title">Agenda tu hora aquí</h1>
+  <!-- Formulario de Reserva -->
+  <div class="form-container">
+    <h1 class="title">Agenda tu hora aquí</h1>
 
-  <!-- Indicadores de pasos -->
-  <div class="step-indicators">
-    <div
-      class="step"
-      [class.active]="step === 1"
-      [class.completed]="step > 1"
-    >
-      1
+    <!-- Indicadores de pasos -->
+    <div class="step-indicators">
+      <div
+        class="step"
+        [class.active]="step === 1"
+        [class.completed]="step > 1"
+        (click)="goToStep(1)">
+        1
+      </div>
+      <div
+        class="step"
+        [class.active]="step === 2"
+        [class.completed]="step > 2"
+        (click)="esPasoValido(1) ? goToStep(2) : null">
+        2
+      </div>
+      <div
+        class="step"
+        [class.active]="step === 3"
+        [class.completed]="step > 3"
+        (click)="esPasoValido(2) ? goToStep(3) : null">
+        3
+      </div>
     </div>
-    <div
-      class="step"
-      [class.active]="step === 2"
-      [class.completed]="step > 2"
-    >
-      2
+
+    <!-- PASO 1: Datos personales y tratamiento -->
+    <div *ngIf="step === 1" class="form-step">
+      <h2 class="step-title">Información Personal</h2>
+
+      <!-- Nombre -->
+      <div class="form-group">
+        <label for="nombre">Nombre Completo *</label>
+        <input
+          id="nombre"
+          type="text"
+          [(ngModel)]="nombre"
+          name="nombre"
+          required
+          placeholder="Ingresa tu nombre completo"
+          class="form-control" />
+      </div>
+
+      <!-- Correo -->
+      <div class="form-group">
+        <label for="correo">Correo Electrónico *</label>
+        <input
+          id="correo"
+          type="email"
+          [(ngModel)]="correo"
+          name="correo"
+          required
+          placeholder="ejemplo@correo.com"
+          class="form-control" />
+      </div>
+
+      <!-- Tratamiento -->
+      <div class="form-group">
+        <label for="tratamiento">Tipo de Tratamiento *</label>
+        <select
+          id="tratamiento"
+          [(ngModel)]="tratamiento"
+          name="tratamiento"
+          required
+          (change)="actualizarPrecio()"
+          class="form-control">
+          <option value="" disabled>Selecciona un tratamiento</option>
+          <option *ngFor="let t of tratamientosDisponibles" [value]="t.nombre">
+            {{ t.nombre }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Información de precios -->
+      <div *ngIf="precio.nacional || precio.internacional" class="price-info">
+        <h3>Información del Tratamiento</h3>
+        
+        <div class="price-row" *ngIf="precio.nacional">
+          <span class="price-label">Valor Nacional:</span>
+          <span class="price-amount">${{ precio.nacional | number:'1.0-0' }}</span>
+        </div>
+        
+        <div class="price-row" *ngIf="precio.internacional">
+          <span class="price-label">Valor Internacional:</span>
+          <span class="price-amount">${{ precio.internacional | number:'1.0-0' }} USD</span>
+        </div>
+        
+        <div class="price-row" *ngIf="precio.sesiones">
+          <span class="price-label">Número de sesiones:</span>
+          <span class="price-amount">{{ precio.sesiones }}</span>
+        </div>
+      </div>
+
+      <!-- Botón siguiente -->
+      <div class="form-actions">
+        <button
+          type="button"
+          (click)="siguientePaso()"
+          class="btn btn-primary"
+          [disabled]="!esPasoValido(1)">
+          Siguiente
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
     </div>
-    <div
-      class="step"
-      [class.active]="step === 3"
-    >
-      3
+
+    <!-- PASO 2: Fecha y hora -->
+    <div *ngIf="step === 2" class="form-step">
+      <h2 class="step-title">Seleccionar Fecha y Hora</h2>
+
+      <!-- Fecha -->
+      <div class="form-group">
+        <label for="fecha">Fecha de la Cita *</label>
+        <input
+          id="fecha"
+          type="date"
+          [(ngModel)]="fecha"
+          name="fecha"
+          required
+          [min]="fechaMinima"
+          (change)="validarFecha()"
+          [class.invalid]="errorMessage"
+          class="form-control" />
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Horarios disponibles -->
+      <div *ngIf="horasDisponibles.length > 0" class="form-group">
+        <label for="hora">Horario Disponible *</label>
+        <select 
+          id="hora" 
+          [(ngModel)]="hora" 
+          name="hora" 
+          required 
+          class="form-control hora-select">
+          <option value="">Selecciona un horario</option>
+          <option *ngFor="let horaDisponible of horasDisponibles" [value]="horaDisponible">
+            {{ horaDisponible }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Sin horarios disponibles -->
+      <div *ngIf="horasDisponibles.length === 0 && fecha && !errorMessage" class="no-hours-message">
+        <i class="fas fa-calendar-times"></i>
+        <p>No hay horarios disponibles para esta fecha.</p>
+        <small>Por favor selecciona otra fecha.</small>
+      </div>
+
+      <!-- Botones navegación -->
+      <div class="form-actions">
+        <button
+          type="button"
+          (click)="pasoAnterior()"
+          class="btn btn-secondary">
+          <i class="fas fa-arrow-left"></i>
+          Anterior
+        </button>
+        
+        <button
+          type="button"
+          (click)="siguientePaso()"
+          class="btn btn-primary"
+          [disabled]="!esPasoValido(2)">
+          Siguiente
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <!-- Sección 1 -->
-<div *ngIf="step === 1" class="form-step">
-  <!-- Tratamiento -->
-  <div class="form-group">
-    <label for="tratamiento">Tratamiento</label>
-    <select
-      id="tratamiento"
-      [(ngModel)]="tratamiento"
-      name="tratamiento"
-      required
-      (change)="actualizarPrecio()"
-    >
-      <option value="" disabled selected>Selecciona un tratamiento</option>
-      <option *ngFor="let t of tratamientosDisponibles" [value]="t.nombre">
-        {{ t.nombre }}
-      </option>
-    </select>
-  </div>
+    <!-- PASO 3: Confirmación y pago -->
+    <div *ngIf="step === 3" class="form-step">
+      <h2 class="step-title">Confirmación y Pago</h2>
 
-  <!-- Precios -->
-  <p class="price" *ngIf="precio.nacional !== null">
-    Valor del tratamiento nacional:
-    <span class="amount">${{ precio.nacional | number: '1.0-0' }}</span>
-  </p>
+      <!-- Resumen de la cita -->
+      <div class="booking-summary">
+        <h3>Resumen de tu Cita</h3>
+        
+        <div class="summary-row">
+          <span class="summary-label">Nombre:</span>
+          <span class="summary-value">{{ nombre }}</span>
+        </div>
+        
+        <div class="summary-row">
+          <span class="summary-label">Correo:</span>
+          <span class="summary-value">{{ correo }}</span>
+        </div>
+        
+        <div class="summary-row">
+          <span class="summary-label">Tratamiento:</span>
+          <span class="summary-value">{{ tratamiento }}</span>
+        </div>
+        
+        <div class="summary-row">
+          <span class="summary-label">Fecha:</span>
+          <span class="summary-value">{{ fecha | date:'dd/MM/yyyy' }}</span>
+        </div>
+        
+        <div class="summary-row">
+          <span class="summary-label">Horario:</span>
+          <span class="summary-value">{{ hora }}</span>
+        </div>
+        
+        <div class="summary-row total" *ngIf="precio.nacional">
+          <span class="summary-label">Total a Pagar:</span>
+          <span class="summary-value price-highlight">${{ precio.nacional | number:'1.0-0' }}</span>
+        </div>
+      </div>
 
-  <p class="price" *ngIf="precio.internacional !== null">
-    Valor del tratamiento internacional:
-    <span class="amount">${{ precio.internacional | number: '1.0-0' }} USD</span>
-  </p>
+      <!-- Métodos de pago -->
+      <div class="payment-methods">
+        <h3>Selecciona tu método de pago</h3>
+        
+        <div class="payment-buttons">
+          <!-- Webpay -->
+          <div *ngIf="mostrarFormularioWebpay" class="webpay-iframe-container">
+            <h3>Formulario de Pago Webpay</h3>
+            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
+            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
+            
+            <iframe 
+              src="https://www.webpay.cl/form-pay/264721"
+              width="100%" 
+              height="600"
+              frameborder="0"
+              class="webpay-iframe">
+            </iframe>
+            
+            <div class="payment-instructions">
+              <p>📋 <strong>Instrucciones:</strong></p>
+              <ol>
+                <li>Completa el formulario de pago arriba</li>
+                <li>Realiza el pago por el monto de <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
+                <li>Una vez completado, haz clic en "Confirmar Pago" abajo</li>
+              </ol>
+              
+              <button 
+                type="button" 
+                (click)="confirmarPagoManual()" 
+                class="btn btn-primary">
+                ✅ Confirmar Pago Realizado
+              </button>
+              
+              <button 
+                type="button" 
+                (click)="cancelarPago()" 
+                class="btn btn-secondary">
+                ❌ Cancelar
+              </button>
+            </div>
+          </div>
 
-  <p class="price" *ngIf="precio.sesiones !== null">
-    Número de sesiones:
-    <span class="amount">{{ precio.sesiones }}</span>
-  </p>
+          <!-- Botón para mostrar el formulario -->
+          <button 
+            *ngIf="!mostrarFormularioWebpay"
+            type="button" 
+            (click)="mostrarWebpay()" 
+            [disabled]="procesandoPago"
+            class="btn btn-payment webpay">
+            <div class="payment-content">
+              <i class="fas fa-credit-card"></i>
+              <span>Pagar con Webpay</span>
+              <small>Formulario de pago</small>
+            </div>
+          </button>
 
-  <!-- Nombre -->
-  <div class="form-group">
-    <label for="nombre">Nombre</label>
-    <input
-      id="nombre"
-      type="text"
-      [(ngModel)]="nombre"
-      name="nombre"
-      required
-      placeholder="Ingresa tu nombre"
-    />
-  </div>
+          <!-- MercadoPago -->
+          <button 
+            type="button" 
+            (click)="onSubmit('mercadopago')" 
+            [disabled]="procesandoPago"
+            class="btn btn-payment mercadopago">
+            <div class="payment-content">
+              <i class="fab fa-cc-mastercard"></i>
+              <span>MercadoPago</span>
+              <small>Próximamente disponible</small>
+            </div>
+          </button>
 
-  <!-- Correo -->
-  <div class="form-group">
-    <label for="correo">Correo Electrónico</label>
-    <input
-      id="correo"
-      type="email"
-      [(ngModel)]="correo"
-      name="correo"
-      required
-      placeholder="Ingresa tu correo"
-    />
-  </div>
+          <!-- Klap -->
+          <button 
+            type="button" 
+            (click)="irAPagoKlap()" 
+            [disabled]="procesandoPago"
+            class="btn btn-payment klap">
+            <div class="payment-content">
+              <i class="fas fa-mobile-alt"></i>
+              <span>Klap</span>
+              <small>Pago móvil</small>
+            </div>
+          </button>
+        </div>
+      </div>
 
-  <!-- Botón siguiente -->
-  <button
-    (click)="goToStep(2)"
-    class="submit-btn"
-    [disabled]="!nombre || !correo || !tratamiento"
-  >
-    Siguiente
-  </button>
-</div>
+      <!-- Botón anterior -->
+      <div class="form-actions">
+        <button
+          type="button"
+          (click)="pasoAnterior()"
+          class="btn btn-secondary"
+          [disabled]="procesandoPago">
+          <i class="fas fa-arrow-left"></i>
+          Anterior
+        </button>
+      </div>
+    </div>
 
+    <!-- Indicador de carga -->
+    <div *ngIf="procesandoPago" class="processing-overlay">
+      <div class="processing-content">
+        <div class="spinner"></div>
+        <p>Procesando tu solicitud...</p>
+        <small>Por favor no cierres esta ventana</small>
+      </div>
+    </div>
 
-  <!-- Sección 2 -->
-  <div *ngIf="step === 2" class="form-step">
-    <div class="form-group">
-  <label for="fecha">Fecha</label>
-  <input
-    id="fecha"
-    type="date"
-    [(ngModel)]="fecha"
-    name="fecha"
-    required
-    [min]="fechaMinima"
-    (change)="validarFecha()"
-    [class.invalid]="errorMessage"
-  />
-</div>
+    <!-- Modal Popup de Webpay -->
+    <div *ngIf="mostrarPopupWebpay" class="webpay-modal-overlay" (click)="cerrarPopupWebpay()">
+      <div class="webpay-modal" (click)="$event.stopPropagation()">
+        <!-- Header del modal -->
+        <div class="modal-header">
+          <div class="modal-title">
+            <i class="fas fa-credit-card"></i>
+            <h3>Pago con Webpay</h3>
+          </div>
+          <button 
+            type="button" 
+            class="modal-close-btn" 
+            (click)="cerrarPopupWebpay()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
 
-<!-- Campo hora -->
-<div class="form-group" *ngIf="horasDisponibles.length > 0">
-  <label for="hora">Selecciona el horario:</label>
-  <select id="hora" [(ngModel)]="hora" name="hora" required class="hora-select">
-    <option value="">Selecciona un horario</option>
-    <option *ngFor="let horaDisponible of horasDisponibles" [value]="horaDisponible">
-      {{ horaDisponible }}
-    </option>
-  </select>
-</div>
+        <!-- Información de pago -->
+        <div class="payment-info">
+          <div class="payment-detail">
+            <span class="detail-label">Tratamiento:</span>
+            <span class="detail-value">{{ tratamiento }}</span>
+          </div>
+          <div class="payment-detail">
+            <span class="detail-label">Fecha:</span>
+            <span class="detail-value">{{ fecha | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="payment-detail">
+            <span class="detail-label">Hora:</span>
+            <span class="detail-value">{{ hora }}</span>
+          </div>
+          <div class="payment-detail total">
+            <span class="detail-label">Total a pagar:</span>
+            <span class="detail-value">${{ precio.nacional | number:'1.0-0' }}</span>
+          </div>
+        </div>
 
-<!-- Mensaje si no hay horarios -->
-<div *ngIf="horasDisponibles.length === 0 && fecha && !errorMessage">
-  <p class="error-message">No hay horas disponibles para esta fecha.</p>
-</div>
+        <!-- Contenido del iframe -->
+        <div class="iframe-container">
+          <iframe 
+            src="https://www.webpay.cl/form-pay/264721"
+            width="100%" 
+            height="500"
+            frameborder="0"
+            class="webpay-iframe">
+          </iframe>
+        </div>
 
-<!-- Mensaje de error -->
-<div *ngIf="errorMessage">
-  <p class="error-message">{{ errorMessage }}</p>
-</div>
+        <!-- Instrucciones y botones -->
+        <div class="modal-footer">
+          <div class="payment-instructions">
+            <p class="instructions-title">
+              <i class="fas fa-info-circle"></i>
+              Instrucciones de pago:
+            </p>
+            <ol>
+              <li>Completa el formulario de pago arriba</li>
+              <li>Realiza el pago por <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
+              <li>Una vez completado, confirma tu pago abajo</li>
+            </ol>
+          </div>
 
-    <button (click)="goToStep(1)" class="submit-btn">Anterior</button>
-    <button (click)="goToStep(3)" class="submit-btn" [disabled]="!esHorarioValido()">Siguiente</button>
-  </div>
-
-  <!-- Sección 3 -->
-  <div *ngIf="step === 3" class="form-step">
-    <p class="price" *ngIf="precio.nacional">
-      Valor del tratamiento nacional: <span class="amount">${{ precio.nacional | number:'1.0-0' }}</span>
-    </p>
-    
-    <p class="price" *ngIf="precio.internacional">
-      Valor del tratamiento internacional: <span class="amount">${{ precio.internacional | number:'1.0-0' }} USD</span>
-    </p>
-    
-    <p class="price" *ngIf="precio.sesiones">
-      Número de sesiones: <span class="amount">{{ precio.sesiones }}</span>
-    </p>
-    
-
-    <button (click)="goToStep(2)" class="submit-btn">Anterior</button>
-    <!-- Pago Webpay -->
-<!-- Webpay -->
-<button type="button" (click)="onSubmit('webpay')" class="submit-btn pago-btn">
- 
-  Pagar con Webpay
-</button>
-
-<!-- Mercado Pago -->
-<button type="button" (click)="onSubmit('mercadopago')" class="submit-btn pago-btn">
-
-  Pagar con MercadoPago
-</button>
-
-<!-- Klap -->
-<button type="button" (click)="irAPagoKlap()" class="submit-btn pago-btn">
-
-  Pagar con Klap
-</button>
-
-
-
+          <div class="modal-actions">
+            <button 
+              type="button" 
+              (click)="confirmarPagoManual()" 
+              class="btn btn-confirm">
+              <i class="fas fa-check"></i>
+              Confirmar Pago Realizado
+            </button>
+            
+            <button 
+              type="button" 
+              (click)="cerrarPopupWebpay()" 
+              class="btn btn-cancel">
+              <i class="fas fa-times"></i>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

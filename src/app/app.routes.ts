@@ -18,6 +18,7 @@ import { CrearTallerComponent } from './pages/crear-taller/crear-taller.componen
 import { AdminTallerComponent } from './pages/admin-taller/admin-taller.component';
 import { HorarioComponent } from './pages/horario/horario.component';
 import { TratamientosComponent } from './pages/tratamientos/tratamientos.component';
+import { WebpayReturnComponent } from './components/webpay-return/webpay-return.component';
 
 
 
@@ -47,6 +48,9 @@ export const routes: Routes = [
   path: 'tratamientos',
   component: TratamientosComponent
 },
+{ path: 'webpay-return',
+    component: WebpayReturnComponent
+  },
 
       
       
