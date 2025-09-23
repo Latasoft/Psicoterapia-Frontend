@@ -117,7 +117,80 @@ export class InicioComponent implements OnInit {
     const file = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      this.uploadMedia(itemId);
+      
+      // Si es una imagen de servicio, usar el flujo específico para servicios
+      if (itemId.includes('service') && itemId.includes('image')) {
+        this.uploadServiceImage(itemId);
+      } else {
+        // Para otros elementos multimedia (hero, tarot, contact)
+        this.uploadMedia(itemId);
+      }
+    }
+  }
+
+  async uploadServiceImage(serviceImageKey: string) {
+    if (!this.selectedFile) return;
+
+    // Verificar autenticación
+    if (!this.isAdmin) {
+      alert('Necesitas estar autenticado para subir archivos');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      return;
+    }
+
+    // Encontrar el índice del servicio
+    const serviceIndex = this.services.findIndex(service => service.imageKey === serviceImageKey);
+    if (serviceIndex === -1) {
+      alert('Servicio no encontrado');
+      return;
+    }
+
+    this.uploadingItem = serviceImageKey;
+
+    try {
+      console.log(`🚀 Uploading service image for service index: ${serviceIndex}`);
+
+      // Crear FormData para enviar la imagen
+      const formData = new FormData();
+      formData.append('imagen', this.selectedFile);
+
+      // Llamar al nuevo endpoint específico para imágenes de servicios
+      const response = await fetch(`${environment.apiUrl}/api/page-content/inicio/service-image/${serviceIndex}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Actualizar el servicio local con la nueva URL
+        this.services[serviceIndex].imageUrl = result.data.secure_url;
+        this.services[serviceIndex].imagePublicId = result.data.public_id;
+
+        console.log('✅ Service image updated:', result.data.secure_url);
+        alert('Imagen del servicio actualizada exitosamente');
+      } else {
+        throw new Error(result.error || 'Error al subir imagen');
+      }
+
+    } catch (error) {
+      console.error('Error uploading service image:', error);
+      alert('Error al subir la imagen del servicio. Por favor, inténtalo de nuevo.');
+    } finally {
+      this.uploadingItem = null;
+      this.selectedFile = null;
     }
   }
 
@@ -192,6 +265,13 @@ export class InicioComponent implements OnInit {
   }
 
   async deleteMedia(itemId: string) {
+    // Si es una imagen de servicio, usar el flujo específico
+    if (itemId.includes('service') && itemId.includes('image')) {
+      await this.deleteServiceImage(itemId);
+      return;
+    }
+
+    // Para otros elementos multimedia (hero, tarot, contact)
     const item = this.mediaItems.find(m => m.id === itemId);
     if (!item || !item.publicId) {
       alert('No hay media personalizada para eliminar');
@@ -218,6 +298,39 @@ export class InicioComponent implements OnInit {
     }
   }
 
+  async deleteServiceImage(serviceImageKey: string) {
+    const serviceIndex = this.services.findIndex(service => service.imageKey === serviceImageKey);
+    if (serviceIndex === -1) {
+      alert('Servicio no encontrado');
+      return;
+    }
+
+    const service = this.services[serviceIndex];
+    if (!service.imagePublicId) {
+      alert('No hay imagen personalizada para eliminar');
+      return;
+    }
+
+    if (confirm('¿Estás seguro de que quieres eliminar esta imagen del servicio?')) {
+      try {
+        // Eliminar imagen de Cloudinary
+        await this.imageService.deleteImage(service.imagePublicId).toPromise();
+
+        // Restaurar imagen por defecto
+        service.imageUrl = 'assets/h11.png'; // Imagen por defecto
+        service.imagePublicId = null;
+
+        // Guardar cambios en Firebase
+        this.savePageContent();
+
+        alert('Imagen del servicio eliminada exitosamente');
+      } catch (error) {
+        console.error('Error deleting service image:', error);
+        alert('Error al eliminar la imagen del servicio');
+      }
+    }
+  }
+
   getDefaultMediaItem(itemId: string): MediaItem | undefined {
     const defaults: { [key: string]: string } = {
       'hero-image': 'assets/h2.jpg',
@@ -237,8 +350,39 @@ export class InicioComponent implements OnInit {
   }
 
   getMediaSrc(itemId: string): string {
+    // Para imágenes de servicios, buscar en el array de services
+    if (itemId.startsWith('service') && itemId.endsWith('-image')) {
+      // Extraer el índice del servicio del itemId (ej: "service1-image" -> 0, "service2-image" -> 1)
+      const serviceMatch = itemId.match(/service(\d+)-image/);
+      if (serviceMatch) {
+        const serviceIndex = parseInt(serviceMatch[1]) - 1; // Convertir a índice base 0
+        if (this.services && this.services[serviceIndex] && this.services[serviceIndex].imageUrl) {
+          return this.services[serviceIndex].imageUrl;
+        }
+      }
+      
+      // Si no se encuentra en services, buscar en el array dinámico por imageKey
+      const serviceByKey = this.services?.find(service => service.imageKey === itemId);
+      if (serviceByKey && serviceByKey.imageUrl) {
+        return serviceByKey.imageUrl;
+      }
+    }
+    
+    // Para otros elementos multimedia (hero, tarot, contact), usar el sistema existente
     const item = this.mediaItems.find(m => m.id === itemId);
-    return item ? item.src : '';
+    return item ? item.src : this.getDefaultImageForService(itemId);
+  }
+
+  private getDefaultImageForService(itemId: string): string {
+    const defaults: { [key: string]: string } = {
+      'hero-image': 'assets/h2.jpg',
+      'hero-video': 'assets/videos/si1.mp4',
+      'service1-image': 'assets/h11.png',
+      'service2-image': 'assets/h12.avif',
+      'tarot-image': 'assets/tarot3.jpeg',
+      'contact-video': 'assets/videos/si2.mp4'
+    };
+    return defaults[itemId] || 'assets/h11.png'; // Imagen por defecto para servicios nuevos
   }
 
   sanitizarUrl(url: string): SafeResourceUrl {
@@ -353,9 +497,11 @@ export class InicioComponent implements OnInit {
   addService() {
     const newService = {
       imageKey: `service${this.services.length + 1}-image`,
+      imageUrl: 'assets/h11.png', // URL por defecto
+      imagePublicId: null, // ID de Cloudinary cuando se suba una imagen personalizada
       title: 'Nuevo Servicio',
-      items: ['Precio'],
-      link: '#',
+      items: ['Precio: $0'],
+      link: '/formulario',
       buttonText: 'Ver más'
     };
     this.services.push(newService);
