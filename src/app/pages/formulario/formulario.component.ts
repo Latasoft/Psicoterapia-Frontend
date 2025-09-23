@@ -556,6 +556,25 @@ export class FormularioComponent implements OnInit, OnDestroy {
       const citaId = response.citaId || response.id || response._id || 'cita-creada';
       console.log('ID de cita extraído:', citaId);
       
+      // Enviar notificación a Matías después de crear la cita exitosamente
+      try {
+        const notificationData = {
+          nombre: citaData.nombre,
+          correo: citaData.correo,
+          tratamiento: citaData.tratamiento,
+          fecha: this.fecha,
+          hora: this.hora,
+          precio: this.precio.nacional
+        };
+        
+        console.log('Enviando notificación a Matías...');
+        await lastValueFrom(this.citasService.notificarReservacion(notificationData));
+        console.log('Notificación a Matías enviada exitosamente');
+      } catch (notificationError) {
+        console.error('Error al enviar notificación a Matías:', notificationError);
+        // No interrumpir el flujo principal si falla la notificación
+      }
+      
       return citaId;
       
     } catch (error) {
@@ -826,7 +845,25 @@ export class FormularioComponent implements OnInit, OnDestroy {
       };
 
       // Enviar la cita (puedes usar tu servicio existente)
-      await this.crearCitaConPago(citaData);
+      const response = await this.crearCitaConPago(citaData);
+      
+      // Enviar notificación a Matías sobre el pago confirmado
+      try {
+        const notificationData = {
+          nombre: citaData.nombre,
+          correo: citaData.correo,
+          tratamiento: citaData.tratamiento,
+          fecha: citaData.fecha,
+          hora: citaData.hora,
+          precio: citaData.monto
+        };
+        
+        console.log('Enviando notificación de pago confirmado a Matías...');
+        await lastValueFrom(this.citasService.notificarReservacion(notificationData));
+        console.log('Notificación de pago confirmado enviada a Matías');
+      } catch (notificationError) {
+        console.error('Error al enviar notificación de pago confirmado:', notificationError);
+      }
       
       // Mostrar confirmación exitosa
       this.mostrarConfirmacionExitosa();
@@ -852,22 +889,24 @@ export class FormularioComponent implements OnInit, OnDestroy {
       
       const fechaHora = `${citaData.fecha}T${horaInicio}:00`;
       
+      // ✅ Enviar solo los campos que acepta el backend actual
       const citaParaEnviar = {
         nombre: citaData.nombre.trim(),
         correo: citaData.correo.trim().toLowerCase(),
         fecha_hora: fechaHora,
-        tratamiento: citaData.tratamiento,
-        monto: citaData.monto,
-        estado_pago: citaData.estadoPago,
-        metodo_pago: citaData.metodoPago,
-        fecha_pago: citaData.fechaPago
+        tratamiento: citaData.tratamiento
+        // ❌ Remover estos campos por ahora:
+        // monto: citaData.monto,
+        // estado_pago: citaData.estadoPago,
+        // metodo_pago: citaData.metodoPago,
+        // fecha_pago: citaData.fechaPago
       };
 
       console.log('Creando cita con pago:', citaParaEnviar);
       
       const response = await lastValueFrom(this.citasService.reservarCita(citaParaEnviar));
       
-      console.log('Cita con pago creada:', response);
+      console.log('Correo llegó bien');
       return response;
       
     } catch (error) {

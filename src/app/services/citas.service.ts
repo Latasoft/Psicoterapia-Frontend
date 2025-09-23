@@ -51,4 +51,9 @@ export class CitasService {
   eliminarTratamiento(tratamientoId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/tratamientos/${tratamientoId}`);
   }
+
+  // Método para notificar a Matías sobre nueva reservación
+  notificarReservacion(citaData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/notificar-reservacion`, citaData);
+  }
 }
