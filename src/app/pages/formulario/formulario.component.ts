@@ -283,7 +283,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
         this.citasService.obtenerHorariosDisponibles(this.fecha)
       );
       
-      console.log('Respuesta horarios:', response);
+      console.log('Respuesta horarios completa:', response);
       
       if (response && response.horariosDisponibles) {
         const horariosRaw = response.horariosDisponibles;
@@ -302,7 +302,25 @@ export class FormularioComponent implements OnInit, OnDestroy {
             // Array de strings
             this.horasDisponibles = horariosRaw;
           }
+          
+          // ✅ NUEVO: Mostrar información sobre horas ocupadas si está disponible
+          if (response.horasOcupadas && response.horasOcupadas.length > 0) {
+            console.log(`Se encontraron ${response.horasOcupadas.length} horas ocupadas:`, response.horasOcupadas);
+          }
+          
+          // ✅ NUEVO: Si la hora actualmente seleccionada ya no está disponible, limpiarla
+          if (this.hora && !this.horasDisponibles.includes(this.hora)) {
+            console.log(`La hora seleccionada '${this.hora}' ya no está disponible. Limpiando selección.`);
+            this.hora = '';
+            this.errorMessage = 'La hora que tenías seleccionada ya no está disponible. Por favor selecciona otra.';
+          }
+        } else {
+          this.horasDisponibles = [];
+          this.errorMessage = 'No hay horarios disponibles para esta fecha.';
         }
+      } else {
+        this.horasDisponibles = [];
+        this.errorMessage = 'No se pudieron cargar los horarios disponibles.';
       }
       
       console.log('Horarios procesados:', this.horasDisponibles);
@@ -323,9 +341,23 @@ export class FormularioComponent implements OnInit, OnDestroy {
   }
 
   esHorarioValido(): boolean {
-    return this.fecha !== '' && 
-           this.hora !== '' && 
-           this.horasDisponibles.includes(this.hora);
+    const horarioBasicoValido = this.fecha !== '' && 
+                                this.hora !== '' && 
+                                this.horasDisponibles.includes(this.hora);
+    
+    // ✅ NUEVO: Validación adicional para asegurar que la hora sigue disponible
+    if (horarioBasicoValido && this.horasDisponibles.length > 0) {
+      // Si la hora seleccionada no está en la lista actual de horas disponibles,
+      // significa que fue ocupada por otra reserva
+      if (!this.horasDisponibles.includes(this.hora)) {
+        console.warn(`La hora '${this.hora}' ya no está disponible`);
+        this.errorMessage = 'La hora seleccionada ya no está disponible. Por favor selecciona otra.';
+        this.hora = ''; // Limpiar la selección
+        return false;
+      }
+    }
+    
+    return horarioBasicoValido;
   }
 
   esMercadoPagoDisponible(): boolean {
@@ -518,36 +550,10 @@ export class FormularioComponent implements OnInit, OnDestroy {
       };
 
       console.log('Datos de la cita a enviar:', citaData);
-      console.log('URL del backend:', 'Verificando servicio de citas...');
-      console.log('Fecha original:', this.fecha);
-      console.log('Hora original:', this.hora);
-      console.log('Hora procesada:', horaInicio);
-      console.log('Fecha/hora combinada:', fechaHora);
-      console.log('Tratamiento seleccionado:', this.tratamiento);
-      console.log('Tratamientos disponibles:', this.tratamientosDisponibles);
       
-      // Verificar que el tratamiento existe en la lista
-      const tratamientoExiste = this.tratamientosDisponibles.find(t => t.nombre === this.tratamiento);
-      console.log('Tratamiento encontrado en lista:', tratamientoExiste);
-      
-      // Validar datos antes de enviar
-      if (!citaData.nombre || citaData.nombre.length < 2) {
-        throw new Error('El nombre debe tener al menos 2 caracteres');
-      }
-      
-      if (!this.validarEmail(citaData.correo)) {
-        throw new Error('El correo electrónico no es válido');
-      }
-      
-      if (!citaData.tratamiento) {
-        throw new Error('Debe seleccionar un tratamiento');
-      }
-      
-      console.log('Enviando solicitud al backend...');
       const response = await lastValueFrom(this.citasService.reservarCita(citaData));
       
       console.log('Respuesta completa del servidor:', response);
-      console.log('Tipo de respuesta:', typeof response);
       
       if (!response) {
         throw new Error('No se recibió respuesta del servidor. Verifique la conexión al backend.');
@@ -555,6 +561,14 @@ export class FormularioComponent implements OnInit, OnDestroy {
       
       const citaId = response.citaId || response.id || response._id || 'cita-creada';
       console.log('ID de cita extraído:', citaId);
+      
+      // ✅ NUEVO: Refrescar horarios disponibles después de crear la cita
+      // para que la hora recién ocupada no aparezca más
+      if (this.fecha === new Date().toISOString().split('T')[0] || 
+          new Date(this.fecha) >= new Date()) {
+        console.log('Refrescando horarios disponibles después de crear cita...');
+        await this.cargarHorariosDisponibles();
+      }
       
       // Enviar notificación a Matías después de crear la cita exitosamente
       try {
@@ -580,59 +594,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('=== ERROR AL CREAR CITA ===');
       console.error('Error completo:', error);
-      console.error('Tipo de error:', typeof error);
-      
-      if (error instanceof Error) {
-        console.error('Error instance message:', error.message);
-        console.error('Error stack:', error.stack);
-        throw error;
-      } else if (error && typeof error === 'object') {
-        const errObj = error as any;
-        console.error('Error object keys:', Object.keys(errObj));
-        console.error('Error status:', errObj.status);
-        console.error('Error statusText:', errObj.statusText);
-        console.error('Error error:', errObj.error);
-        console.error('Error message:', errObj.message);
-        console.error('Error body:', errObj.error ? JSON.stringify(errObj.error, null, 2) : 'No error body');
-        
-        if (errObj.status === 0) {
-          throw new Error('No se puede conectar al servidor. Verifique que el backend esté funcionando.');
-        } else if (errObj.status === 400) {
-          const errorMessage = errObj.error?.error || errObj.error?.message || 'Datos inválidos enviados al servidor';
-          console.error('Error 400 - Backend validation failed:', errorMessage);
-          
-          // Proporcionar mensaje más específico según el tipo de error
-          let userMessage = '';
-          if (errorMessage.includes('Tratamiento inválido')) {
-            userMessage = 'El tratamiento seleccionado no es válido. Por favor, recargue la página y seleccione un tratamiento de la lista.';
-          } else if (errorMessage.includes('Fecha y hora inválidas')) {
-            userMessage = 'La fecha y hora seleccionadas no son válidas. Por favor, seleccione una fecha y hora correctas.';
-          } else if (errorMessage.includes('No se trabaja los domingos')) {
-            userMessage = 'No se atiende los domingos. Por favor, seleccione otro día.';
-          } else if (errorMessage.includes('Ya hay una cita agendada')) {
-            userMessage = 'Ya existe una cita en esa fecha y hora. Por favor, seleccione otro horario.';
-          } else if (errorMessage.includes('no está disponible')) {
-            userMessage = 'El horario seleccionado no está disponible. Por favor, seleccione otro horario de la lista.';
-          } else {
-            userMessage = `Error de validación: ${errorMessage}`;
-          }
-          
-          throw new Error(userMessage);
-        } else if (errObj.status === 404) {
-          throw new Error('Servicio no encontrado. Verifique la URL del backend.');
-        } else if (errObj.status === 500) {
-          throw new Error('Error interno del servidor. Contacte al administrador.');
-        } else if (errObj.error && errObj.error.message) {
-          throw new Error(`Error del servidor: ${errObj.error.message}`);
-        } else if (errObj.message) {
-          throw new Error(`Error: ${errObj.message}`);
-        } else {
-          throw new Error(`Error del servidor (${errObj.status || 'desconocido'}): ${JSON.stringify(errObj)}`);
-        }
-      } else {
-        console.error('Error tipo string o primitivo:', error);
-        throw new Error(`Error inesperado: ${error}`);
-      }
+      throw error;
     }
   }
 
