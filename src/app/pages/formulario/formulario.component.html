@@ -385,9 +385,52 @@
             </div>
           </div>
 
+          <!-- KLAP Vista (igual que Webpay y MercadoPago) -->
+          <div *ngIf="mostrarFormularioKlap" class="webpay-iframe-container">
+            <h3>Pago con KLAP</h3>
+            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
+            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
+            
+            <div class="klap-info">
+              <div class="payment-card klap-card">
+                <h4>📱 Código QR para KLAP</h4>
+                <div class="qr-container">
+                  <img src="assets/qr.png" alt="Código QR KLAP" class="qr-image">
+                </div>
+                <p class="qr-instructions">
+                  <strong>Escanea el código QR con tu app KLAP</strong>
+                </p>
+              </div>
+            </div>
+            
+            <div class="payment-instructions">
+              <p>📋 <strong>Instrucciones:</strong></p>
+              <ol>
+                <li>Abre tu app KLAP en tu teléfono móvil</li>
+                <li>Escanea el código QR mostrado arriba</li>
+                <li>Confirma el pago por <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
+                <li>Una vez completado, regresa aquí y confirma el pago</li>
+              </ol>
+              
+              <button 
+                type="button" 
+                (click)="confirmarPagoManual()" 
+                class="btn btn-primary">
+                ✅ Confirmar Pago Realizado
+              </button>
+              
+              <button 
+                type="button" 
+                (click)="cancelarPagoKlap()" 
+                class="btn btn-secondary">
+                ❌ Cancelar
+              </button>
+            </div>
+          </div>
+
           <!-- Botón para mostrar el formulario -->
           <button 
-            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago"
+            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
             type="button" 
             (click)="mostrarWebpay()" 
             [disabled]="procesandoPago"
@@ -401,7 +444,7 @@
 
           <!-- MercadoPago -->
           <button 
-            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago"
+            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
             type="button" 
             (click)="mostrarMercadoPago()" 
             [disabled]="procesandoPago || !esMercadoPagoDisponible()"
@@ -418,8 +461,9 @@
 
           <!-- Klap -->
           <button 
+            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
             type="button" 
-            (click)="irAPagoKlap()" 
+            (click)="mostrarKlap()" 
             [disabled]="procesandoPago"
             class="btn btn-payment klap">
             <div class="payment-content">

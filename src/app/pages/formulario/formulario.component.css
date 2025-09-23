@@ -1260,6 +1260,49 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+/* ========== ESTILOS ESPECÍFICOS PARA KLAP ========== */
+.klap-info {
+  margin: 20px 0;
+}
+
+.klap-card {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 15px 0;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+  text-align: center;
+}
+
+.klap-card h4 {
+  margin: 0 0 20px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.qr-container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px auto;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.qr-image {
+  width: 200px;
+  height: 200px;
+  display: block;
+  margin: 0 auto;
+}
+
+.qr-instructions {
+  margin: 15px 0 0 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
 /* ========== SECCI�N DE CONFIRMACI�N DE PAGO ========== */
 .confirmation-section {
   margin-top: 20px;

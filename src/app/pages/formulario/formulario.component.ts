@@ -109,6 +109,10 @@ export class FormularioComponent implements OnInit, OnDestroy {
   mostrarFormularioMercadoPago = false;
   mostrarPopupMercadoPago = false;
 
+  // Propiedades para KLAP (igual que Webpay y MercadoPago)
+  mostrarFormularioKlap = false;
+  mostrarPopupKlap = false;
+
   constructor(
     private authService: AuthService,
     private imageService: ImageService,
@@ -699,6 +703,15 @@ export class FormularioComponent implements OnInit, OnDestroy {
   abrirMercadoPago(url: string) {
     console.log('Abriendo MercadoPago en:', url);
     window.open(url, '_blank');
+  }
+
+  // Funciones para KLAP (iguales que Webpay y MercadoPago)
+  mostrarKlap() {
+    this.mostrarFormularioKlap = true;
+  }
+
+  cancelarPagoKlap() {
+    this.mostrarFormularioKlap = false;
   }
 
   abrirPopupWebpay() {
