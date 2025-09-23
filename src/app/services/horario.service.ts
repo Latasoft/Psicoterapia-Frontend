@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class HorarioService {
-  private apiUrl = 'https://backend-psicologia-fckw.onrender.com/api/horario'; // ajustá si es necesario
+  private apiUrl = 'http://localhost:3000/api/horario'; // ajustá si es necesario
 
   constructor(private http: HttpClient) {}
 
@@ -18,12 +18,12 @@ export class HorarioService {
     return this.http.post(`${this.apiUrl}/guardar`, horarioData);
   }
 
-  editarDia(dia: string, horas: string[]) {
-    return this.http.patch(`${this.apiUrl}/editar-dia/${dia}`, { horas });
+  editarDia(dia: string, rangos: any[]) {
+    return this.http.patch(`${this.apiUrl}/editar-dia/${dia}`, { horas: rangos });
   }
 
-  editarExcepcion(fecha: string, horas: string[]) {
-    return this.http.patch(`${this.apiUrl}/editar-excepcion/${fecha}`, { horas });
+  editarExcepcion(fecha: string, rangos: any[]) {
+    return this.http.patch(`${this.apiUrl}/editar-excepcion/${fecha}`, { horas: rangos });
   }
 
    eliminarExcepcion(fecha: string): Observable<any> {

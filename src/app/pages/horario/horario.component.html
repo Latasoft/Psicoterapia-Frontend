@@ -1,18 +1,39 @@
 <div class="contenedor-horarios">
   <div class="horario-semanal">
     <h2>Horario Semanal</h2>
-    <!-- Aquí va tu código del horario semanal -->
-    <div *ngFor="let dia of ['lunes','martes','miércoles','jueves','viernes','sábado']"> 
+    
+    <div *ngFor="let dia of ['lunes','martes','miércoles','jueves','viernes','sábado','domingo']"> 
       <h4>{{ dia | titlecase }}</h4>
-      <p>Horas: {{ horarioSemanal[dia]?.join(', ') || 'Sin horario' }}</p>
+      
+      <!-- Mostrar rangos de horas -->
+      <div class="horas-disponibles">
+        <strong>Horarios disponibles:</strong>
+        <span *ngIf="(horarioSemanal[dia] && horarioSemanal[dia].length > 0); else sinHorario" class="horas-lista">
+          <span *ngFor="let rango of horarioSemanal[dia]; let last = last">
+            {{ rango.inicio }} - {{ rango.fin }}<span *ngIf="!last">, </span>
+          </span>
+        </span>
+        <ng-template #sinHorario>
+          <span class="sin-horario">Sin horario definido</span>
+        </ng-template>
+      </div>
 
-      <input #inputHora type="time" />
-      <button (click)="agregarHoraDia(dia, inputHora.value); inputHora.value=''">Agregar hora</button>
+      <!-- Agregar nuevo rango -->
+      <div class="agregar-rango">
+        <label>Desde:</label>
+        <input #inputInicio type="time" />
+        <label>Hasta:</label>
+        <input #inputFin type="time" />
+        <button (click)="agregarRangoDia(dia, inputInicio.value, inputFin.value); inputInicio.value=''; inputFin.value=''">
+          Agregar horario
+        </button>
+      </div>
 
-      <ul>
-        <li *ngFor="let hora of horarioSemanal[dia]">
-          {{ hora }}
-          <button (click)="eliminarHoraDia(dia, hora)">Eliminar</button>
+      <!-- Lista de rangos con opción de eliminar -->
+      <ul class="lista-rangos" *ngIf="(horarioSemanal[dia]?.length || 0) > 0">
+        <li *ngFor="let rango of horarioSemanal[dia]; let i = index" class="rango-item">
+          <span class="rango-texto">{{ rango.inicio }} - {{ rango.fin }}</span>
+          <button class="btn-eliminar" (click)="eliminarRangoDia(dia, i)">Eliminar</button>
         </li>
       </ul>
     </div>
@@ -20,25 +41,46 @@
 
   <div class="excepciones">
     <h2>Excepciones</h2>
-    <div>
-      <label for="nuevaFecha">Agregar nueva excepción (fecha sin atención o con horarios especiales):</label>
+    
+    <div class="agregar-excepcion">
+      <label for="nuevaFecha">Agregar nueva excepción:</label>
       <input id="nuevaFecha" type="date" [(ngModel)]="nuevaFechaExcepcion" />
       <button (click)="agregarExcepcionNueva(nuevaFechaExcepcion)">Agregar excepción</button>
     </div>
 
-    <div *ngFor="let fecha of excepciones | keyvalue">
+    <div *ngFor="let fecha of excepciones | keyvalue" class="excepcion-item">
       <h4>{{ fecha.key }}</h4>
-      <p>Horas disponibles: {{ fecha.value.length > 0 ? fecha.value.join(', ') : 'No atiende' }}</p>
       
+      <!-- Mostrar rangos disponibles para la excepción -->
+      <div class="horas-disponibles-excepcion">
+        <strong>Horarios disponibles:</strong>
+        <span *ngIf="fecha.value.length > 0; else noAtiende" class="horas-lista">
+          <span *ngFor="let rango of fecha.value; let last = last">
+            {{ rango.inicio }} - {{ rango.fin }}<span *ngIf="!last">, </span>
+          </span>
+        </span>
+        <ng-template #noAtiende>
+          <span class="no-atiende">No atiende este día</span>
+        </ng-template>
+      </div>
 
-      <input #inputHoraEx type="time" />
-      <button (click)="agregarHoraExcepcion(fecha.key, inputHoraEx.value); inputHoraEx.value=''">Agregar hora</button>
-      <button class="eliminar-excepcion" (click)="eliminarExcepcion(fecha.key)">Eliminar excepción</button>
+      <!-- Agregar rango a excepción -->
+      <div class="agregar-rango-excepcion">
+        <label>Desde:</label>
+        <input #inputInicioEx type="time" />
+        <label>Hasta:</label>
+        <input #inputFinEx type="time" />
+        <button (click)="agregarRangoExcepcion(fecha.key, inputInicioEx.value, inputFinEx.value); inputInicioEx.value=''; inputFinEx.value=''">
+          Agregar horario
+        </button>
+        <button class="eliminar-excepcion" (click)="eliminarExcepcion(fecha.key)">Eliminar excepción</button>
+      </div>
 
-      <ul>
-        <li *ngFor="let hora of fecha.value">
-          {{ hora }}
-          <button (click)="eliminarHoraExcepcion(fecha.key, hora)">Eliminar</button>
+      <!-- Lista de rangos de la excepción -->
+      <ul class="lista-rangos-excepcion" *ngIf="fecha.value.length > 0">
+        <li *ngFor="let rango of fecha.value; let i = index" class="rango-item">
+          <span class="rango-texto">{{ rango.inicio }} - {{ rango.fin }}</span>
+          <button class="btn-eliminar" (click)="eliminarRangoExcepcion(fecha.key, i)">Eliminar</button>
         </li>
       </ul>
       <hr />

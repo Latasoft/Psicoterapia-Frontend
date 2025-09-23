@@ -3,6 +3,10 @@ import { HorarioService } from '../../services/horario.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+interface RangoHora {
+  inicio: string;
+  fin: string;
+}
 
 @Component({
   selector: 'app-horario',
@@ -12,9 +16,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class HorarioComponent implements OnInit{
 
-  horarioSemanal: any = {};
-  excepciones: Record<string, string[]> = {};
-   nuevaFechaExcepcion: string = '';
+  horarioSemanal: Record<string, RangoHora[]> = {};
+  excepciones: Record<string, RangoHora[]> = {};
+  nuevaFechaExcepcion: string = '';
 
   constructor(private horarioService: HorarioService) {}
 
@@ -31,99 +35,114 @@ export class HorarioComponent implements OnInit{
     });
   }
 
-  actualizarDia(dia: string, horas: string[]) {
-    this.horarioService.editarDia(dia, horas).subscribe({
-      next: () => alert(`Horario del ${dia} actualizado`),
+  // Agregar rango de hora a un día
+  agregarRangoDia(dia: string, inicio: string, fin: string) {
+    if (!inicio || !fin) {
+      alert('Debe especificar hora de inicio y fin');
+      return;
+    }
+
+    if (inicio >= fin) {
+      alert('La hora de inicio debe ser menor que la hora de fin');
+      return;
+    }
+
+    const nuevoRango: RangoHora = { inicio, fin };
+    const rangosActuales = this.horarioSemanal[dia] || [];
+    
+    // Verificar si ya existe un rango similar
+    const existeRango = rangosActuales.some(r => r.inicio === inicio && r.fin === fin);
+    if (existeRango) {
+      alert('Ya existe un rango con esos horarios');
+      return;
+    }
+
+    const nuevosRangos = [...rangosActuales, nuevoRango];
+    this.actualizarDia(dia, nuevosRangos);
+  }
+
+  // Eliminar rango de un día
+  eliminarRangoDia(dia: string, index: number) {
+    const rangosActuales = this.horarioSemanal[dia] || [];
+    const nuevosRangos = rangosActuales.filter((_, i) => i !== index);
+    this.actualizarDia(dia, nuevosRangos);
+  }
+
+  // Actualizar día con array de rangos
+  actualizarDia(dia: string, rangos: RangoHora[]) {
+    this.horarioService.editarDia(dia, rangos).subscribe({
+      next: () => {
+        alert(`Horario del ${dia} actualizado`);
+        this.horarioSemanal[dia] = rangos;
+      },
       error: (err) => console.error(err)
     });
   }
 
-  actualizarExcepcion(fecha: string, horas: string[]) {
-    this.horarioService.editarExcepcion(fecha, horas).subscribe({
-      next: () => alert(`Excepción del ${fecha} actualizada`),
+  // Agregar rango a excepción
+  agregarRangoExcepcion(fecha: string, inicio: string, fin: string) {
+    if (!inicio || !fin) {
+      alert('Debe especificar hora de inicio y fin');
+      return;
+    }
+
+    if (inicio >= fin) {
+      alert('La hora de inicio debe ser menor que la hora de fin');
+      return;
+    }
+
+    const nuevoRango: RangoHora = { inicio, fin };
+    const rangosActuales = this.excepciones[fecha] || [];
+    
+    const existeRango = rangosActuales.some(r => r.inicio === inicio && r.fin === fin);
+    if (existeRango) {
+      alert('Ya existe un rango con esos horarios');
+      return;
+    }
+
+    const nuevosRangos = [...rangosActuales, nuevoRango];
+    this.actualizarExcepcion(fecha, nuevosRangos);
+  }
+
+  // Eliminar rango de excepción
+  eliminarRangoExcepcion(fecha: string, index: number) {
+    const rangosActuales = this.excepciones[fecha] || [];
+    const nuevosRangos = rangosActuales.filter((_, i) => i !== index);
+    this.actualizarExcepcion(fecha, nuevosRangos);
+  }
+
+  // Actualizar excepción
+  actualizarExcepcion(fecha: string, rangos: RangoHora[]) {
+    this.horarioService.editarExcepcion(fecha, rangos).subscribe({
+      next: () => {
+        alert(`Excepción del ${fecha} actualizada`);
+        this.excepciones[fecha] = rangos;
+      },
       error: (err) => console.error(err)
     });
   }
-getHoras(horas: unknown): string {
-  if (Array.isArray(horas)) {
-    return horas.join(', ');
+
+  // Agregar nueva excepción
+  agregarExcepcionNueva(fecha: string) {
+    if (!fecha) return;
+    if (!this.excepciones[fecha]) {
+      this.horarioService.editarExcepcion(fecha, []).subscribe(() => {
+        this.excepciones[fecha] = [];
+      });
+    } else {
+      alert('Ya existe una excepción para esa fecha.');
+    }
   }
-  return 'Sin horas disponibles';
-}
 
-// Para agregar una hora a un día específico
-agregarHoraDia(dia: string, horaNueva: string) {
-  if (!horaNueva) return;
-
-  // Obtener las horas actuales o inicializar array vacío
-  const horasActuales = this.horarioSemanal[dia] || [];
-
-  // Si la hora no existe, agregarla
-  if (!horasActuales.includes(horaNueva)) {
-    horasActuales.push(horaNueva);
-    this.actualizarDia(dia, horasActuales);
-  }
-}
-
-// Para eliminar una hora de un día
-eliminarHoraDia(dia: string, horaEliminar: string) {
-  const horasActuales = this.horarioSemanal[dia] || [];
-  const index = horasActuales.indexOf(horaEliminar);
-  if (index !== -1) {
-    horasActuales.splice(index, 1);
-    this.actualizarDia(dia, horasActuales);
-  }
-}
-// Agregar hora en una excepción (fecha)
-// En el componente TS:
-
-// Agregar hora a una excepción (fecha)
-agregarHoraExcepcion(fecha: string, hora: string) {
-  if (!hora) return;
-
-  const horasActuales = this.excepciones[fecha] || [];
-  if (!horasActuales.includes(hora)) {
-    const nuevasHoras = [...horasActuales, hora];
-    this.horarioService.editarExcepcion(fecha, nuevasHoras).subscribe(() => {
-      this.excepciones[fecha] = nuevasHoras;
+  // Eliminar excepción completa
+  eliminarExcepcion(fecha: string) {
+    this.horarioService.eliminarExcepcion(fecha).subscribe({
+      next: () => {
+        alert(`Excepción del ${fecha} eliminada.`);
+        delete this.excepciones[fecha];
+      },
+      error: err => console.error('Error al eliminar excepción:', err)
     });
   }
-}
-
-// Eliminar hora de una excepción
-eliminarHoraExcepcion(fecha: string, hora: string) {
-  const horasActuales = this.excepciones[fecha] || [];
-  const nuevasHoras = horasActuales.filter(h => h !== hora);
-  this.horarioService.editarExcepcion(fecha, nuevasHoras).subscribe(() => {
-    this.excepciones[fecha] = nuevasHoras;
-  });
-}
-
-// Agregar una nueva excepción (día sin horas o con horas)
-agregarExcepcionNueva(fecha: string) {
-  if (!fecha) return;
-  if (!this.excepciones[fecha]) {
-    this.horarioService.editarExcepcion(fecha, []).subscribe(() => {
-      this.excepciones[fecha] = [];
-    });
-  } else {
-    alert('Ya existe una excepción para esa fecha.');
-  }
-}
-eliminarExcepcion(fecha: string) {
-  this.horarioService.eliminarExcepcion(fecha).subscribe({
-    next: () => {
-      alert(`Excepción del ${fecha} eliminada.`);
-      // También actualizamos el objeto para que desaparezca del listado en el frontend:
-      delete this.excepciones[fecha];
-    },
-    error: err => console.error('Error al eliminar excepción:', err)
-  });
-}
-
-
-
-
-
 }
 
