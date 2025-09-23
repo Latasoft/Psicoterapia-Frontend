@@ -422,3 +422,25 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+.hora-select {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.hora-select:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.hora-select option {
+  padding: 10px;
+  font-size: 16px;
+}

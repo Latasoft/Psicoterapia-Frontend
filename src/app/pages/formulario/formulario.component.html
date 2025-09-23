@@ -159,16 +159,23 @@
 
 <!-- Campo hora -->
 <div class="form-group" *ngIf="horasDisponibles.length > 0">
-  <label for="hora">Hora</label>
-  <select id="hora" [(ngModel)]="hora" name="hora" required>
-    <option value="" disabled selected>Selecciona una hora</option>
-    <option *ngFor="let h of horasDisponibles" [value]="h">{{ h }}</option>
+  <label for="hora">Selecciona el horario:</label>
+  <select id="hora" [(ngModel)]="hora" name="hora" required class="hora-select">
+    <option value="">Selecciona un horario</option>
+    <option *ngFor="let horaDisponible of horasDisponibles" [value]="horaDisponible">
+      {{ horaDisponible }}
+    </option>
   </select>
 </div>
 
 <!-- Mensaje si no hay horarios -->
-<div *ngIf="horasDisponibles.length === 0 && fecha">
+<div *ngIf="horasDisponibles.length === 0 && fecha && !errorMessage">
   <p class="error-message">No hay horas disponibles para esta fecha.</p>
+</div>
+
+<!-- Mensaje de error -->
+<div *ngIf="errorMessage">
+  <p class="error-message">{{ errorMessage }}</p>
 </div>
 
     <button (click)="goToStep(1)" class="submit-btn">Anterior</button>
