@@ -122,7 +122,80 @@ export class FormularioComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
+  // ========== CACHE DEL FORMULARIO ==========
+  private readonly FORM_CACHE_KEY = 'formulario_cliente_datos';
+
+  private saveFormDataToCache() {
+    const formData = {
+      nombre: this.nombre,
+      correo: this.correo,
+      tratamiento: this.tratamiento,
+      fecha: this.fecha,
+      hora: this.hora,
+      step: this.step,
+      timestamp: new Date().getTime()
+    };
+    
+    localStorage.setItem(this.FORM_CACHE_KEY, JSON.stringify(formData));
+    console.log('Datos del formulario guardados en caché:', formData);
+  }
+
+  private loadFormDataFromCache() {
+    try {
+      const cachedData = localStorage.getItem(this.FORM_CACHE_KEY);
+      if (cachedData) {
+        const formData = JSON.parse(cachedData);
+        
+        // Verificar que los datos no sean muy antiguos (24 horas)
+        const now = new Date().getTime();
+        const cacheAge = now - formData.timestamp;
+        const maxAge = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        
+        if (cacheAge < maxAge) {
+          this.nombre = formData.nombre || '';
+          this.correo = formData.correo || '';
+          this.tratamiento = formData.tratamiento || '';
+          this.fecha = formData.fecha || '';
+          this.hora = formData.hora || '';
+          this.step = formData.step || 1;
+          
+          console.log('Datos del formulario cargados desde caché:', formData);
+          return true;
+        } else {
+          console.log('Datos del caché expirados, eliminando...');
+          this.clearFormCache();
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar datos del caché:', error);
+      this.clearFormCache();
+    }
+    return false;
+  }
+
+  clearFormCache() {
+    localStorage.removeItem(this.FORM_CACHE_KEY);
+    console.log('Caché del formulario eliminado');
+    
+    // Opcional: También limpiar los datos del formulario actual
+    this.limpiarFormulario();
+    
+    alert('Datos guardados eliminados correctamente');
+  }
+
+  debouncedSave() {
+    if (this.saveTimeout) {
+      clearTimeout(this.saveTimeout);
+    }
+    
+    this.saveTimeout = setTimeout(() => {
+      this.saveFormDataToCache();
+    }, 1000); // Guardar después de 1 segundo de inactividad
+  }
+
   ngOnInit() {
+    // Cargar datos del caché antes de inicializar
+    this.loadFormDataFromCache();
     this.initializeComponent();
   }
 
@@ -284,12 +357,14 @@ export class FormularioComponent implements OnInit, OnDestroy {
   siguientePaso() {
     if (this.step < this.totalSteps && this.esPasoValido(this.step)) {
       this.step++;
+      this.debouncedSave(); // Guardar datos al cambiar de paso
     }
   }
 
   pasoAnterior() {
     if (this.step > 1) {
       this.step--;
+      this.debouncedSave(); // Guardar datos al cambiar de paso
     }
   }
 
@@ -361,6 +436,9 @@ export class FormularioComponent implements OnInit, OnDestroy {
       }
 
       console.log('Cita creada exitosamente con ID:', citaId);
+
+      // Limpiar caché del formulario una vez que la cita se crea exitosamente
+      this.clearFormCache();
 
       // Procesar pago según método
       switch (paymentMethod) {

@@ -93,19 +93,20 @@
           id="nombre"
           type="text"
           [(ngModel)]="nombre"
+          (input)="debouncedSave()"
           name="nombre"
           required
           placeholder="Ingresa tu nombre completo"
           class="form-control" />
       </div>
 
-      <!-- Correo -->
       <div class="form-group">
         <label for="correo">Correo Electrónico *</label>
         <input
           id="correo"
           type="email"
           [(ngModel)]="correo"
+          (input)="debouncedSave()"
           name="correo"
           required
           placeholder="ejemplo@correo.com"
@@ -120,7 +121,7 @@
           [(ngModel)]="tratamiento"
           name="tratamiento"
           required
-          (change)="actualizarPrecio()"
+          (change)="actualizarPrecio(); debouncedSave()"
           class="form-control">
           <option value="" disabled>Selecciona un tratamiento</option>
           <option *ngFor="let t of tratamientosDisponibles" [value]="t.nombre">
@@ -147,6 +148,18 @@
           <span class="price-label">Número de sesiones:</span>
           <span class="price-amount">{{ precio.sesiones }}</span>
         </div>
+      </div>
+
+      <!-- Botón limpiar caché -->
+      <div class="cache-actions">
+        <button
+          type="button"
+          (click)="clearFormCache()"
+          class="btn btn-secondary btn-sm"
+          title="Limpiar datos guardados del formulario">
+          <i class="fas fa-trash"></i>
+          Limpiar datos guardados
+        </button>
       </div>
 
       <!-- Botón siguiente -->
@@ -176,7 +189,7 @@
           name="fecha"
           required
           [min]="fechaMinima"
-          (change)="validarFecha()"
+          (change)="validarFecha(); debouncedSave()"
           [class.invalid]="errorMessage"
           class="form-control" />
       </div>
@@ -195,6 +208,7 @@
           [(ngModel)]="hora" 
           name="hora" 
           required 
+          (change)="debouncedSave()"
           class="form-control hora-select">
           <option value="">Selecciona un horario</option>
           <option *ngFor="let horaDisponible of horasDisponibles" [value]="horaDisponible">
