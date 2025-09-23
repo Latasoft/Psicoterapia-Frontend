@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HorarioService {
-  private apiUrl = 'http://localhost:3000/api/horario'; // ajustá si es necesario
+  private apiUrl = `${environment.apiUrl}/api/horario`;  // URL cambiar cuando haga push por esto   private apiUrl = `${environment.apiUrl}/login`; 
 
   constructor(private http: HttpClient) {}
 
