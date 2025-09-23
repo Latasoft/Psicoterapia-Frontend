@@ -331,13 +331,16 @@
           <button 
             type="button" 
             (click)="onSubmit('mercadopago')" 
-            [disabled]="procesandoPago"
+            [disabled]="procesandoPago || !esMercadoPagoDisponible()"
             class="btn btn-payment mercadopago">
             <div class="payment-content">
               <i class="fab fa-cc-mastercard"></i>
               <span>MercadoPago</span>
-              <small>Próximamente disponible</small>
+              <small>Solo para $40.000 y $70.000</small>
             </div>
+            <span *ngIf="procesandoPago" class="loading-spinner">
+              <i class="fas fa-spinner fa-spin"></i>
+            </span>
           </button>
 
           <!-- Klap -->

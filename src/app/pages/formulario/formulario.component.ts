@@ -247,6 +247,10 @@ export class FormularioComponent implements OnInit, OnDestroy {
            this.horasDisponibles.includes(this.hora);
   }
 
+  esMercadoPagoDisponible(): boolean {
+    return this.precio.nacional === 40000 || this.precio.nacional === 70000;
+  }
+
   esPasoValido(paso: number): boolean {
     switch (paso) {
       case 1:
@@ -284,24 +288,62 @@ export class FormularioComponent implements OnInit, OnDestroy {
   // ========== PAGOS ==========
   // Enviar formulario con integración de pagos
   async onSubmit(paymentMethod: string) {
-    if (!this.esFormularioValido()) {
-      alert('Por favor complete todos los campos requeridos');
+    console.log('=== INICIANDO onSubmit ===');
+    console.log('Método de pago seleccionado:', paymentMethod);
+    
+    // Validaciones detalladas
+    if (!this.nombre || this.nombre.trim() === '') {
+      alert('Por favor ingrese su nombre');
+      return;
+    }
+    
+    if (!this.correo || this.correo.trim() === '') {
+      alert('Por favor ingrese su correo electrónico');
+      return;
+    }
+    
+    if (!this.validarEmail(this.correo.trim())) {
+      alert('Por favor ingrese un correo electrónico válido');
+      return;
+    }
+    
+    if (!this.tratamiento) {
+      alert('Por favor seleccione un tratamiento');
+      return;
+    }
+    
+    if (!this.fecha) {
+      alert('Por favor seleccione una fecha');
+      return;
+    }
+    
+    if (!this.hora) {
+      alert('Por favor seleccione una hora');
+      return;
+    }
+    
+    if (!this.esHorarioValido()) {
+      alert('La hora seleccionada no está disponible');
+      return;
+    }
+
+    // Validación específica para MercadoPago
+    if (paymentMethod === 'mercadopago' && !this.esMercadoPagoDisponible()) {
+      alert('MercadoPago solo está disponible para tratamientos de $40.000 y $70.000');
       return;
     }
 
     this.procesandoPago = true;
 
     try {
-      console.log('=== INICIANDO PROCESO DE PAGO ===');
-      console.log('Método de pago:', paymentMethod);
-      console.log('Datos del formulario:', {
-        nombre: this.nombre,
-        correo: this.correo,
-        tratamiento: this.tratamiento,
-        fecha: this.fecha,
-        hora: this.hora,
-        precio: this.precio
-      });
+      console.log('=== DATOS DEL FORMULARIO ===');
+      console.log('Nombre:', this.nombre);
+      console.log('Correo:', this.correo);
+      console.log('Tratamiento:', this.tratamiento);
+      console.log('Fecha:', this.fecha);
+      console.log('Hora:', this.hora);
+      console.log('Precio:', this.precio);
+      console.log('Horarios disponibles:', this.horasDisponibles);
 
       // Crear la cita primero
       const citaId = await this.crearCita();
@@ -310,49 +352,63 @@ export class FormularioComponent implements OnInit, OnDestroy {
         throw new Error('No se pudo crear la cita. Verifique los datos ingresados.');
       }
 
-      console.log('Cita creada con ID:', citaId);
+      console.log('Cita creada exitosamente con ID:', citaId);
 
       // Procesar pago según método
       switch (paymentMethod) {
         case 'webpay':
+          console.log('Procesando pago con Webpay...');
           await this.procesarPagoWebpay(citaId);
           break;
         case 'mercadopago':
+          console.log('Procesando pago con MercadoPago...');
           await this.procesarPagoMercadoPago(citaId);
           break;
         case 'klap':
+          console.log('Redirigiendo a Klap...');
           this.irAPagoKlap();
           break;
         default:
+          console.log('Cita sin pago procesada exitosamente');
           alert('¡Cita reservada exitosamente! Te llegará un correo de confirmación.');
           this.limpiarFormulario();
           break;
       }
       
     } catch (error) {
-      console.error('Error detallado en onSubmit:', error);
+      console.error('=== ERROR EN onSubmit ===');
+      console.error('Error completo:', error);
+      console.error('Tipo de error:', typeof error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
       
       let errorMessage = 'Error desconocido al procesar la solicitud.';
       
       if (error instanceof Error) {
         errorMessage = error.message;
+        console.log('Error message from Error instance:', error.message);
       } else if (typeof error === 'string') {
         errorMessage = error;
+        console.log('Error as string:', error);
       } else if (error && typeof error === 'object') {
-        const errObj = error as { error?: any; message?: string };
-        if (errObj.error && typeof errObj.error === 'object' && 'message' in errObj.error) {
+        console.log('Error as object:', JSON.stringify(error, null, 2));
+        const errObj = error as { error?: any; message?: string; status?: number };
+        
+        if (errObj.status === 0) {
+          errorMessage = 'Error de conexión. Verifique su conexión a internet.';
+        } else if (errObj.error && typeof errObj.error === 'object' && 'message' in errObj.error) {
           errorMessage = errObj.error.message;
         } else if (errObj.message) {
           errorMessage = errObj.message;
         } else if (errObj.error) {
-          errorMessage = JSON.stringify(errObj.error);
+          errorMessage = typeof errObj.error === 'string' ? errObj.error : JSON.stringify(errObj.error);
         }
       }
       
-      console.error('Mensaje de error procesado:', errorMessage);
-      alert(`Error: ${errorMessage}\n\nPor favor intenta nuevamente o contacta al administrador.`);
+      console.error('Mensaje de error final:', errorMessage);
+      alert(`Error: ${errorMessage}\n\nDetalles técnicos guardados en la consola.\nPor favor intenta nuevamente o contacta al administrador.`);
     } finally {
       this.procesandoPago = false;
+      console.log('=== FIN onSubmit ===');
     }
   }
 
@@ -376,6 +432,17 @@ export class FormularioComponent implements OnInit, OnDestroy {
       };
 
       console.log('Datos de la cita a enviar:', citaData);
+      console.log('URL del backend:', 'Verificando servicio de citas...');
+      console.log('Fecha original:', this.fecha);
+      console.log('Hora original:', this.hora);
+      console.log('Hora procesada:', horaInicio);
+      console.log('Fecha/hora combinada:', fechaHora);
+      console.log('Tratamiento seleccionado:', this.tratamiento);
+      console.log('Tratamientos disponibles:', this.tratamientosDisponibles);
+      
+      // Verificar que el tratamiento existe en la lista
+      const tratamientoExiste = this.tratamientosDisponibles.find(t => t.nombre === this.tratamiento);
+      console.log('Tratamiento encontrado en lista:', tratamientoExiste);
       
       // Validar datos antes de enviar
       if (!citaData.nombre || citaData.nombre.length < 2) {
@@ -390,25 +457,76 @@ export class FormularioComponent implements OnInit, OnDestroy {
         throw new Error('Debe seleccionar un tratamiento');
       }
       
+      console.log('Enviando solicitud al backend...');
       const response = await lastValueFrom(this.citasService.reservarCita(citaData));
       
-      console.log('Respuesta del servidor al crear cita:', response);
+      console.log('Respuesta completa del servidor:', response);
+      console.log('Tipo de respuesta:', typeof response);
       
       if (!response) {
-        throw new Error('No se recibió respuesta del servidor');
+        throw new Error('No se recibió respuesta del servidor. Verifique la conexión al backend.');
       }
       
-      return response.citaId || response.id || 'cita-creada';
+      const citaId = response.citaId || response.id || response._id || 'cita-creada';
+      console.log('ID de cita extraído:', citaId);
+      
+      return citaId;
       
     } catch (error) {
-      console.error('Error detallado al crear cita:', error);
+      console.error('=== ERROR AL CREAR CITA ===');
+      console.error('Error completo:', error);
+      console.error('Tipo de error:', typeof error);
       
       if (error instanceof Error) {
+        console.error('Error instance message:', error.message);
+        console.error('Error stack:', error.stack);
         throw error;
-      } else if (error && typeof error === 'object' && (error as any).error) {
-        throw new Error((error as any).error.message || 'Error del servidor al crear la cita');
+      } else if (error && typeof error === 'object') {
+        const errObj = error as any;
+        console.error('Error object keys:', Object.keys(errObj));
+        console.error('Error status:', errObj.status);
+        console.error('Error statusText:', errObj.statusText);
+        console.error('Error error:', errObj.error);
+        console.error('Error message:', errObj.message);
+        console.error('Error body:', errObj.error ? JSON.stringify(errObj.error, null, 2) : 'No error body');
+        
+        if (errObj.status === 0) {
+          throw new Error('No se puede conectar al servidor. Verifique que el backend esté funcionando.');
+        } else if (errObj.status === 400) {
+          const errorMessage = errObj.error?.error || errObj.error?.message || 'Datos inválidos enviados al servidor';
+          console.error('Error 400 - Backend validation failed:', errorMessage);
+          
+          // Proporcionar mensaje más específico según el tipo de error
+          let userMessage = '';
+          if (errorMessage.includes('Tratamiento inválido')) {
+            userMessage = 'El tratamiento seleccionado no es válido. Por favor, recargue la página y seleccione un tratamiento de la lista.';
+          } else if (errorMessage.includes('Fecha y hora inválidas')) {
+            userMessage = 'La fecha y hora seleccionadas no son válidas. Por favor, seleccione una fecha y hora correctas.';
+          } else if (errorMessage.includes('No se trabaja los domingos')) {
+            userMessage = 'No se atiende los domingos. Por favor, seleccione otro día.';
+          } else if (errorMessage.includes('Ya hay una cita agendada')) {
+            userMessage = 'Ya existe una cita en esa fecha y hora. Por favor, seleccione otro horario.';
+          } else if (errorMessage.includes('no está disponible')) {
+            userMessage = 'El horario seleccionado no está disponible. Por favor, seleccione otro horario de la lista.';
+          } else {
+            userMessage = `Error de validación: ${errorMessage}`;
+          }
+          
+          throw new Error(userMessage);
+        } else if (errObj.status === 404) {
+          throw new Error('Servicio no encontrado. Verifique la URL del backend.');
+        } else if (errObj.status === 500) {
+          throw new Error('Error interno del servidor. Contacte al administrador.');
+        } else if (errObj.error && errObj.error.message) {
+          throw new Error(`Error del servidor: ${errObj.error.message}`);
+        } else if (errObj.message) {
+          throw new Error(`Error: ${errObj.message}`);
+        } else {
+          throw new Error(`Error del servidor (${errObj.status || 'desconocido'}): ${JSON.stringify(errObj)}`);
+        }
       } else {
-        throw new Error('Error desconocido al crear la cita');
+        console.error('Error tipo string o primitivo:', error);
+        throw new Error(`Error inesperado: ${error}`);
       }
     }
   }
@@ -490,8 +608,41 @@ export class FormularioComponent implements OnInit, OnDestroy {
   }
 
   private async procesarPagoMercadoPago(citaId: string) {
-    console.log('Procesando pago MercadoPago para cita:', citaId);
-    alert('Integración de MercadoPago próximamente disponible');
+    try {
+      console.log('Procesando pago MercadoPago para cita:', citaId);
+      console.log('Monto del tratamiento:', this.precio.nacional);
+      
+      const monto = this.precio.nacional;
+      
+      if (!monto) {
+        throw new Error('No se pudo determinar el monto del tratamiento');
+      }
+      
+      let mercadoPagoUrl = '';
+      
+      // Determinar URL según el monto
+      if (monto === 40000) {
+        mercadoPagoUrl = 'https://www.mercadopago.cl/checkout/v1/payment/redirect/06638f34-c958-4e65-a8ec-18bc2af158f1/payment-option-form/?preference-id=85259864-f26303ab-6b6d-4660-b199-4ecfb5b8d265&router-request-id=bead2b8b-580f-4e8f-b696-9ca3fc7daf27&source=link&p=d07bceff09d85d30681c53fb5aac6bb3';
+      } else if (monto === 70000) {
+        mercadoPagoUrl = 'https://mercadopago.cl/checkout/v1/payment/redirect/?source=link&preference-id=85259864-b4065e2e-8790-4880-bd92-e2a79c7e1fb8&router-request-id=6b4e86d2-2326-4fea-b7db-3f50c7c83129';
+      } else {
+        throw new Error(`MercadoPago solo está disponible para montos de $40.000 y $70.000. Monto actual: $${monto.toLocaleString()}`);
+      }
+      
+      console.log('Redirigiendo a MercadoPago URL:', mercadoPagoUrl);
+      
+      // Redirigir directamente a MercadoPago (igual que Webpay)
+      window.location.href = mercadoPagoUrl;
+      
+    } catch (error) {
+      console.error('Error en procesarPagoMercadoPago:', error);
+      
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Error al procesar el pago con MercadoPago');
+      }
+    }
   }
 
   irAPagoKlap() {
