@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TallerService {
-  private apiUrl = 'https://backend-psicologia-fckw.onrender.com/api/taller'; // Ajusta esto si cambia tu ruta
+  private apiUrl = `${environment.apiUrl}/api/taller`;
 
   constructor(private http: HttpClient) {}
 
