@@ -1,46 +1,54 @@
 <form [formGroup]="tallerForm" (ngSubmit)="enviarFormulario()">
 
+  <!-- Indicador de progreso -->
+  <div class="progress-indicator">
+    <div class="step" [class.active]="seccionActual === 1" [class.completed]="seccionActual > 1">
+      <span class="step-number">1</span>
+      <span class="step-label">Información Básica</span>
+    </div>
+    <div class="step" [class.active]="seccionActual === 2" [class.completed]="seccionActual > 2">
+      <span class="step-number">2</span>
+      <span class="step-label">Sesiones</span>
+    </div>
+    <div class="step" [class.active]="seccionActual === 3">
+      <span class="step-number">3</span>
+      <span class="step-label">Políticas y Contacto</span>
+    </div>
+  </div>
+
   <!-- SECCIÓN 1 -->
   <div *ngIf="seccionActual === 1" class="form-section">
-    <h2>Taller de Duelo</h2>
+    <h2>Taller de Duelo - Información Básica</h2>
 
     <label>
-      Subtítulo:
-      <input formControlName="subtitulo" type="text" />
+      Subtítulo: *
+      <input formControlName="subtitulo" type="text" placeholder="Ej: Espacio de acompañamiento" />
     </label>
     <div *ngIf="tallerForm.get('subtitulo')?.invalid && tallerForm.get('subtitulo')?.touched" class="error">
       El subtítulo es obligatorio.
     </div>
 
     <label>
-      Fecha de inicio:
-      <input formControlName="fechaInicio" type="date" />
-    </label>
-    <div *ngIf="tallerForm.get('fechaInicio')?.invalid && tallerForm.get('fechaInicio')?.touched" class="error">
-      La fecha de inicio es obligatoria.
-    </div>
-
-    <label>
-      Valor:
-      <input formControlName="valor" type="number" />
+      Valor (CLP): *
+      <input formControlName="valor" type="number" placeholder="Ej: 50000" />
     </label>
     <div *ngIf="tallerForm.get('valor')?.invalid && tallerForm.get('valor')?.touched" class="error">
       El valor es obligatorio.
     </div>
 
     <label>
-      Facilitador:
-      <input formControlName="facilitador" type="text" />
+      Facilitador: *
+      <input formControlName="facilitador" type="text" placeholder="Nombre del facilitador" />
     </label>
     <div *ngIf="tallerForm.get('facilitador')?.invalid && tallerForm.get('facilitador')?.touched" class="error">
       El facilitador es obligatorio.
     </div>
 
-    <h3>Descripción de Servicio</h3>
+    <h3>Descripción del Servicio</h3>
     <div formGroupName="descripcionDeServicio">
       <label>
-        Texto:
-        <textarea formControlName="texto"></textarea>
+        Descripción completa del taller: *
+        <textarea formControlName="texto" rows="6" placeholder="Describe de qué trata el taller, objetivos, metodología, etc."></textarea>
       </label>
     </div>
     <div *ngIf="tallerForm.get('descripcionDeServicio.texto')?.invalid && tallerForm.get('descripcionDeServicio.texto')?.touched" class="error">
@@ -53,48 +61,112 @@
 
   <!-- SECCIÓN 2 -->
   <div *ngIf="seccionActual === 2" class="form-section">
-    <h3>Próximas Sesiones</h3>
+    <h2>Próximas Sesiones del Taller</h2>
+    <p class="section-description">
+      Agrega todas las sesiones que tendrá el taller. Completa cada sesión con todos sus datos antes de agregar la siguiente.
+      <br>
+      <strong>No es necesario guardar cada sesión individualmente</strong> - todas se guardarán al final cuando completes el formulario.
+    </p>
+
+    <!-- Indicador de fecha de inicio -->
+    <div *ngIf="proximasSesiones.length > 0 && proximasSesiones.at(0).get('fecha')?.value" class="info-box">
+      <strong>Fecha de inicio del taller:</strong> {{ proximasSesiones.at(0).get('fecha')?.value | date:'dd/MM/yyyy' }}
+      <br>
+      <small>La fecha de la primera sesión se usará como fecha de inicio del taller.</small>
+    </div>
+    
     <div formArrayName="proximasSesiones">
-      <div *ngFor="let sesion of proximasSesiones.controls; let i = index" [formGroupName]="i" class="sesion-box">
+      <div *ngFor="let sesion of proximasSesiones.controls; let i = index" [formGroupName]="i" class="sesion-box" [class.sesion-completa]="sesion.valid" [class.sesion-incompleta]="sesion.invalid">
+        <div class="sesion-header">
+          <h4>Sesión {{ i + 1 }}</h4>
+          <span *ngIf="sesion.valid" class="badge-completo">Completa</span>
+          <span *ngIf="sesion.invalid" class="badge-incompleto">Incompleta</span>
+        </div>
+        
+        <div class="form-row">
+          <label>
+            Día: *
+            <input formControlName="dia" type="text" placeholder="Ej: Lunes" [class.input-error]="sesion.get('dia')?.invalid && sesion.get('dia')?.touched" />
+            <span *ngIf="sesion.get('dia')?.invalid && sesion.get('dia')?.touched" class="field-error">Requerido</span>
+          </label>
+          <label>
+            Fecha: *
+            <input formControlName="fecha" type="date" [class.input-error]="sesion.get('fecha')?.invalid && sesion.get('fecha')?.touched" />
+            <span *ngIf="sesion.get('fecha')?.invalid && sesion.get('fecha')?.touched" class="field-error">Requerido</span>
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            Hora de inicio: *
+            <input formControlName="hora" type="time" [class.input-error]="sesion.get('hora')?.invalid && sesion.get('hora')?.touched" />
+            <span *ngIf="sesion.get('hora')?.invalid && sesion.get('hora')?.touched" class="field-error">Requerido</span>
+          </label>
+          <label>
+            Duración (horas):
+            <input formControlName="duracionHoras" type="number" min="0" max="24" placeholder="Ej: 2" />
+          </label>
+          <label>
+            Duración (minutos):
+            <input formControlName="duracionMinutos" type="number" min="0" max="59" placeholder="Ej: 30" />
+          </label>
+        </div>
+        
+        <div *ngIf="sesion.hasError('duracionRequerida') && sesion.touched" class="error">
+          Debes especificar al menos las horas O los minutos de duración (o ambos).
+        </div>
+
         <label>
-          Día:
-          <input formControlName="dia" type="text" />
+          Profesional a cargo: *
+          <input formControlName="profesional" type="text" placeholder="Nombre del profesional" [class.input-error]="sesion.get('profesional')?.invalid && sesion.get('profesional')?.touched" />
+          <span *ngIf="sesion.get('profesional')?.invalid && sesion.get('profesional')?.touched" class="field-error">Requerido</span>
         </label>
-        <label>
-          Fecha:
-          <input formControlName="fecha" type="date" />
-        </label>
-        <label>
-          Hora de inicio:
-          <input formControlName="hora" type="time" />
-        </label>
-        <label>
-          Duración horas:
-          <input formControlName="duracionHoras" type="number" min="0" />
-        </label>
-        <label>
-          Duración minutos:
-          <input formControlName="duracionMinutos" type="number" min="0" max="59" />
-        </label>
-        <label>
-          Profesional:
-          <input formControlName="profesional" type="text" />
-        </label>
-        <button type="button" (click)="eliminarSesion(i)">Eliminar sesión</button>
+
+        <button 
+          type="button" 
+          class="btn-eliminar" 
+          (click)="eliminarSesion(i)"
+          [disabled]="proximasSesiones.length === 1"
+          title="{{ proximasSesiones.length === 1 ? 'Debe haber al menos una sesión' : 'Eliminar esta sesión' }}">
+          Eliminar sesión
+        </button>
       </div>
     </div>
-    <button type="button" (click)="agregarSesion()">Agregar sesión</button>
 
-    <button type="button" (click)="anteriorSeccion()">Anterior</button>
-    <button type="button" (click)="siguienteSeccion()" [disabled]="!validarSeccionActual()">Siguiente</button>
+    <button type="button" class="btn-agregar" (click)="agregarSesion()">
+      Agregar otra sesión
+    </button>
+
+  
+    <div class="navigation-buttons">
+      <button type="button" class="btn-secondary" (click)="anteriorSeccion()">Anterior</button>
+      <button type="button" class="btn-primary" (click)="siguienteSeccion()" [disabled]="!validarSeccionActual()">
+        Siguiente
+      </button>
+    </div>
   </div>
 
   <!-- SECCIÓN 3 -->
   <div *ngIf="seccionActual === 3" class="form-section">
+    <h2>Políticas y Datos de Contacto</h2>
+    
+    <!-- Resumen de sesiones -->
+    <div class="resumen-sesiones">
+      <h4>Resumen de Sesiones ({{ proximasSesiones.length }})</h4>
+      <div *ngFor="let sesion of proximasSesiones.controls; let i = index" class="mini-sesion">
+        <strong>Sesión {{ i + 1 }}:</strong> 
+        {{ sesion.get('dia')?.value || '(sin día)' }}, 
+        {{ sesion.get('fecha')?.value || '(sin fecha)' }} - 
+        {{ sesion.get('hora')?.value || '(sin hora)' }}
+        <span *ngIf="sesion.valid" class="check">✓</span>
+        <span *ngIf="sesion.invalid" class="warning">⚠</span>
+      </div>
+    </div>
+    
     <h3>Política de Cancelación</h3>
     <div formGroupName="politicaDeCancelacion">
       <label>
-        <textarea formControlName="texto"></textarea>
+        <textarea formControlName="texto" rows="5" placeholder="Describe la política de cancelación del taller..."></textarea>
       </label>
     </div>
     <div *ngIf="tallerForm.get('politicaDeCancelacion.texto')?.invalid && tallerForm.get('politicaDeCancelacion.texto')?.touched" class="error">
@@ -104,15 +176,17 @@
     <h3>Datos de Contacto</h3>
     <div formGroupName="datosDeContacto">
       <label>
-        <textarea formControlName="texto"></textarea>
+        <textarea formControlName="texto" rows="5" placeholder="Email, teléfono, etc..."></textarea>
       </label>
     </div>
     <div *ngIf="tallerForm.get('datosDeContacto.texto')?.invalid && tallerForm.get('datosDeContacto.texto')?.touched" class="error">
       Los datos de contacto son obligatorios.
     </div>
 
-    <button type="button" (click)="anteriorSeccion()">Anterior</button>
-    <button type="submit" [disabled]="tallerForm.invalid">Guardar Taller</button>
+    <div class="navigation-buttons">
+      <button type="button" class="btn-secondary" (click)="anteriorSeccion()">Anterior</button>
+      <button type="submit" class="btn-success" [disabled]="tallerForm.invalid">Guardar Taller</button>
+    </div>
   </div>
 
 </form>
