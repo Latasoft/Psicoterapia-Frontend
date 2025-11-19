@@ -1,0 +1,86 @@
+<!-- Loader de pantalla completa -->
+<div *ngIf="isLoading" class="full-screen-loader">
+  <div class="loader">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+</div>
+
+<!-- Contenido de registro -->
+<div class="register-container" *ngIf="!isLoading">
+  <div class="register-card">
+    <div class="register-form-section">
+      <h2 class="register-title">Crear Cuenta</h2>
+
+      <!-- Mensaje de éxito -->
+      <div *ngIf="successMessage" class="success-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <span>{{ successMessage }}</span>
+      </div>
+
+      <!-- Mensaje de error -->
+      <div *ngIf="errorMessage" class="error-message">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form (ngSubmit)="onRegister()" class="form">
+        <input 
+          type="text" 
+          [(ngModel)]="username" 
+          name="username" 
+          class="input" 
+          placeholder="Nombre de usuario" 
+          required 
+          minlength="3" />
+        
+        <input 
+          type="email" 
+          [(ngModel)]="email" 
+          name="email" 
+          class="input" 
+          placeholder="Correo electrónico" 
+          required />
+        
+        <input 
+          type="password" 
+          [(ngModel)]="contrasena" 
+          name="password" 
+          class="input" 
+          placeholder="Contraseña" 
+          required 
+          minlength="6" />
+        
+        <input 
+          type="password" 
+          [(ngModel)]="confirmarContrasena" 
+          name="confirmPassword" 
+          class="input" 
+          placeholder="Confirmar contraseña" 
+          required />
+
+        <button type="submit" class="register-button">
+          Registrarse
+        </button>
+      </form>
+
+      <p class="login-link">
+        ¿Ya tienes cuenta? <a routerLink="/login">Inicia sesión aquí</a>
+      </p>
+    </div>
+
+    <div class="register-image-section">
+      <img src="assets/p2.avif" alt="Registro" />
+    </div>
+  </div>
+</div>

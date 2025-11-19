@@ -7,7 +7,7 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class CitasService {
-  private apiUrl = `${environment.apiUrl}/api/citas`;
+  private apiUrl = `${environment.apiUrl}/api`;
 
   constructor(private http: HttpClient) {}
 
@@ -16,25 +16,37 @@ export class CitasService {
   }
 
   obtenerHorariosDisponibles(fecha: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/horarios-disponibles?fecha=${fecha}`);
+    return this.http.get(`${this.apiUrl}/horarios/disponibles/${fecha}`);
   }
 
   reservarCita(citaData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/reservar`, citaData);
+    return this.http.post(`${this.apiUrl}/citas`, citaData);
   }
 
   obtenerCitas(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/ver`);
+    return this.http.get(`${this.apiUrl}/citas`);
+  }
+
+  obtenerMisCitas(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/citas/mis-citas`);
   }
 
   reagendarCita(citaId: string, nuevaFechaHora: string): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/reagendar/${citaId}`, { 
-      nuevaFechaHora: nuevaFechaHora 
+    return this.http.patch(`${this.apiUrl}/citas/${citaId}`, { 
+      appointment_datetime: nuevaFechaHora 
     });
   }
 
   cancelarCita(citaId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/cancelar/${citaId}`);
+    return this.http.patch(`${this.apiUrl}/citas/${citaId}/status`, { 
+      status: 'cancelled' 
+    });
+  }
+
+  confirmarCita(citaId: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/citas/${citaId}/status`, { 
+      status: 'confirmed' 
+    });
   }
 
   // Método para actualizar un tratamiento

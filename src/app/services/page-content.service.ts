@@ -22,4 +22,10 @@ export class PageContentService {
     console.log(`💾 Updating content for page: ${pageId}`);
     return this.http.put(`${this.apiUrl}/${pageId}`, content);
   }
+
+  // Actualizar múltiples campos de forma eficiente (batch update)
+  batchUpdateContent(pageId: string, updates: { [contentId: string]: any }): Observable<any> {
+    console.log(`📦 Batch updating ${Object.keys(updates).length} fields for page: ${pageId}`);
+    return this.http.patch(`${this.apiUrl}/${pageId}/batch`, { updates });
+  }
 }

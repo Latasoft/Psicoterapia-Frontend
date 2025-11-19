@@ -12,13 +12,14 @@ import { AuthService } from '../../services/auth.service';
 export class NavbarComponent {
   isMenuOpen = false;
   isLoading: boolean = false; 
+  isLoggedIn = false;
+  userRole: string | null = null;
 
   // Método para alternar el menú
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
-    console.log('Menu toggled:', this.isMenuOpen);  // Verifica si se está alternando correctamente en la consola
+    console.log('Menu toggled:', this.isMenuOpen);
   }
-  isLoggedIn = false;
 
   constructor(private authService: AuthService) {}
 
@@ -27,11 +28,23 @@ export class NavbarComponent {
       this.isLoggedIn = status;
     });
 
-    this.authService.checkLogin(); // 👈 Esto verifica si hay token al cargar
+    this.authService.userRole$.subscribe((role) => {
+      this.userRole = role;
+    });
+
+    this.authService.checkLogin();
+  }
+
+  isAdmin(): boolean {
+    return this.userRole === 'admin';
+  }
+
+  isUsuario(): boolean {
+    return this.userRole === 'usuario';
   }
 
   logout() {
     this.authService.logout();
-    window.location.href = '/'; // o usa router.navigate(['/']);
+    window.location.href = '/';
   }
 }

@@ -38,7 +38,7 @@ interface MediaItem {
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './formulario.component.html',
-  styleUrls: ['./formulario.component.css']
+  styleUrls: ['./formulario.component.css', './formulario-extended.component.css']
 })
 export class FormularioComponent implements OnInit, OnDestroy {
   // Admin properties
@@ -73,12 +73,16 @@ export class FormularioComponent implements OnInit, OnDestroy {
   step = 1;
   totalSteps = 3;
 
-  // Form fields
-  tratamiento = '';
+  // Form fields - Datos del paciente
   nombre = '';
   correo = '';
+  telefono = '';
+  
+  // Datos de la cita
+  tratamiento = '';
   fecha: string = '';
   hora: string = '';
+  notasCita = '';
 
   // Treatment and pricing
   tratamientosDisponibles: Tratamiento[] = [];
@@ -129,6 +133,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
     const formData = {
       nombre: this.nombre,
       correo: this.correo,
+      telefono: this.telefono,
       tratamiento: this.tratamiento,
       fecha: this.fecha,
       hora: this.hora,
@@ -154,6 +159,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
         if (cacheAge < maxAge) {
           this.nombre = formData.nombre || '';
           this.correo = formData.correo || '';
+          this.telefono = formData.telefono || '';
           this.tratamiento = formData.tratamiento || '';
           this.fecha = formData.fecha || '';
           this.hora = formData.hora || '';
@@ -177,8 +183,15 @@ export class FormularioComponent implements OnInit, OnDestroy {
     localStorage.removeItem(this.FORM_CACHE_KEY);
     console.log('Caché del formulario eliminado');
     
-    // Opcional: También limpiar los datos del formulario actual
-    this.limpiarFormulario();
+    // Limpiar los datos del formulario actual
+    this.nombre = '';
+    this.correo = '';
+    this.telefono = '';
+    this.tratamiento = '';
+    this.fecha = '';
+    this.hora = '';
+    this.notasCita = '';
+    this.step = 1;
     
     alert('Datos guardados eliminados correctamente');
   }
@@ -335,11 +348,12 @@ export class FormularioComponent implements OnInit, OnDestroy {
   // ========== VALIDACIONES ==========
   esFormularioValido(): boolean {
     return this.nombre.trim() !== '' && 
-           this.correo.trim() !== '' && 
+           this.correo.trim() !== '' &&
+           this.telefono.trim() !== '' &&
            this.tratamiento !== '' && 
            this.esHorarioValido();
   }
-
+  
   esHorarioValido(): boolean {
     const horarioBasicoValido = this.fecha !== '' && 
                                 this.hora !== '' && 
@@ -368,7 +382,8 @@ export class FormularioComponent implements OnInit, OnDestroy {
     switch (paso) {
       case 1:
         return this.nombre.trim() !== '' && 
-               this.correo.trim() !== '' && 
+               this.correo.trim() !== '' &&
+               this.telefono.trim() !== '' &&
                this.tratamiento !== '';
       case 2:
         return this.esHorarioValido();
@@ -408,7 +423,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
     
     // Validaciones detalladas
     if (!this.nombre || this.nombre.trim() === '') {
-      alert('Por favor ingrese su nombre');
+      alert('Por favor ingrese su nombre completo');
       return;
     }
     
@@ -419,6 +434,11 @@ export class FormularioComponent implements OnInit, OnDestroy {
     
     if (!this.validarEmail(this.correo.trim())) {
       alert('Por favor ingrese un correo electrónico válido');
+      return;
+    }
+    
+    if (!this.telefono || this.telefono.trim() === '') {
+      alert('Por favor ingrese su teléfono de contacto');
       return;
     }
     
@@ -540,53 +560,45 @@ export class FormularioComponent implements OnInit, OnDestroy {
         horaInicio = this.hora.split(' - ')[0];
       }
       
-      const fechaHora = `${this.fecha}T${horaInicio}:00`;
+      // Construir objeto patient con campos básicos
+      const patientData: any = {
+        full_name: this.nombre.trim(),
+        email: this.correo.trim().toLowerCase(),
+        phone: this.telefono.trim()
+      };
       
+      // Construir datos de la cita en el nuevo formato
       const citaData = {
-        nombre: this.nombre.trim(),
-        correo: this.correo.trim().toLowerCase(),
-        fecha_hora: fechaHora,
-        tratamiento: this.tratamiento
+        patient: patientData,
+        treatment_id: this.tratamiento,
+        fecha: this.fecha,
+        hora: horaInicio,
+        notas: this.notasCita && this.notasCita.trim() ? this.notasCita.trim() : undefined
       };
 
-      console.log('Datos de la cita a enviar:', citaData);
+      console.log('Datos de la cita a enviar (nuevo formato):', citaData);
       
       const response = await lastValueFrom(this.citasService.reservarCita(citaData));
       
       console.log('Respuesta completa del servidor:', response);
       
-      if (!response) {
-        throw new Error('No se recibió respuesta del servidor. Verifique la conexión al backend.');
+      if (!response || !response.success) {
+        throw new Error(response?.message || 'No se recibió respuesta del servidor.');
       }
       
-      const citaId = response.citaId || response.id || response._id || 'cita-creada';
-      console.log('ID de cita extraído:', citaId);
+      const citaId = response.cita?.id;
+      if (!citaId) {
+        throw new Error('No se recibió el ID de la cita.');
+      }
       
-      // ✅ NUEVO: Refrescar horarios disponibles después de crear la cita
-      // para que la hora recién ocupada no aparezca más
+      console.log('Cita creada exitosamente. ID:', citaId);
+      console.log('Paciente ID:', response.paciente?.id);
+      
+      // Refrescar horarios disponibles
       if (this.fecha === new Date().toISOString().split('T')[0] || 
           new Date(this.fecha) >= new Date()) {
-        console.log('Refrescando horarios disponibles después de crear cita...');
+        console.log('Refrescando horarios disponibles...');
         await this.cargarHorariosDisponibles();
-      }
-      
-      // Enviar notificación a Matías después de crear la cita exitosamente
-      try {
-        const notificationData = {
-          nombre: citaData.nombre,
-          correo: citaData.correo,
-          tratamiento: citaData.tratamiento,
-          fecha: this.fecha,
-          hora: this.hora,
-          precio: this.precio.nacional
-        };
-        
-        console.log('Enviando notificación a Matías...');
-        await lastValueFrom(this.citasService.notificarReservacion(notificationData));
-        console.log('Notificación a Matías enviada exitosamente');
-      } catch (notificationError) {
-        console.error('Error al enviar notificación a Matías:', notificationError);
-        // No interrumpir el flujo principal si falla la notificación
       }
       
       return citaId;

@@ -1,0 +1,224 @@
+/* Loader de pantalla completa */
+.full-screen-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 9999;
+}
+
+.loader {
+  display: flex;
+  gap: 10px;
+}
+
+.circle {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background-color: #12B1D1;
+  animation: bounce 1.2s infinite ease-in-out;
+}
+
+.circle:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.circle:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.circle:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.circle:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+/* Contenedor principal */
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.register-card {
+  display: flex;
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Sección del formulario */
+.register-form-section {
+  flex: 1;
+  padding: 60px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Sección de imagen */
+.register-image-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.register-image-section img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Título */
+.register-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 32px;
+  text-align: center;
+  color: #10a5d3;
+  margin-bottom: 30px;
+}
+
+/* Mensajes */
+.error-message,
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.success-message {
+  background-color: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+.error-message svg,
+.success-message svg {
+  flex-shrink: 0;
+}
+
+/* Formulario */
+.form {
+  margin-top: 20px;
+}
+
+/* Estilo de los inputs */
+.input {
+  width: 100%;
+  background: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 20px;
+  margin-top: 15px;
+  box-shadow: #cff0ff 0px 10px 10px -5px;
+  border-inline: 2px solid transparent;
+  font-size: 16px;
+}
+
+/* Placeholder */
+.input::placeholder {
+  color: rgb(170, 170, 170);
+}
+
+/* Foco en inputs */
+.input:focus {
+  outline: none;
+  border-inline: 2px solid #12B1D1;
+}
+
+/* Botón de registro */
+.register-button {
+  display: block;
+  width: 100%;
+  font-weight: bold;
+  background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+  color: white;
+  padding-block: 15px;
+  margin: 20px auto;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.register-button:hover {
+  transform: scale(1.03);
+  box-shadow: 0 5px 15px rgba(18, 177, 209, 0.3);
+}
+
+.register-button:active {
+  transform: scale(0.98);
+}
+
+/* Enlace a login */
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-link a {
+  color: #12B1D1;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .register-card {
+    flex-direction: column;
+  }
+
+  .register-image-section {
+    min-height: 200px;
+  }
+
+  .register-form-section {
+    padding: 40px 20px;
+  }
+
+  .register-title {
+    font-size: 24px;
+  }
+}

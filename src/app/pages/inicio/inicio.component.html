@@ -1,78 +1,40 @@
-<!-- Panel de Administración -->
-<div *ngIf="isAdmin" class="admin-panel">
-  <button (click)="toggleAdminMode()" class="admin-toggle-btn" [class.active]="adminMode">
-    <i class="fas fa-cog"></i>
-    {{ adminMode ? 'Salir del modo admin' : 'Modo administración' }}
-  </button>
-</div>
+<!-- Indicador de modo edición (visible solo para admins) -->
+<app-edit-mode-indicator></app-edit-mode-indicator>
 
 <div class="image-card-4">
   <div class="logo-container">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <img [src]="getMediaSrc('hero-image')" alt="Logo" class="logo" />
-      
-      <!-- Controles de admin para imagen hero -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #heroImageInput 
-               accept="image/*" 
-               (change)="onFileSelected($event, 'hero-image')"
-               style="display: none;">
-        
-        <button (click)="heroImageInput.click()" 
-                [disabled]="isUploading('hero-image')"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
-          {{ isUploading('hero-image') ? 'Subiendo...' : 'Cambiar imagen' }}
-        </button>
-        
-        <button (click)="deleteMedia('hero-image')" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-          Restaurar original
-        </button>
-      </div>
-    </div>
+    <img [src]="getMediaSrc('hero-image')" 
+         alt="Logo" 
+         class="logo" 
+         appEditableImage
+         imageKey="hero-image"
+         pageId="inicio"
+         (imageChange)="onImageChange($event, 'hero-image')" />
   </div>
   <div class="card-content">
-    <h2>Psicoterapia e Hipnoterapia Clínica Online</h2>
+    <h2 appEditableContent 
+        pageId="inicio" 
+        contentId="hero-title"
+        contentType="text">Psicoterapia e Hipnoterapia Clínica Online</h2>
   </div>
 </div>
 
 <div class="psychologist-card">
   <div class="psychologist-card-content">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <video controls>
-        <source [src]="getMediaSrc('hero-video')" type="video/mp4" />
-        Tu navegador no soporta la reproducción de video.
-      </video>
-
-      <!-- Controles de admin para video hero -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #heroVideoInput 
-               accept="video/*" 
-               (change)="onFileSelected($event, 'hero-video')"
-               style="display: none;">
-        
-        <button (click)="heroVideoInput.click()" 
-                [disabled]="isUploading('hero-video')"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
-          {{ isUploading('hero-video') ? 'Subiendo...' : 'Cambiar video' }}
-        </button>
-        
-        <button (click)="deleteMedia('hero-video')" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-          Restaurar original
-        </button>
-      </div>
-    </div>
+    <video controls>
+      <source [src]="getMediaSrc('hero-video')" type="video/mp4" />
+      Tu navegador no soporta la reproducción de video.
+    </video>
 
     <div class="text-section">
-      <h2>Tu bienestar emocional es lo más importante</h2>
-      <p>Agenda una cita con nuestro especialista y comienza tu camino hacia el equilibrio mental.</p>
+      <h2 appEditableContent 
+          pageId="inicio" 
+          contentId="hero-subtitle"
+          contentType="text">Tu bienestar emocional es lo más importante</h2>
+      <p appEditableContent 
+         pageId="inicio" 
+         contentId="hero-description"
+         contentType="text">Agenda una cita con nuestro especialista y comienza tu camino hacia el equilibrio mental.</p>
       <a [routerLink]="'/formulario'" class="cta-button">Agendar cita</a>
     </div>
   </div>
@@ -97,8 +59,14 @@
 <div class="psychologist-card2">
   <div class="psychologist-card-content">
     <div class="text-section">
-      <h2>Servicios</h2>
-      <p>Nuestros servicios.</p>
+      <h2 appEditableContent 
+          pageId="inicio" 
+          contentId="services-title"
+          contentType="text">Servicios</h2>
+      <p appEditableContent 
+         pageId="inicio" 
+         contentId="services-description"
+         contentType="text">Nuestros servicios.</p>
     </div>
   </div>
 </div>
@@ -106,89 +74,46 @@
 <!-- Cards de Servicios Dinámicos -->
 <div class="container-cards">
   <div *ngFor="let service of services; let i = index" class="card">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <img [src]="getMediaSrc(service.imageKey)" [alt]="service.title" />
-      
-      <!-- Controles de admin para imagen -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #serviceInput
-               accept="image/*" 
-               (change)="onFileSelected($event, service.imageKey)"
-               style="display: none;">
-        
-        <button (click)="serviceInput.click()" 
-                [disabled]="isUploading(service.imageKey)"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
-        </button>
-        
-        <button (click)="deleteMedia(service.imageKey)" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    </div>
+    <img [src]="getMediaSrc(service.imageKey)" 
+         [alt]="service.title"
+         appEditableImage
+         [imageKey]="service.imageKey"
+         pageId="inicio"
+         (imageChange)="onImageChange($event, service.imageKey)" />
     
     <!-- Título editable -->
-    <h2 *ngIf="!adminMode">{{ service.title }}</h2>
-    <h2 *ngIf="adminMode">
-      <input type="text" [(ngModel)]="service.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título del servicio">
-    </h2>
+    <h2 appEditableContent 
+        pageId="inicio" 
+        [contentId]="'service-title-' + i"
+        contentType="text">{{ service.title }}</h2>
     
-    <!-- Lista de precios/información editable -->
+    <!-- Lista de precios/información -->
     <ul class="card-list">
       <li *ngFor="let item of service.items; let j = index">
-        <span *ngIf="!adminMode">{{ item }}</span>
-        <div *ngIf="adminMode" class="service-item-editor">
-          <input type="text" [(ngModel)]="service.items[j]" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Información del servicio">
-          <button (click)="removeServiceItem(i, j)" class="admin-btn delete-btn small">
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
+        <span appEditableContent 
+              pageId="inicio" 
+              [contentId]="'service-' + i + '-item-' + j"
+              contentType="text">{{ item }}</span>
         <hr />
-      </li>
-      
-      <!-- Botón para agregar items en modo admin -->
-      <li *ngIf="adminMode">
-        <button (click)="addServiceItem(i)" class="admin-btn add-btn">
-          <i class="fas fa-plus"></i> Agregar item
-        </button>
       </li>
     </ul>
     
-    <!-- URL editable -->
-    <a *ngIf="!adminMode" [href]="service.link" class="btn">{{ service.buttonText }}</a>
-    <div *ngIf="adminMode" class="admin-link-editor">
-      <input type="text" [(ngModel)]="service.link" (ngModelChange)="onContentChange()" class="admin-input" placeholder="URL del enlace">
-      <input type="text" [(ngModel)]="service.buttonText" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Texto del botón">
-    </div>
-    
-    <!-- Botón para eliminar servicio completo -->
-    <button *ngIf="adminMode" (click)="removeService(i)" class="admin-btn delete-service-btn">
-      <i class="fas fa-trash"></i> Eliminar servicio
-    </button>
-  </div>
-  
-  <!-- Botón para agregar nuevo servicio -->
-  <div *ngIf="adminMode" class="add-service-card">
-    <button (click)="addService()" class="admin-btn add-service-btn">
-      <i class="fas fa-plus"></i> Agregar nuevo servicio
-    </button>
+    <!-- Botón con enlace -->
+    <a [href]="service.link" class="btn">{{ service.buttonText }}</a>
   </div>
   
   <!-- Sección de Convenios Editable -->
   <div class="blog-titulo">
-    <div class="additional-info" [class.admin-editing]="adminMode">
-      <h3 *ngIf="!adminMode">{{ conveniosInfo.title }}</h3>
-      <h3 *ngIf="adminMode">
-        <input type="text" [(ngModel)]="conveniosInfo.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título de convenios">
-      </h3>
+    <div class="additional-info">
+      <h3 appEditableContent 
+          pageId="inicio" 
+          contentId="convenios-title"
+          contentType="text">{{ conveniosInfo.title }}</h3>
       
-      <p *ngIf="!adminMode">{{ conveniosInfo.description }}</p>
-      <p *ngIf="adminMode">
-        <textarea [(ngModel)]="conveniosInfo.description" (ngModelChange)="onContentChange()" class="admin-textarea" placeholder="Descripción de convenios"></textarea>
-      </p>
+      <p appEditableContent 
+         pageId="inicio" 
+         contentId="convenios-description"
+         contentType="html">{{ conveniosInfo.description }}</p>
     </div>
   </div>
 </div>
@@ -198,39 +123,20 @@
 <!-- Texto de Tarot Editable -->
 <div class="card-container">
   <div class="text-section1">
-    <h2 *ngIf="!adminMode">{{ tarotText.content }}</h2>
-    <h2 *ngIf="adminMode">
-      <textarea [(ngModel)]="tarotText.content" (ngModelChange)="onContentChange()" class="admin-textarea" placeholder="Texto del tarot"></textarea>
-    </h2>
+    <h2 appEditableContent 
+        pageId="inicio" 
+        contentId="tarot-text"
+        contentType="html">{{ tarotText.content }}</h2>
     <a href="/tarotista" class="btn">Ver más</a>
   </div>
   
   <div class="image-section">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <img [src]="getMediaSrc('tarot-image')" alt="Imagen de Servicios" />
-      
-      <!-- Controles de admin para imagen tarot -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #tarotInput 
-               accept="image/*" 
-               (change)="onFileSelected($event, 'tarot-image')"
-               style="display: none;">
-        
-        <button (click)="tarotInput.click()" 
-                [disabled]="isUploading('tarot-image')"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
-          Cambiar imagen
-        </button>
-        
-        <button (click)="deleteMedia('tarot-image')" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-          Restaurar
-        </button>
-      </div>
-    </div>
+    <img [src]="getMediaSrc('tarot-image')" 
+         alt="Imagen de Servicios" 
+         appEditableImage
+         imageKey="tarot-image"
+         pageId="inicio"
+         (imageChange)="onImageChange($event, 'tarot-image')" />
   </div>
 </div>
 
@@ -265,26 +171,18 @@
 
   <!-- Información de Contacto Editable (Unificada) -->
 <div class="contacto-card">
-  <div [class.admin-editing]="adminMode" class="editable-section">
-    <h2 *ngIf="!adminMode">{{ contactInfo.title }}</h2>
-    <h2 *ngIf="adminMode">
-      <input type="text" [(ngModel)]="contactInfo.title" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Título de contacto">
-    </h2>
+  <div class="editable-section">
+    <h2 appEditableContent 
+        pageId="inicio" 
+        contentId="contact-title"
+        contentType="text">{{ contactInfo.title }}</h2>
     
-    <div *ngIf="!adminMode">
-      <p *ngFor="let contact of contactInfo.items">{{ contact }}</p>
-    </div>
-    
-    <div *ngIf="adminMode" class="admin-contact-editor">
-      <div *ngFor="let contact of contactInfo.items; let i = index" class="contact-item-editor">
-        <input type="text" [(ngModel)]="contactInfo.items[i]" (ngModelChange)="onContentChange()" class="admin-input" placeholder="Información de contacto">
-        <button (click)="removeContactItem(i)" class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-      <button (click)="addContactItem()" class="admin-btn add-btn">
-        <i class="fas fa-plus"></i> Agregar contacto
-      </button>
+    <div>
+      <p *ngFor="let contact of contactInfo.items; let i = index"
+         appEditableContent 
+         [pageId]="'inicio'" 
+         [contentId]="'contact-item-' + i"
+         contentType="text">{{ contact }}</p>
     </div>
   </div>
 
@@ -310,36 +208,12 @@
   </ul>
 </div>
 
-  <!-- Video con controles de admin -->
+  <!-- Video de contacto -->
   <div class="video-container">
-    <div class="media-wrapper" [class.admin-active]="adminMode">
-      <video controls>
-        <source [src]="getMediaSrc('contact-video')" type="video/mp4" />
-        Tu navegador no soporta la reproducción de video.
-      </video>
-
-      <!-- Controles de admin para video de contacto -->
-      <div *ngIf="adminMode" class="admin-controls">
-        <input type="file" 
-               #contactVideoInput 
-               accept="video/*" 
-               (change)="onFileSelected($event, 'contact-video')"
-               style="display: none;">
-        
-        <button (click)="contactVideoInput.click()" 
-                [disabled]="isUploading('contact-video')"
-                class="admin-btn upload-btn">
-          <i class="fas fa-upload"></i>
-          {{ isUploading('contact-video') ? 'Subiendo...' : 'Cambiar video' }}
-        </button>
-        
-        <button (click)="deleteMedia('contact-video')" 
-                class="admin-btn delete-btn">
-          <i class="fas fa-trash"></i>
-          Restaurar original
-        </button>
-      </div>
-    </div>
+    <video controls>
+      <source [src]="getMediaSrc('contact-video')" type="video/mp4" />
+      Tu navegador no soporta la reproducción de video.
+    </video>
   </div>
 </div>
 

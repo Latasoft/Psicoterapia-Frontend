@@ -90,8 +90,8 @@ export class ImageService {
     );
   }
 
-  deleteImage(publicId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${encodeURIComponent(publicId)}`, {
+  deleteImage(path: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/delete?path=${encodeURIComponent(path)}`, {
       headers: this.getAuthHeaders()
     }).pipe(
       catchError(this.handleError)

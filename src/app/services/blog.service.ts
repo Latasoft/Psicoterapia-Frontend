@@ -26,12 +26,11 @@ export class BlogService {
     );
   }
   eliminarBlog(id: string): Observable<any> {
-  return this.http.delete(`${this.apiUrl}/eliminar/${id}`);
-}
+    return this.http.delete(`${this.apiUrl}/${id}`);
+  }
  
-  
   editarBlog(id: string, blog: any) {
-    return this.http.put(`${this.apiUrl}/editar/${id}`, blog);
+    return this.http.put(`${this.apiUrl}/${id}`, blog);
   }
   
 }

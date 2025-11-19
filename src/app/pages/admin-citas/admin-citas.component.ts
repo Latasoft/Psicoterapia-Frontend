@@ -11,15 +11,45 @@ interface Precio {
   sesiones: number | null;
 }
 
-// Interfaz para cita
+// Interfaz para paciente
+interface Paciente {
+  id: string;
+  full_name: string;
+  email: string;
+  rut?: string;
+  phone?: string;
+  city?: string;
+  emergency_contact_name?: string;
+  emergency_contact_phone?: string;
+  medical_notes?: string;
+}
+
+// Interfaz para tratamiento
+interface Tratamiento {
+  id: string;
+  name: string;
+  price_national: number;
+  price_international: number;
+}
+
+// Interfaz para cita (nuevo formato)
 interface Cita {
   id: string;
-  nombre: string;
-  correo: string;
-  estado: string;
-  fecha_hora: Date | string; // manejamos Date o string (antes de normalizar)
-  precio: Precio | any;
-  tratamiento: string;
+  appointment_datetime: Date | string;
+  status: string;
+  notes?: string;
+  price_national?: number;
+  price_international?: number;
+  sessions?: number;
+  patients?: Paciente;
+  treatments?: Tratamiento;
+  // Campos legacy (por compatibilidad temporal)
+  nombre?: string;
+  correo?: string;
+  estado?: string;
+  fecha_hora?: Date | string;
+  precio?: Precio | any;
+  tratamiento?: string;
 }
 
 @Component({
@@ -44,25 +74,38 @@ export class AdminCitasComponent implements OnInit {
     this.citasService.obtenerCitas().subscribe({
       next: (data: Cita[]) => {
         this.citas = data.map((cita: Cita) => {
-          // Normalizar fecha_hora: convertir Firestore Timestamp a Date, o parsear string
-          if ((cita.fecha_hora as any)?._seconds) {
-            cita.fecha_hora = new Date((cita.fecha_hora as any)._seconds * 1000);
-          } else if (typeof cita.fecha_hora === 'string') {
-            cita.fecha_hora = new Date(cita.fecha_hora);
+          // Normalizar fecha: nuevo formato usa appointment_datetime
+          const fechaHora = cita.appointment_datetime || cita.fecha_hora;
+          if ((fechaHora as any)?._seconds) {
+            cita.appointment_datetime = new Date((fechaHora as any)._seconds * 1000);
+          } else if (typeof fechaHora === 'string') {
+            cita.appointment_datetime = new Date(fechaHora);
           }
 
-          // Normalizar precio a tu formato consistente
-          if (cita.precio) {
+          // Normalizar datos del paciente (nuevo formato con JOIN)
+          if (cita.patients) {
+            cita.nombre = cita.patients.full_name;
+            cita.correo = cita.patients.email;
+          }
+
+          // Normalizar estado
+          cita.estado = cita.status || cita.estado || 'pending';
+
+          // Normalizar tratamiento (nuevo formato con JOIN)
+          if (cita.treatments) {
+            cita.tratamiento = cita.treatments.name;
             cita.precio = {
-              precioNacional: cita.precio.precioNacional ?? cita.precio.nacional ?? null,
-              precioInternacional: cita.precio.precioInternacional ?? cita.precio.internacional ?? null,
-              sesiones: cita.precio.sesiones ?? null,
+              precioNacional: cita.treatments.price_national,
+              precioInternacional: cita.treatments.price_international,
+              sesiones: cita.sessions
             };
-          }
-
-          // Normalizar tratamiento a string si viene como objeto
-          if (typeof cita.tratamiento !== 'string' && cita.tratamiento) {
-            cita.tratamiento = cita.tratamiento;
+          } else if (cita.precio) {
+            // Formato legacy
+            cita.precio = {
+              precioNacional: cita.precio.precioNacional ?? cita.precio.nacional ?? cita.price_national ?? null,
+              precioInternacional: cita.precio.precioInternacional ?? cita.precio.internacional ?? cita.price_international ?? null,
+              sesiones: cita.precio.sesiones ?? cita.sessions ?? null,
+            };
           }
 
           return cita;
@@ -80,24 +123,28 @@ export class AdminCitasComponent implements OnInit {
   // Método para filtrar citas
   buscarCitas(): void {
     if (this.busqueda.trim() === '') {
-      this.citasFiltradas = this.citas;  // Si no hay búsqueda, mostrar todas las citas
+      this.citasFiltradas = this.citas;
     } else {
+      const searchTerm = this.busqueda.toLowerCase();
       this.citasFiltradas = this.citas.filter(cita =>
-        cita.nombre.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        cita.correo.toLowerCase().includes(this.busqueda.toLowerCase()) ||
-        cita.tratamiento.toLowerCase().includes(this.busqueda.toLowerCase())
+        (cita.nombre && cita.nombre.toLowerCase().includes(searchTerm)) ||
+        (cita.correo && cita.correo.toLowerCase().includes(searchTerm)) ||
+        (cita.tratamiento && cita.tratamiento.toLowerCase().includes(searchTerm)) ||
+        (cita.patients?.rut && cita.patients.rut.toLowerCase().includes(searchTerm)) ||
+        (cita.patients?.phone && cita.patients.phone.includes(searchTerm))
       );
     }
   }
 
   // Método para iniciar la edición de la cita
   editarCita(cita: Cita): void {
-    this.citaAEditar = { ...cita }; // Guardar una copia de la cita a editar
-    // Si la fecha es Date, convertir a string para input datetime-local
-    if (cita.fecha_hora instanceof Date) {
-      this.nuevaFechaHora = cita.fecha_hora.toISOString().slice(0,16);
-    } else {
-      this.nuevaFechaHora = cita.fecha_hora as string;
+    this.citaAEditar = { ...cita };
+    // Usar appointment_datetime (nuevo formato)
+    const fechaHora = cita.appointment_datetime || cita.fecha_hora;
+    if (fechaHora instanceof Date) {
+      this.nuevaFechaHora = fechaHora.toISOString().slice(0,16);
+    } else if (typeof fechaHora === 'string') {
+      this.nuevaFechaHora = new Date(fechaHora).toISOString().slice(0,16);
     }
   }
 

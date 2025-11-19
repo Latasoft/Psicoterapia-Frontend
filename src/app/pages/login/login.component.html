@@ -9,16 +9,7 @@
   </div>
 </div>
 
-<!-- Tarjeta de error elegante -->
-<div *ngIf="errorMessage" class="error-overlay">
-  <div class="error-card-animated">
-    <div class="error-icon">⚠️</div>
-    <p class="error-text">{{ errorMessage }}</p>
-    <button class="error-button" (click)="errorMessage = ''">Cerrar</button>
-  </div>
-</div>
-
-<!-- Aquí tu contenido normal de login -->
+<!-- Contenido de login -->
 <div class="login-container" *ngIf="!isLoading">
   <div class="login-card">
     <div class="login-form-section">
@@ -32,6 +23,19 @@
         <input class="login-button" type="submit" value="Iniciar sesión" [disabled]="isLoading" />
       </form>
 
+      <!-- Mensaje de error discreto -->
+      <div *ngIf="errorMessage" class="error-message-inline">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <p class="register-link">
+        ¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a>
+      </p>
 
       <span class="agreement"><a href="/">EMHpsicoterapiaonline</a></span>
     </div>

@@ -7,16 +7,16 @@ import { environment } from '../environments/environment';
   providedIn: 'root'
 })
 export class HorarioService {
-  private apiUrl = `${environment.apiUrl}/api/horario`;  // URL cambiar cuando haga push por esto   private apiUrl = `${environment.apiUrl}/login`; 
+  private apiUrl = `${environment.apiUrl}/api/horarios`; 
 
   constructor(private http: HttpClient) {}
 
   obtenerHorario() {
-    return this.http.get(`${this.apiUrl}/obtener`);
+    return this.http.get(`${this.apiUrl}/semanal`);
   }
 
   guardarHorario(horarioData: any) {
-    return this.http.post(`${this.apiUrl}/guardar`, horarioData);
+    return this.http.post(`${this.apiUrl}/semanal`, horarioData);
   }
 
   editarDia(dia: string, rangos: any[]) {

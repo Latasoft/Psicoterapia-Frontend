@@ -10,6 +10,9 @@ import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
+import { EditableContentDirective } from '../../directives/editable-content.directive';
+import { EditableImageDirective } from '../../directives/editable-image.directive';
+import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
 
 interface MediaItem {
   id: string;
@@ -22,7 +25,14 @@ interface MediaItem {
 
 @Component({
     selector: 'app-inicio',
-    imports: [RouterModule, FormsModule, CommonModule],
+    imports: [
+      RouterModule, 
+      FormsModule, 
+      CommonModule,
+      EditableContentDirective,
+      EditableImageDirective,
+      EditModeIndicatorComponent
+    ],
     templateUrl: './inicio.component.html',
     styleUrls: ['./inicio.component.css']
 })
@@ -512,6 +522,57 @@ export class InicioComponent implements OnInit {
     if (confirm('¿Estás seguro de que quieres eliminar este servicio?')) {
       this.services.splice(index, 1);
       this.savePageContent();
+    }
+  }
+
+  // Método para manejar cambios de imagen del nuevo sistema edit-in-place
+  async onImageChange(file: File, imageKey: string) {
+    if (!this.isAdmin) {
+      alert('Necesitas estar autenticado para subir archivos');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      return;
+    }
+
+    this.uploadingItem = imageKey;
+
+    try {
+      console.log(`🚀 Uploading image for ${imageKey}`);
+      
+      const uploadResponse = await this.imageService.uploadImage(file, 'homepage').toPromise();
+
+      if (uploadResponse && uploadResponse.success) {
+        // Actualizar el item de media
+        const item = this.mediaItems.find(m => m.id === imageKey);
+        if (item) {
+          // Eliminar imagen anterior si existe
+          if (item.publicId) {
+            try {
+              await this.imageService.deleteImage(item.publicId).toPromise();
+            } catch (deleteError) {
+              console.warn('Error deleting previous image:', deleteError);
+            }
+          }
+
+          // Actualizar con la nueva imagen
+          item.src = uploadResponse.data.secure_url;
+          item.publicId = uploadResponse.data.public_id;
+          
+          this.saveMediaToStorage();
+          console.log('✅ Image updated successfully');
+        }
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+    } finally {
+      this.uploadingItem = null;
     }
   }
 }

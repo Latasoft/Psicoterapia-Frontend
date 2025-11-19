@@ -93,6 +93,24 @@
     color: #0099ff;
     text-decoration: none;
   }
+
+  /* Enlace de registro */
+  .register-link {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .register-link a {
+    color: #12B1D1;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .register-link a:hover {
+    text-decoration: underline;
+  }
   
   /* Botón de login */
   .login-button {
@@ -315,5 +333,42 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/* Mensaje de error discreto inline */
+.error-message-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background-color: #fee;
+  border-left: 4px solid #f44;
+  border-radius: 8px;
+  color: #c33;
+  margin-top: 16px;
+  font-size: 14px;
+  animation: fadeInError 0.3s ease-in;
+}
+
+.error-message-inline svg {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+}
+
+.error-message-inline span {
+  flex: 1;
+  font-weight: 500;
+}
+
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

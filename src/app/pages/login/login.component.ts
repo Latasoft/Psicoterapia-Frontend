@@ -20,17 +20,22 @@ export class LoginComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onLogin(): void {
-    this.isLoading = true; // Mostrar loader al iniciar
+    this.isLoading = true;
+    this.errorMessage = ''; // Limpiar mensaje anterior
 
     this.authService.login(this.username, this.contrasena).subscribe({
       next: (response) => {
-        localStorage.setItem('token', response.token); // Guarda el token
-        this.isLoading = false; // Ocultar loader
-        this.router.navigateByUrl('/', { replaceUrl: true }); // Redirigir
+        localStorage.setItem('token', response.token);
+        this.isLoading = false;
+        this.router.navigateByUrl('/', { replaceUrl: true });
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'Error al iniciar sesión.';
-        this.isLoading = false; // También ocultar loader si hay error
+        this.errorMessage = error.error?.message || 'Usuario o contraseña incorrectos';
+        this.isLoading = false;
+        // Auto-ocultar el mensaje después de 5 segundos
+        setTimeout(() => {
+          this.errorMessage = '';
+        }, 5000);
       }
     });
   }
