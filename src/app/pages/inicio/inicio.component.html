@@ -1,6 +1,7 @@
 <!-- Indicador de modo edición (visible solo para admins) -->
 <app-edit-mode-indicator></app-edit-mode-indicator>
 
+<!-- Portada -->
 <div class="image-card-4">
   <div class="logo-container">
     <img [src]="getMediaSrc('hero-image')" 
@@ -19,6 +20,7 @@
   </div>
 </div>
 
+<!-- Primer card. Video -->
 <div class="psychologist-card">
   <div class="psychologist-card-content">
     <video controls>
@@ -42,7 +44,7 @@
 
 <!-- Blog section (sin cambios) -->
 <div class="blog-section">
-  <h1 class="blog-title">BLOG</h1>
+  <h1 class="blog-title">Blog</h1>
   <div *ngIf="ultimosBlogs.length" class="blog-cards">
     <div *ngFor="let blog of ultimosBlogs.slice(0, 4)" class="blog-card">
       <img *ngIf="blog.imagen" [src]="blog.imagen" alt="{{ blog.titulo }}" class="blog-card-image" />
@@ -56,6 +58,7 @@
   </div>
 </div>
 
+<!-- Servicios -->
 <div class="psychologist-card2">
   <div class="psychologist-card-content">
     <div class="text-section">
@@ -117,7 +120,6 @@
     </div>
   </div>
 </div>
-
 
 
 <!-- Texto de Tarot Editable -->
@@ -186,6 +188,7 @@
     </div>
   </div>
 
+  <!-- Contacto -->
   <h3>Encuéntranos también en:</h3>
   <ul>
     <li>
@@ -193,20 +196,11 @@
         <button>2x3</button>
       </a>
     </li>
-
-    <li>
-      <a href="https://app.snabb.cl/#/profile/practitioner/13698609-0" target="_blank" class="contact-link">
-        <button>Perfil Snabb</button>
+        <li>
+      <a href="https://www.psychologytoday.com/profile/1022969" target="_blank" class="contact-link">
+        <button>Psychology Today</button>
       </a>
     </li>
-
-    <li>
-      <a href="https://www.psicologosonline.cl/centros/eduardo-marquez-huerta?utm_source=451925&utm_medium=widget&utm_campaign=widget-company_stamp" target="_blank" class="contact-link">
-        <img src="assets/stamp.png" alt="Snabb App" class="snabb-image-btn">
-      </a>
-    </li>
-  </ul>
-</div>
 
   <!-- Video de contacto -->
   <div class="video-container">
@@ -215,8 +209,6 @@
       Tu navegador no soporta la reproducción de video.
     </video>
   </div>
-</div>
-
 
 <a href="https://wa.me/56994739587?text=¡Hola!%20Me%20interesa%20tu%20servicio" target="_blank">
   <button class="whatsapp-button">
