@@ -299,12 +299,6 @@
   }
 }
 
-  
-  
-  
-
-
-
 /* Container de los blogs*/
 .blog-section {
   background-image: url('/assets/f2.jpg');
@@ -313,7 +307,8 @@
   padding: 60px 20px;
   color: white;
   text-align: center;
-}
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+  }
 
 .blog-title {
   font-size: 2.5rem;
@@ -366,12 +361,6 @@
   margin-bottom: 15px;
 }
 
-
-
-
-
-
-
   
   /* Contenedor general del card (ahora con esquinas en punta) */
   .psychologist-card {
@@ -383,6 +372,70 @@
     border-radius: 0; /* Esquinas en punta */
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1); /* Suaviza el diseño */
   }
+
+  /*Conveios*/
+
+   .convenios-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #9e9893;
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  }
+
+  /*Tarot*/
+
+  .tarot-title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #9e9893;
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  }
+
+
+
+  /*Servicios*/
+
+  .servicios-section {
+  background-color: #D7D1CC; 
+  background-position: center;
+  width: 100%;
+  max-width: 2000px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .servicios-title {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+    color: #9e9893;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .servicios-card-content {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 20px;
+    background-color: transparent; /* Sin bordes ni fondo interno */
+  }
+
+  .text-section{
+  max-width: 900px;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  }
+
+
+
   
   /* Contenido del card */
   .psychologist-card-content {
@@ -393,10 +446,6 @@
     background-color: transparent; /* Sin bordes ni fondo interno */
   }
   
-
-  
-  
-
   .psychologist-card2 {
     width: 100%;
     max-width: 2000px;
@@ -419,6 +468,7 @@
 .psychologist-card2 .psychologist-card-content .text-section {
   max-width: 900px;
   width: 100%;
+  text-align: center;
 }
 
 .psychologist-card2 .psychologist-card-content .text-section h2 {

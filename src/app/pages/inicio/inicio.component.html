@@ -59,13 +59,10 @@
 </div>
 
 <!-- Servicios -->
-<div class="psychologist-card2">
-  <div class="psychologist-card-content">
+<div class="servicios-section">
+  <h1 class="servicios-title">Servicios</h1>
+  <div class="servicios-card-content">
     <div class="text-section">
-      <h2 appEditableContent 
-          pageId="inicio" 
-          contentId="services-title"
-          contentType="text">Servicios</h2>
       <p appEditableContent 
          pageId="inicio" 
          contentId="services-description"
@@ -108,11 +105,7 @@
   <!-- Sección de Convenios Editable -->
   <div class="blog-titulo">
     <div class="additional-info">
-      <h3 appEditableContent 
-          pageId="inicio" 
-          contentId="convenios-title"
-          contentType="text">{{ conveniosInfo.title }}</h3>
-      
+      <h1 class="convenios-title">Convenios</h1>
       <p appEditableContent 
          pageId="inicio" 
          contentId="convenios-description"
@@ -121,15 +114,17 @@
   </div>
 </div>
 
-
 <!-- Texto de Tarot Editable -->
 <div class="card-container">
   <div class="text-section1">
-    <h2 appEditableContent 
-        pageId="inicio" 
-        contentId="tarot-text"
-        contentType="html">{{ tarotText.content }}</h2>
-    <a href="/tarotista" class="btn">Ver más</a>
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <h1 class="tarot-title" style="text-align: center; margin-bottom: 1rem;">Tarot</h1>
+      <p appEditableContent 
+          pageId="inicio" 
+          contentId="tarot-text"
+          contentType="html">{{ tarotText.content }}</p>
+      <a href="/tarotista" class="btn">Ver más</a>
+    </div>
   </div>
   
   <div class="image-section">
