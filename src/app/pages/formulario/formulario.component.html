@@ -1,46 +1,4 @@
 <div class="outer-container">
-  <!-- Imagen Banner -->
-  <div class="image-container" [class.admin-active]="adminMode">
-    <img 
-      [src]="bannerImage" 
-      alt="Psicoterapia Banner" 
-      class="form-image"
-      (error)="bannerImage = 'assets/a2.avif'" />
-    
-    <div *ngIf="adminMode" class="edit-overlay">
-      <button 
-        (click)="onImageClick('banner')" 
-        class="edit-btn"
-        [disabled]="uploadingMedia">
-        <i class="fas fa-edit"></i> 
-        {{ uploadingMedia ? 'Subiendo...' : 'Cambiar imagen' }}
-      </button>
-    </div>
-  </div>
-
-  <!-- Sección Sobre mí -->
-  <div class="about-me">
-    <h2 
-      class="about-title" 
-      [contentEditable]="adminMode"
-      (blur)="onTextChange($event, 'title')">
-      {{ aboutContent.title }}
-    </h2>
-    <p 
-      class="about-description" 
-      [contentEditable]="adminMode" 
-      (blur)="onTextChange($event, 'description')">
-      {{ aboutContent.description }}
-    </p>
-  </div>
-
-  <!-- Cards de características -->
-  <div class="cards-container">
-    <div class="card" *ngFor="let card of cards; let i = index">
-      <h3 class="card-title">{{ card.title }}</h3>
-      <p class="card-description">{{ card.description }}</p>
-    </div>
-  </div>
 
   <!-- Formulario de Reserva -->
   <div class="form-container">

@@ -48,27 +48,6 @@ export class FormularioComponent implements OnInit, OnDestroy {
   uploadingMedia = false;
   selectedFile: File | null = null;
 
-  // Content properties
-  aboutContent = {
-    title: 'Sobre mí',
-    description: '22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo. Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.'
-  };
-
-  cards = [
-    {
-      title: 'Confidencialidad',
-      description: 'Todo lo compartido en las sesiones se mantiene en total confidencialidad, garantizando un espacio seguro para tu desarrollo personal.'
-    },
-    {
-      title: 'Profesionalismo',
-      description: 'Cuento con la formación y experiencia necesarias para ofrecer un servicio de calidad, basado en el respeto y la ética profesional.'
-    },
-    {
-      title: 'Responsabilidad',
-      description: 'Me comprometo a ofrecerte la mejor atención, siguiendo los estándares más altos de profesionalismo y dedicación.'
-    }
-  ];
-
   // Form properties
   step = 1;
   totalSteps = 3;
@@ -1001,9 +980,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
     if (!this.adminMode) return;
 
     const content = {
-      bannerImage: this.bannerImage,
-      aboutContent: this.aboutContent,
-      cards: this.cards
+      bannerImage: this.bannerImage
     };
 
     try {
@@ -1028,17 +1005,7 @@ export class FormularioComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  onTextChange(event: any, field: string) {
-    if (!this.adminMode) return;
-    
-    if (field === 'description') {
-      this.aboutContent.description = event.target.innerText;
-    } else if (field === 'title') {
-      this.aboutContent.title = event.target.innerText;
-    }
-    
-    this.onContentChange();
-  }
+
 
   private async loadPageContent() {
     try {
@@ -1055,8 +1022,6 @@ export class FormularioComponent implements OnInit, OnDestroy {
       const content = await lastValueFrom(this.pageContentService.getPageContent('formulario'));
       if (content) {
         this.bannerImage = content.bannerImage || this.bannerImage;
-        this.aboutContent = content.aboutContent || this.aboutContent;
-        this.cards = content.cards || this.cards;
       }
     } catch (error) {
       console.error('Error al cargar contenido:', error);

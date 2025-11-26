@@ -30,4 +30,28 @@
       <img src="assets/tik.avif" alt="TikTok" />
     </a>
   </div>
+
+  <!-- Sección Sobre mí -->
+  <div class="about-me">
+    <h2 
+      class="about-title" 
+      [contentEditable]="adminMode"
+      (blur)="onTextChange($event, 'title')">
+      {{ aboutContent.title }}
+    </h2>
+    <p 
+      class="about-description" 
+      [contentEditable]="adminMode" 
+      (blur)="onTextChange($event, 'description')">
+      {{ aboutContent.description }}
+    </p>
+  </div>
+
+  <!-- Cards de características -->
+  <div class="cards-container">
+    <div class="card" *ngFor="let card of cards; let i = index">
+      <h3 class="card-title">{{ card.title }}</h3>
+      <p class="card-description">{{ card.description }}</p>
+    </div>
+  </div>
   
