@@ -1,0 +1,97 @@
+<div class="configuracion-disponibilidad">
+  <div class="config-section">
+    <h3>Configuración Global</h3>
+    <div class="config-grid">
+      <div class="config-item">
+        <label>Mínimo de anticipación (horas):</label>
+        <input type="number" [(ngModel)]="configGlobal.minimo_anticipacion_horas" name="minimo_anticipacion" min="1" max="168">
+      </div>
+      <div class="config-item">
+        <label>Máximo días adelante:</label>
+        <input type="number" [(ngModel)]="configGlobal.maximo_dias_adelante" name="maximo_dias" min="1" max="365">
+      </div>
+      <div class="config-item">
+        <label>
+          <input type="checkbox" [(ngModel)]="configGlobal.permitir_citas_domingos" name="domingos">
+          Permitir citas domingos
+        </label>
+      </div>
+      <div class="config-item">
+        <label>
+          <input type="checkbox" [(ngModel)]="configGlobal.permitir_citas_fines_semana" name="fines_semana">
+          Permitir citas fines de semana
+        </label>
+      </div>
+    </div>
+    <button class="btn-primary" (click)="guardarConfiguracion()">Guardar Configuración</button>
+  </div>
+
+  <div class="config-section">
+    <div class="header-with-actions">
+      <h3>Horarios Semanales</h3>
+      <div class="acciones-globales">
+        <select [(ngModel)]="diaOrigen" name="diaOrigen" class="select-dia">
+          <option value="">Seleccionar día...</option>
+          <option *ngFor="let dia of diasSemana" [value]="dia.key">{{ dia.nombre }}</option>
+        </select>
+        <button class="btn-success" (click)="aplicarATodos()" [disabled]="!diaOrigen || !horarioSemanal[diaOrigen]" title="Copiar a todos los días de la semana">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+          </svg>
+          <span>Aplicar a todos</span>
+        </button>
+        <button class="btn-primary" (click)="aplicarALaborables()" [disabled]="!diaOrigen || !horarioSemanal[diaOrigen]" title="Copiar a días laborables (Lunes-Viernes)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+          </svg>
+          <span>Aplicar a laborables</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="dias-grid">
+      <div class="dia-card" *ngFor="let dia of diasSemana">
+        <div class="dia-header">
+          <h4>{{ dia.nombre }}</h4>
+          <label class="switch">
+            <input type="checkbox" [(ngModel)]="dia.activo" name="activo-{{dia.key}}" (change)="toggleDia(dia)">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div *ngIf="dia.activo" class="horarios-list">
+          <div class="horario-item" *ngFor="let bloque of horarioSemanal[dia.key] || []; let i = index">
+            <div class="time-group">
+              <label class="time-label">Desde</label>
+              <input type="time" [(ngModel)]="bloque.inicio" name="inicio-{{dia.key}}-{{i}}" (change)="onHorarioChange()" class="time-input">
+            </div>
+            <div class="separator">→</div>
+            <div class="time-group">
+              <label class="time-label">Hasta</label>
+              <input type="time" [(ngModel)]="bloque.fin" name="fin-{{dia.key}}-{{i}}" (change)="onHorarioChange()" class="time-input">
+            </div>
+            <div class="modalidad-group">
+              <label class="time-label">Modalidad</label>
+              <select [(ngModel)]="bloque.modalidad" name="modalidad-{{dia.key}}-{{i}}" (change)="onHorarioChange()" class="modalidad-select">
+                <option value="presencial">Presencial</option>
+                <option value="online">Online</option>
+                <option value="ambas">Ambas</option>
+              </select>
+            </div>
+            <button class="btn-eliminar" (click)="eliminarBloque(dia.key, i)" title="Eliminar bloque">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <button class="btn-agregar" (click)="agregarBloque(dia.key)">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span>Agregar horario</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

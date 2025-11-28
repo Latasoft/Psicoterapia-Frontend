@@ -1,0 +1,65 @@
+<div class="horarios-container">
+  <div class="dias-grid">
+    <div *ngFor="let dia of diasSemana" class="dia-card">
+      <div class="dia-header">
+        <h4>{{ dia | titlecase }}</h4>
+      </div>
+
+      <div class="dia-config">
+        <div class="horario-diario">
+          <h5>Horario de Trabajo</h5>
+          <div class="time-inputs">
+            <div class="input-group">
+              <label>Inicio</label>
+              <input type="time" [(ngModel)]="getDiaConfig(dia).hora_inicio" class="time-input">
+            </div>
+            <div class="input-group">
+              <label>Fin</label>
+              <input type="time" [(ngModel)]="getDiaConfig(dia).hora_fin" class="time-input">
+            </div>
+          </div>
+        </div>
+
+        <div class="pausas-section">
+          <h5>Pausas</h5>
+          <div class="pausas-list">
+            <div *ngFor="let pausa of getDiaConfig(dia).pausas; let i = index" class="pausa-item">
+              <div class="time-inputs">
+                <div class="input-group">
+                  <label>Inicio</label>
+                  <input type="time" [(ngModel)]="pausa.inicio" class="time-input">
+                </div>
+                <div class="input-group">
+                  <label>Fin</label>
+                  <input type="time" [(ngModel)]="pausa.fin" class="time-input">
+                </div>
+              </div>
+              <button class="btn-delete" (click)="eliminarPausa(dia, i)" title="Eliminar pausa">
+                <span>×</span>
+              </button>
+            </div>
+            <button class="btn-add-pausa" (click)="agregarPausa(dia)">
+              <span>+ Agregar Pausa</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="modalidad-section">
+          <h5>Modalidad</h5>
+          <select [(ngModel)]="getDiaConfig(dia).modalidad" class="modalidad-select">
+            <option value="ambas">Ambas</option>
+            <option value="presencial">Presencial</option>
+            <option value="online">Online</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-save" (click)="guardarCambios()" [disabled]="guardando">
+      <span *ngIf="!guardando">Guardar Cambios</span>
+      <span *ngIf="guardando">Guardando...</span>
+    </button>
+  </div>
+</div>

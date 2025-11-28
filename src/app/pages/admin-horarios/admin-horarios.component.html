@@ -1,0 +1,91 @@
+<div class="admin-horarios-container">
+  <header class="admin-header">
+    <h1>Panel de Administración de Horarios</h1>
+    <p class="subtitle">Gestiona tus horarios semanales y excepciones de manera simple y visual. Recuerda guardar los cambios cuando termines.</p>
+  </header>
+
+  <section *ngIf="cargando" class="loading-section">
+    <div class="loader"></div>
+    <span>Cargando datos...</span>
+  </section>
+
+  <section *ngIf="error" class="error-section">
+    <span class="error-msg">{{ error }}</span>
+  </section>
+
+  <section *ngIf="!cargando && !error" class="content-section">
+    <nav class="tabs-nav">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'servicios'"
+        (click)="setActiveTab('servicios')">
+        Catálogo de Paquetes
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'disponibilidad'"
+        (click)="setActiveTab('disponibilidad')">
+        Configuración de Disponibilidad
+      </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'vista-semanal'"
+        (click)="setActiveTab('vista-semanal')">
+        Vista Semanal
+      </button>
+      <!-- Pestaña Calendario Mensual oculta -->
+      <!--
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'calendario'"
+        (click)="setActiveTab('calendario')">
+        Calendario Mensual
+      </button>
+      -->
+    </nav>
+
+    <!-- Pestaña 1: Catálogo de Paquetes -->
+    <div *ngIf="activeTab === 'servicios'" class="tab-content">
+      <app-catalogo-paquetes></app-catalogo-paquetes>
+    </div>
+
+    <!-- Pestaña 2: Configuración de Disponibilidad -->
+    <div *ngIf="activeTab === 'disponibilidad'" class="tab-content">
+      <app-configuracion-disponibilidad
+        [horarioSemanal]="horarioSemanal"
+        (horarioChange)="onHorarioChange($event)">
+      </app-configuracion-disponibilidad>
+      
+      <!-- Botón de guardado manual -->
+      <div class="save-actions">
+        <button 
+          class="btn-save" 
+          (click)="guardarHorarios()" 
+          [disabled]="guardando"
+          [class.guardando]="guardando">
+          <svg *ngIf="!guardando" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span *ngIf="!guardando">Guardar Cambios</span>
+          <span *ngIf="guardando">Guardando...</span>
+        </button>
+        <p class="save-hint" *ngIf="!guardando">Realiza todos los cambios necesarios y luego haz clic en "Guardar Cambios"</p>
+      </div>
+    </div>
+
+    <!-- Pestaña 3: Vista Semanal -->
+    <div *ngIf="activeTab === 'vista-semanal'" class="tab-content">
+      <app-vista-semanal-calendario></app-vista-semanal-calendario>
+    </div>
+
+    <!-- Pestaña 4: Calendario Mensual (Oculta) -->
+    <!--
+    <div *ngIf="activeTab === 'calendario'" class="tab-content">
+      <app-calendario-gestion
+        [excepciones]="excepciones"
+        (excepcionChange)="onExcepcionChange($event)">
+      </app-calendario-gestion>
+    </div>
+    -->
+  </section>
+</div>

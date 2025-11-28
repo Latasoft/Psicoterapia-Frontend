@@ -23,6 +23,7 @@
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/tratamientos">Tratamientos</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-taller">Taller</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/horario">Horario</a></li>
+    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-horarios">Panel Admin</a></li>
     <li *ngIf="isLoggedIn && isAdmin()" class="logout-item">
       <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

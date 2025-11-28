@@ -1,558 +1,91 @@
-<div class="outer-container">
-
-  <!-- Formulario de Reserva -->
-  <div class="form-container">
-    <h1 class="title">Agenda tu hora aquí</h1>
-
-    <!-- Indicadores de pasos -->
-    <div class="step-indicators">
-      <div
-        class="step"
-        [class.active]="step === 1"
-        [class.completed]="step > 1"
-        (click)="goToStep(1)">
-        1
-      </div>
-      <div
-        class="step"
-        [class.active]="step === 2"
-        [class.completed]="step > 2"
-        (click)="esPasoValido(1) ? goToStep(2) : null">
-        2
-      </div>
-      <div
-        class="step"
-        [class.active]="step === 3"
-        [class.completed]="step > 3"
-        (click)="esPasoValido(2) ? goToStep(3) : null">
-        3
-      </div>
-    </div>
-
-    <!-- PASO 1: Datos personales y tratamiento -->
-    <div *ngIf="step === 1" class="form-step">
-      <h2 class="step-title">Información Personal</h2>
-
-      <!-- Datos Básicos -->
-      <div class="form-group">
-        <label for="nombre">Nombre Completo *</label>
-        <input
-          id="nombre"
-          type="text"
-          [(ngModel)]="nombre"
-          (input)="debouncedSave()"
-          name="nombre"
-          required
-          placeholder="Ingresa tu nombre completo"
-          class="form-control" />
-      </div>
-
-      <div class="form-group">
-        <label for="correo">Correo Electrónico *</label>
-        <input
-          id="correo"
-          type="email"
-          [(ngModel)]="correo"
-          (input)="debouncedSave()"
-          name="correo"
-          required
-          placeholder="ejemplo@correo.com"
-          class="form-control" />
-      </div>
-
-      <div class="form-group">
-        <label for="telefono">Teléfono *</label>
-        <input
-          id="telefono"
-          type="tel"
-          [(ngModel)]="telefono"
-          (input)="debouncedSave()"
-          name="telefono"
-          required
-          placeholder="+56912345678"
-          class="form-control" />
-        <small class="form-text">Formato: +56912345678</small>
-      </div>
-
-      <!-- Tratamiento -->
-      <div class="form-group">
-        <label for="tratamiento">Tipo de Tratamiento *</label>
-        <select
-          id="tratamiento"
-          [(ngModel)]="tratamiento"
-          name="tratamiento"
-          required
-          (change)="actualizarPrecio(); debouncedSave()"
-          class="form-control">
-          <option value="" disabled>Selecciona un tratamiento</option>
-          <option *ngFor="let t of tratamientosDisponibles" [value]="t.nombre">
-            {{ t.nombre }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Información de precios -->
-      <div *ngIf="precio.nacional || precio.internacional" class="price-info">
-        <h3>Información del Tratamiento</h3>
-        
-        <div class="price-row" *ngIf="precio.nacional">
-          <span class="price-label">Valor Nacional:</span>
-          <span class="price-amount">${{ precio.nacional | number:'1.0-0' }}</span>
-        </div>
-        
-        <div class="price-row" *ngIf="precio.internacional">
-          <span class="price-label">Valor Internacional:</span>
-          <span class="price-amount">${{ precio.internacional | number:'1.0-0' }} USD</span>
-        </div>
-        
-        <div class="price-row" *ngIf="precio.sesiones">
-          <span class="price-label">Número de sesiones:</span>
-          <span class="price-amount">{{ precio.sesiones }}</span>
-        </div>
-      </div>
-
-      <!-- Botón limpiar caché -->
-      <div class="cache-actions">
-        <button
-          type="button"
-          (click)="clearFormCache()"
-          class="btn btn-secondary btn-sm"
-          title="Limpiar datos guardados del formulario">
-          <i class="fas fa-trash"></i>
-          Limpiar datos guardados
-        </button>
-      </div>
-
-      <!-- Botón siguiente -->
-      <div class="form-actions">
-        <button
-          type="button"
-          (click)="siguientePaso()"
-          class="btn btn-primary"
-          [disabled]="!esPasoValido(1)">
-          Siguiente
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- PASO 2: Fecha y hora -->
-    <div *ngIf="step === 2" class="form-step">
-      <h2 class="step-title">Seleccionar Fecha y Hora</h2>
-
-      <!-- Fecha -->
-      <div class="form-group">
-        <label for="fecha">Fecha de la Cita *</label>
-        <input
-          id="fecha"
-          type="date"
-          [(ngModel)]="fecha"
-          name="fecha"
-          required
-          [min]="fechaMinima"
-          (change)="validarFecha(); debouncedSave()"
-          [class.invalid]="errorMessage"
-          class="form-control" />
-      </div>
-
-      <!-- Mensaje de error -->
-      <div *ngIf="errorMessage" class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        {{ errorMessage }}
-      </div>
-
-      <!-- Horarios disponibles -->
-      <div *ngIf="horasDisponibles.length > 0" class="form-group">
-        <label for="hora">Horario Disponible *</label>
-        <select 
-          id="hora" 
-          [(ngModel)]="hora" 
-          name="hora" 
-          required 
-          (change)="debouncedSave()"
-          class="form-control hora-select">
-          <option value="">Selecciona un horario</option>
-          <option *ngFor="let horaDisponible of horasDisponibles" [value]="horaDisponible">
-            {{ horaDisponible }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Sin horarios disponibles -->
-      <div *ngIf="horasDisponibles.length === 0 && fecha && !errorMessage" class="no-hours-message">
-        <i class="fas fa-calendar-times"></i>
-        <p>No hay horarios disponibles para esta fecha.</p>
-        <small>Por favor selecciona otra fecha.</small>
-      </div>
-
-      <!-- Botones navegación -->
-      <div class="form-actions">
-        <button
-          type="button"
-          (click)="pasoAnterior()"
-          class="btn btn-secondary">
-          <i class="fas fa-arrow-left"></i>
-          Anterior
-        </button>
-        
-        <button
-          type="button"
-          (click)="siguientePaso()"
-          class="btn btn-primary"
-          [disabled]="!esPasoValido(2)">
-          Siguiente
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- PASO 3: Confirmación y pago -->
-    <div *ngIf="step === 3" class="form-step">
-      <h2 class="step-title">Confirmación y Pago</h2>
-
-      <!-- Resumen de la cita -->
-      <div class="booking-summary">
-        <h3>Resumen de tu Cita</h3>
-        
-        <div class="summary-row">
-          <span class="summary-label">Nombre:</span>
-          <span class="summary-value">{{ nombre }}</span>
-        </div>
-        
-        <div class="summary-row">
-          <span class="summary-label">Correo:</span>
-          <span class="summary-value">{{ correo }}</span>
-        </div>
-        
-        <div class="summary-row">
-          <span class="summary-label">Tratamiento:</span>
-          <span class="summary-value">{{ tratamiento }}</span>
-        </div>
-        
-        <div class="summary-row">
-          <span class="summary-label">Fecha:</span>
-          <span class="summary-value">{{ fecha | date:'dd/MM/yyyy' }}</span>
-        </div>
-        
-        <div class="summary-row">
-          <span class="summary-label">Horario:</span>
-          <span class="summary-value">{{ hora }}</span>
-        </div>
-        
-        <div class="summary-row total" *ngIf="precio.nacional">
-          <span class="summary-label">Total a Pagar:</span>
-          <span class="summary-value price-highlight">${{ precio.nacional | number:'1.0-0' }}</span>
-        </div>
-      </div>
-
-      <!-- Métodos de pago -->
-      <div class="payment-methods">
-        <h3>Selecciona tu método de pago</h3>
-        
-        <div class="payment-buttons">
-          <!-- Webpay -->
-          <div *ngIf="mostrarFormularioWebpay" class="webpay-iframe-container">
-            <h3>Formulario de Pago Webpay</h3>
-            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
-            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
-            
-            <iframe 
-              src="https://www.webpay.cl/form-pay/264721"
-              width="100%" 
-              height="600"
-              frameborder="0"
-              class="webpay-iframe">
-            </iframe>
-            
-            <div class="payment-instructions">
-              <p>📋 <strong>Instrucciones:</strong></p>
-              <ol>
-                <li>Completa el formulario de pago arriba</li>
-                <li>Realiza el pago por el monto de <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
-                <li>Una vez completado, haz clic en "Confirmar Pago" abajo</li>
-              </ol>
-              
-              <button 
-                type="button" 
-                (click)="confirmarPagoManual()" 
-                class="btn btn-primary">
-                ✅ Confirmar Pago Realizado
-              </button>
-              
-              <button 
-                type="button" 
-                (click)="cancelarPago()" 
-                class="btn btn-secondary">
-                ❌ Cancelar
-              </button>
-            </div>
-          </div>
-
-          <!-- MercadoPago Vista (igual que Webpay) -->
-          <div *ngIf="mostrarFormularioMercadoPago" class="webpay-iframe-container">
-            <h3>Pago con MercadoPago</h3>
-            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
-            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
-            
-            <div class="mercadopago-info">
-              <div class="payment-card">
-                <h4>🔗 Enlace de Pago MercadoPago</h4>
-                <p *ngIf="tratamiento === 'Psicoterapia e hipnoterapia'">
-                  <strong>Link para $40.000:</strong><br>
-                  <button 
-                    type="button"
-                    (click)="abrirMercadoPago('https://www.mercadopago.cl/checkout/v1/payment/redirect/d36cfce6-9d1b-4fc1-83c4-da4503134202/payment-option-form/?preference-id=85259864-f26303ab-6b6d-4660-b199-4ecfb5b8d265&router-request-id=7af10d48-1adf-4e40-9bdb-d0fa69c3fdb3&source=link&p=d07bceff09d85d30681c53fb5aac6bb3')" 
-                    class="payment-link-btn">
-                    🔗 Ir a MercadoPago - $40.000
-                  </button>
-                </p>
-                <p *ngIf="tratamiento === 'Taller de duelo'">
-                  <strong>Link para $70.000:</strong><br>
-                  <button 
-                    type="button"
-                    (click)="abrirMercadoPago('https://www.mercadopago.cl/checkout/v1/payment/redirect/4882cf38-5686-47c8-8346-bb0463fa82a8/payment-option-form/?preference-id=85259864-b4065e2e-8790-4880-bd92-e2a79c7e1fb8&router-request-id=6b4e86d2-2326-4fea-b7db-3f50c7c83129&source=link&p=d07bceff09d85d30681c53fb5aac6bb3')" 
-                    class="payment-link-btn">
-                    🔗 Ir a MercadoPago - $70.000
-                  </button>
-                </p>
-                
-                <!-- Mostrar ambos enlaces si no se puede determinar el tratamiento -->
-                <div *ngIf="!tratamiento || (tratamiento !== 'Psicoterapia e hipnoterapia' && tratamiento !== 'Taller de duelo')">
-                  <p><strong>Enlaces disponibles:</strong></p>
-                  <button 
-                    type="button"
-                    (click)="abrirMercadoPago('https://mpago.la/1cJ4Rht')" 
-                    class="payment-link-btn">
-                    🔗 Psicoterapia - $40.000
-                  </button>
-                  <br><br>
-                  <button 
-                    type="button"
-                    (click)="abrirMercadoPago('https://mpago.la/1BPFfVT')" 
-                    class="payment-link-btn">
-                    🔗 Taller de duelo - $70.000
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            <div class="payment-instructions">
-              <p>📋 <strong>Instrucciones:</strong></p>
-              <ol>
-                <li>Haz clic en el enlace de MercadoPago arriba</li>
-                <li>Realiza el pago por el monto de <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
-                <li>Una vez completado, regresa aquí y confirma el pago</li>
-              </ol>
-              
-              <button 
-                type="button" 
-                (click)="confirmarPagoManual()" 
-                class="btn btn-primary">
-                ✅ Confirmar Pago Realizado
-              </button>
-              
-              <button 
-                type="button" 
-                (click)="cancelarPagoMercadoPago()" 
-                class="btn btn-secondary">
-                ❌ Cancelar
-              </button>
-            </div>
-          </div>
-
-          <!-- KLAP Vista (igual que Webpay y MercadoPago) -->
-          <div *ngIf="mostrarFormularioKlap" class="webpay-iframe-container">
-            <h3>Pago con KLAP</h3>
-            <p><strong>Monto a pagar:</strong> ${{ precio.nacional | number:'1.0-0' }}</p>
-            <p><strong>Tratamiento:</strong> {{ tratamiento }}</p>
-            
-            <div class="klap-info">
-              <div class="payment-card klap-card">
-                <h4>📱 Código QR para KLAP</h4>
-                <div class="qr-container">
-                  <img src="assets/qr.png" alt="Código QR KLAP" class="qr-image">
-                </div>
-                <p class="qr-instructions">
-                  <strong>Escanea el código QR con tu app KLAP</strong>
-                </p>
-              </div>
-            </div>
-            
-            <div class="payment-instructions">
-              <p>📋 <strong>Instrucciones:</strong></p>
-              <ol>
-                <li>Abre tu app KLAP en tu teléfono móvil</li>
-                <li>Escanea el código QR mostrado arriba</li>
-                <li>Confirma el pago por <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
-                <li>Una vez completado, regresa aquí y confirma el pago</li>
-              </ol>
-              
-              <button 
-                type="button" 
-                (click)="confirmarPagoManual()" 
-                class="btn btn-primary">
-                ✅ Confirmar Pago Realizado
-              </button>
-              
-              <button 
-                type="button" 
-                (click)="cancelarPagoKlap()" 
-                class="btn btn-secondary">
-                ❌ Cancelar
-              </button>
-            </div>
-          </div>
-
-          <!-- Botón para mostrar el formulario -->
-          <button 
-            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
-            type="button" 
-            (click)="mostrarWebpay()" 
-            [disabled]="procesandoPago"
-            class="btn btn-payment webpay">
-            <div class="payment-content">
-              <i class="fas fa-credit-card"></i>
-              <span>Pagar con Webpay</span>
-              <small>Formulario de pago</small>
-            </div>
-          </button>
-
-          <!-- MercadoPago -->
-          <button 
-            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
-            type="button" 
-            (click)="mostrarMercadoPago()" 
-            [disabled]="procesandoPago || !esMercadoPagoDisponible()"
-            class="btn btn-payment mercadopago">
-            <div class="payment-content">
-              <i class="fab fa-cc-mastercard"></i>
-              <span>MercadoPago</span>
-              <small>Formulario de pago</small>
-            </div>
-            <span *ngIf="procesandoPago" class="loading-spinner">
-              <i class="fas fa-spinner fa-spin"></i>
-            </span>
-          </button>
-
-          <!-- Klap -->
-          <button 
-            *ngIf="!mostrarFormularioWebpay && !mostrarFormularioMercadoPago && !mostrarFormularioKlap"
-            type="button" 
-            (click)="mostrarKlap()" 
-            [disabled]="procesandoPago"
-            class="btn btn-payment klap">
-            <div class="payment-content">
-              <i class="fas fa-mobile-alt"></i>
-              <span>Klap</span>
-              <small>Pago móvil</small>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Botón anterior -->
-      <div class="form-actions">
-        <button
-          type="button"
-          (click)="pasoAnterior()"
-          class="btn btn-secondary"
-          [disabled]="procesandoPago">
-          <i class="fas fa-arrow-left"></i>
-          Anterior
-        </button>
-      </div>
-    </div>
-
-    <!-- Indicador de carga -->
-    <div *ngIf="procesandoPago" class="processing-overlay">
-      <div class="processing-content">
-        <div class="spinner"></div>
-        <p>Procesando tu solicitud...</p>
-        <small>Por favor no cierres esta ventana</small>
-      </div>
-    </div>
-
-    <!-- Modal Popup de Webpay -->
-    <div *ngIf="mostrarPopupWebpay" class="webpay-modal-overlay" (click)="cerrarPopupWebpay()">
-      <div class="webpay-modal" (click)="$event.stopPropagation()">
-        <!-- Header del modal -->
-        <div class="modal-header">
-          <div class="modal-title">
-            <i class="fas fa-credit-card"></i>
-            <h3>Pago con Webpay</h3>
-          </div>
-          <button 
-            type="button" 
-            class="modal-close-btn" 
-            (click)="cerrarPopupWebpay()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <!-- Información de pago -->
-        <div class="payment-info">
-          <div class="payment-detail">
-            <span class="detail-label">Tratamiento:</span>
-            <span class="detail-value">{{ tratamiento }}</span>
-          </div>
-          <div class="payment-detail">
-            <span class="detail-label">Fecha:</span>
-            <span class="detail-value">{{ fecha | date:'dd/MM/yyyy' }}</span>
-          </div>
-          <div class="payment-detail">
-            <span class="detail-label">Hora:</span>
-            <span class="detail-value">{{ hora }}</span>
-          </div>
-          <div class="payment-detail total">
-            <span class="detail-label">Total a pagar:</span>
-            <span class="detail-value">${{ precio.nacional | number:'1.0-0' }}</span>
-          </div>
-        </div>
-
-        <!-- Contenido del iframe -->
-        <div class="iframe-container">
-          <iframe 
-            src="https://www.webpay.cl/form-pay/264721"
-            width="100%" 
-            height="500"
-            frameborder="0"
-            class="webpay-iframe">
-          </iframe>
-        </div>
-
-        <!-- Instrucciones y botones -->
-        <div class="modal-footer">
-          <div class="payment-instructions">
-            <p class="instructions-title">
-              <i class="fas fa-info-circle"></i>
-              Instrucciones de pago:
-            </p>
-            <ol>
-              <li>Completa el formulario de pago arriba</li>
-              <li>Realiza el pago por <strong>${{ precio.nacional | number:'1.0-0' }}</strong></li>
-              <li>Una vez completado, confirma tu pago abajo</li>
-            </ol>
-          </div>
-
-          <div class="modal-actions">
-            <button 
-              type="button" 
-              (click)="confirmarPagoManual()" 
-              class="btn btn-confirm">
-              <i class="fas fa-check"></i>
-              Confirmar Pago Realizado
-            </button>
-            
-            <button 
-              type="button" 
-              (click)="cerrarPopupWebpay()" 
-              class="btn btn-cancel">
-              <i class="fas fa-times"></i>
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </div>
+<div class="formulario-page">
+  
+  <!-- Banner -->
+  <div class="banner">
+    <img src="assets/a2.avif" alt="Banner" />
+    <div class="banner-overlay">
+      <h1>Agenda tu sesión</h1>
+      <p>Elige el paquete que mejor se adapte a tus necesidades</p>
     </div>
   </div>
+
+  <!-- Contenedor de paquetes -->
+  <div class="paquetes-container">
+    
+    <!-- Loading -->
+    <div class="loading" *ngIf="cargando">
+      <div class="spinner"></div>
+      <p>Cargando paquetes...</p>
+    </div>
+
+    <!-- Error -->
+    <div class="error-message" *ngIf="error">
+      {{ error }}
+    </div>
+
+    <!-- Grid de tarjetas -->
+    <div class="paquetes-grid" *ngIf="!cargando && !error">
+      <div 
+        class="paquete-card"
+        *ngFor="let paquete of paquetes"
+        [class.destacado]="paquete.destacado"
+        (click)="abrirModal(paquete)"
+      >
+
+
+        <!-- Nombre -->
+        <h3>{{ paquete.nombre }}</h3>
+
+        <!-- Descripción -->
+        <p class="descripcion">{{ paquete.descripcion }}</p>
+
+        <!-- Detalles -->
+        <div class="detalles">
+          <div class="detalle-item">
+            <span class="icono">
+              <svg width="20" height="20" fill="none" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            <span>{{ paquete.duracion }} minutos</span>
+          </div>
+          <div class="detalle-item">
+            <span class="icono">
+              <svg width="20" height="20" fill="none" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </span>
+            <span>{{ paquete.sesiones }} sesión{{ paquete.sesiones > 1 ? 'es' : '' }}</span>
+          </div>
+          <div class="detalle-item">
+            <span class="icono">
+              <svg width="20" height="20" fill="none" stroke="#4a90e2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+            <span>{{ paquete.modalidad === 'ambas' ? 'Presencial u Online' : paquete.modalidad }}</span>
+          </div>
+        </div>
+
+        <!-- Precio -->
+        <div class="precio">
+          <span class="precio-amount">{{ getPrecio(paquete) }}</span>
+        </div>
+
+        <!-- Botón -->
+        <button class="btn-reservar">
+          Reservar ahora
+        </button>
+      </div>
+    </div>
+
+    <!-- Mensaje si no hay paquetes -->
+    <div class="no-paquetes" *ngIf="!cargando && !error && paquetes.length === 0">
+      <p>No hay paquetes disponibles en este momento.</p>
+    </div>
+
+  </div>
+
+  <!-- Modal de reserva -->
+  <app-modal-reserva
+    *ngIf="mostrarModal && paqueteSeleccionado"
+    [paquete]="paqueteSeleccionado"
+    (cerrar)="cerrarModal()"
+    (reservaCompletada)="onReservaCompletada($event)"
+  ></app-modal-reserva>
+
 </div>

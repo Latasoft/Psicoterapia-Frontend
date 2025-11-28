@@ -1,0 +1,109 @@
+<div class="catalogo-servicios">
+  <div class="header">
+    <h3>Catálogo de Servicios</h3>
+    <button class="btn-primary" (click)="abrirModalNuevo()">Nuevo Servicio</button>
+  </div>
+
+  <div class="servicios-grid" *ngIf="!cargando">
+    <div class="servicio-card" *ngFor="let paquete of paquetes" [style.border-left-color]="paquete.color" [class.inactivo-card]="!paquete.activo">
+      <div class="servicio-header">
+        <h4>{{ paquete.nombre }}</h4>
+        <div class="acciones">
+          <button class="btn-editar" (click)="editarPaquete(paquete)">Editar</button>
+          <button class="btn-eliminar" (click)="eliminarPaquete(paquete)">Eliminar</button>
+        </div>
+      </div>
+      <p class="descripcion">{{ paquete.descripcion }}</p>
+      <div class="detalles">
+        <span>Duración: {{ paquete.duracion }} min</span>
+        <span>Sesiones: {{ paquete.sesiones }}</span>
+        <span>Precio: ${{ paquete.precio_nacional }}</span>
+        <span *ngIf="paquete.precio_internacional">Int: ${{ paquete.precio_internacional }}</span>
+        <span>{{ paquete.modalidad }}</span>
+      </div>
+      <div class="estado">
+        <span [class]="paquete.activo ? 'activo' : 'inactivo'">
+          {{ paquete.activo ? 'Activo' : 'Inactivo' }}
+        </span>
+        <!-- Badge destacado oculto -->
+        <!-- <span *ngIf="paquete.destacado" class="destacado">Destacado</span> -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear/editar servicio -->
+  <div class="modal" *ngIf="mostrarModal" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>{{ editando ? 'Editar Servicio' : 'Nuevo Servicio' }}</h3>
+      <form (ngSubmit)="guardarPaquete()">
+        <div class="form-group">
+          <label>Nombre:</label>
+          <input type="text" [(ngModel)]="paqueteForm.nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea [(ngModel)]="paqueteForm.descripcion" name="descripcion" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Duración (minutos):</label>
+            <input type="number" [(ngModel)]="paqueteForm.duracion" name="duracion" required>
+          </div>
+          <div class="form-group">
+            <label>Sesiones:</label>
+            <input type="number" [(ngModel)]="paqueteForm.sesiones" name="sesiones" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio Nacional:</label>
+            <input type="number" [(ngModel)]="paqueteForm.precio_nacional" name="precio_nacional" step="0.01" required>
+          </div>
+          <div class="form-group">
+            <label>Precio Internacional:</label>
+            <input type="number" [(ngModel)]="paqueteForm.precio_internacional" name="precio_internacional" step="0.01">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Modalidad:</label>
+            <select [(ngModel)]="paqueteForm.modalidad" name="modalidad">
+              <option value="online">Online</option>
+              <option value="presencial">Presencial</option>
+              <option value="ambas">Ambas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Color:</label>
+            <input type="color" [(ngModel)]="paqueteForm.color" name="color">
+          </div>
+        </div>
+        <!-- Campos icono y destacado ocultos - se mantienen en DB pero no visibles en UI -->
+        <!--
+        <div class="form-row">
+          <div class="form-group">
+            <label>Ícono (opcional):</label>
+            <input type="text" [(ngModel)]="paqueteForm.icono" name="icono" placeholder="fa-brain">
+          </div>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" [(ngModel)]="paqueteForm.destacado" name="destacado">
+              Destacado
+            </label>
+          </div>
+        </div>
+        -->
+        <div class="form-group">
+          <label>
+            <input type="checkbox" [(ngModel)]="paqueteForm.activo" name="activo">
+            Activo
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

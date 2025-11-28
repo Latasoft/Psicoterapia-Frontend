@@ -18,6 +18,7 @@ import { RoleGuard } from './guards/role.guard';
 import { AdminBlogComponent } from './pages/admin-blog/admin-blog.component';
 import { CrearTallerComponent } from './pages/crear-taller/crear-taller.component';
 import { AdminTallerComponent } from './pages/admin-taller/admin-taller.component';
+import { AdminHorariosComponent } from './pages/admin-horarios/admin-horarios.component';
 import { HorarioComponent } from './pages/horario/horario.component';
 import { TratamientosComponent } from './pages/tratamientos/tratamientos.component';
 import { WebpayReturnComponent } from './components/webpay-return/webpay-return.component';
@@ -34,6 +35,12 @@ export const routes: Routes = [
       path: 'mis-citas', 
       component: MisCitasComponent,
       canActivate: [AuthGuard]
+    },
+    {
+      path: 'admin-horarios',
+      component: AdminHorariosComponent,
+      canActivate: [RoleGuard],
+      data: { roles: ['admin'] }
     },
     {
         path: 'admin-citas',

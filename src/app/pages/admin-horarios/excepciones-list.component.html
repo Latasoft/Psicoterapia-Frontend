@@ -1,0 +1,61 @@
+<div class="excepciones-container">
+  <div class="excepciones-list">
+    <div *ngFor="let exc of excepciones; let i = index" class="excepcion-item">
+      <div class="excepcion-form">
+        <div class="form-row">
+          <div class="input-group">
+            <label>Fecha</label>
+            <input type="date" [(ngModel)]="exc.fecha" class="date-input">
+          </div>
+
+          <div class="time-inputs">
+            <div class="input-group">
+              <label>Inicio</label>
+              <input type="time" [(ngModel)]="exc.hora_inicio" class="time-input">
+            </div>
+            <div class="input-group">
+              <label>Fin</label>
+              <input type="time" [(ngModel)]="exc.hora_fin" class="time-input">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="input-group full-width">
+            <label>Motivo</label>
+            <input type="text" [(ngModel)]="exc.motivo" placeholder="Ej: Vacaciones, feriado..." class="text-input">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="exc.bloqueado" class="checkbox-input">
+              <span class="checkmark"></span>
+              Bloqueado (no disponible)
+            </label>
+          </div>
+
+          <button class="btn-delete" (click)="eliminarExcepcion(i)" title="Eliminar excepción">
+            <span>×</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="excepciones.length === 0" class="no-excepciones">
+      <p>No hay excepciones configuradas</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-add-exc" (click)="agregarExcepcion()">
+      <span>Agregar Excepción</span>
+    </button>
+
+    <button class="btn-save" (click)="guardarCambios()" [disabled]="guardando">
+      <span *ngIf="!guardando">Guardar Cambios</span>
+      <span *ngIf="guardando">Guardando...</span>
+    </button>
+  </div>
+</div>

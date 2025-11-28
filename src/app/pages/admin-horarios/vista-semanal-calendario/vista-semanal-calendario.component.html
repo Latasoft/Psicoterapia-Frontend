@@ -1,0 +1,162 @@
+<!-- =====================================================
+     VISTA SEMANAL CALENDARIO - TEMPLATE REFACTORIZADO
+     ===================================================== -->
+
+<div class="vista-semanal-container">
+  
+  <!-- ==================== HEADER ==================== -->
+  <header class="header-semanal">
+    <button 
+      class="btn-nav-semana" 
+      (click)="navegarSemana(-1)"
+      aria-label="Semana anterior"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+    
+    <h2 class="titulo-semana">{{ semanaActualTexto() }}</h2>
+    
+    <button 
+      class="btn-nav-semana" 
+      (click)="navegarSemana(1)"
+      aria-label="Semana siguiente"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- ==================== LEYENDA ==================== -->
+  <div class="leyenda" role="legend">
+    <div class="item-leyenda">
+      <span class="badge-disponible" aria-hidden="true"></span>
+      <span>Disponible</span>
+    </div>
+    <div class="item-leyenda">
+      <span class="badge-ocupado" aria-hidden="true"></span>
+      <span>Cita reservada</span>
+    </div>
+    <div class="item-leyenda">
+      <span class="badge-bloqueado" aria-hidden="true"></span>
+      <span>Bloqueado</span>
+    </div>
+    <div class="item-leyenda">
+      <span class="badge-fuera" aria-hidden="true"></span>
+      <span>Fuera de horario</span>
+    </div>
+  </div>
+
+  <!-- ==================== GRID SEMANAL ==================== -->
+  <div class="grid-semanal" *ngIf="!cargando" role="grid">
+    
+    <!-- Cabecera con días de la semana -->
+    <div class="cabecera-dias" role="rowheader">
+      <div class="celda-hora-vacia"></div>
+      <div 
+        *ngFor="let dia of diasSemana" 
+        class="celda-dia"
+        [class.hoy]="esHoy(dia.fecha)"
+        role="columnheader"
+      >
+        <div class="nombre-dia">{{ dia.nombre }}</div>
+        <div class="numero-dia">{{ dia.fecha.getDate() }}</div>
+      </div>
+    </div>
+
+    <!-- Contenedor scrollable -->
+    <div class="contenedor-scroll">
+      
+      <!-- Grilla horaria unificada -->
+      <div class="grilla-horaria">
+        
+        <!-- Renderizar todas las celdas en un solo grid -->
+        <ng-container *ngFor="let hora of horasDelDia; let horaIndex = index">
+          
+          <!-- Columna de hora -->
+          <div class="celda-hora" role="rowheader">{{ hora }}</div>
+          
+          <!-- Celdas de cada día para esta hora -->
+          <ng-container *ngFor="let dia of diasSemana; let diaIndex = index">
+            <ng-container *ngIf="obtenerCelda(dia, hora) as celda">
+              
+              <div 
+                class="celda-horaria"
+                [ngClass]="{
+                  'disponible': celda.estado === 'disponible',
+                  'ocupado': celda.estado === 'ocupado',
+                  'bloqueado': celda.estado === 'bloqueado',
+                  'fuera-horario': celda.estado === 'fuera-horario',
+                  'primer-bloque': celda.esPrimerBloque,
+                  'bloque-continuacion': celda.esBloqueContinuacion,
+                  'clickable': celda.estado !== 'fuera-horario'
+                }"
+                [style.--grid-span]="celda.bloquesOcupados || 1"
+                [attr.data-bloques]="celda.bloquesOcupados"
+                [attr.data-cita-id]="celda.datos?.id"
+                [attr.role]="celda.estado === 'fuera-horario' ? 'gridcell' : 'button'"
+                [attr.aria-label]="obtenerAriaLabel(celda, dia, hora)"
+                (click)="onCeldaClickSeguro(dia, hora)"
+              >
+                <!-- CONTENIDO: Solo visible si NO es bloque de continuación -->
+                <ng-container *ngIf="!celda.esBloqueContinuacion">
+                  
+                  <!-- Estado: DISPONIBLE -->
+                  <div class="badge-estado" *ngIf="celda.estado === 'disponible' && !celda.datos">
+                    <span class="estado-label">DISPONIBLE</span>
+                  </div>
+
+                  <!-- Contenido con datos (Cita o Bloqueo) -->
+                  <div class="contenido-celda" *ngIf="celda.datos">
+                    
+                    <!-- CITA -->
+                    <div *ngIf="celda.estado === 'ocupado' && esCita(celda.datos)" class="info-cita">
+                      <div class="badge-cita">CITA</div>
+                      <div class="nombre-cita">{{ celda.datos.nombre_paciente }}</div>
+                      <div class="duracion-cita">{{ celda.datos.duracion }} min</div>
+                    </div>
+                    
+                    <!-- BLOQUEO -->
+                    <div *ngIf="celda.estado === 'bloqueado' && esBloqueo(celda.datos)" class="info-bloqueo">
+                      <div class="badge-bloqueo">{{ celda.datos.tipo }}</div>
+                      <div class="desc-bloqueo" *ngIf="celda.datos.descripcion">
+                        {{ celda.datos.descripcion }}
+                      </div>
+                    </div>
+                    
+                  </div>
+                </ng-container>
+                
+              </div>
+              
+            </ng-container>
+          </ng-container>
+          
+        </ng-container>
+        
+      </div>
+      
+    </div>
+    
+  </div>
+
+  <!-- ==================== LOADING STATE ==================== -->
+  <div class="loading-container" *ngIf="cargando">
+    <div class="spinner" role="status" aria-label="Cargando"></div>
+    <p>Cargando vista semanal...</p>
+  </div>
+
+  <!-- ==================== MODAL DETALLE CITA ==================== -->
+  <app-modal-detalle-cita
+    *ngIf="mostrarModalDetalleCita && citaIdSeleccionada"
+    [citaId]="citaIdSeleccionada"
+    (cerrar)="cerrarModalDetalleCita()"
+    (citaActualizada)="onCitaActualizada()"
+  ></app-modal-detalle-cita>
+
+  <!-- ==================== MODAL EXCEPCIÓN ==================== -->
+  <!-- ... Tu modal existente de excepciones ... -->
+
+</div>

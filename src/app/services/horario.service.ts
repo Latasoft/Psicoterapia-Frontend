@@ -12,7 +12,7 @@ export class HorarioService {
   constructor(private http: HttpClient) {}
 
   obtenerHorario() {
-    return this.http.get(`${this.apiUrl}/semanal`);
+    return this.http.get(`${this.apiUrl}`);
   }
 
   guardarHorario(horarioData: any) {

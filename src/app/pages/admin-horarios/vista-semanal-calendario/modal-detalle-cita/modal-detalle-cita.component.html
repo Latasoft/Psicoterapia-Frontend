@@ -1,0 +1,228 @@
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        Detalle de la Cita
+      </h2>
+      <button class="btn-cerrar" (click)="cerrarModal()">&times;</button>
+    </div>
+
+    <!-- Contenido -->
+    <div class="modal-body">
+      
+      <!-- Loading -->
+      <div *ngIf="cargando" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando detalles...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error && !cargando" class="error-message">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+        </svg>
+        {{ error }}
+      </div>
+
+      <!-- Contenido de la cita -->
+      <div *ngIf="cita && !cargando" class="cita-detalle">
+        
+        <!-- Estado y acciones principales -->
+        <div class="header-actions">
+          <div class="estado-badge" [style.background-color]="obtenerColorEstado(cita.estado)">
+            {{ obtenerEtiquetaEstado(cita.estado) }}
+          </div>
+          <div class="acciones-rapidas">
+            <button class="btn-secondary" (click)="activarReagendar()" *ngIf="!modoReagendar">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Reagendar
+            </button>
+            <button class="btn-danger" (click)="cancelarCita()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Cancelar Cita
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección: Fecha y Hora -->
+        <div class="seccion" *ngIf="!modoReagendar">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Fecha y Hora
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Fecha:</span>
+              <span class="value">{{ formatearFecha(cita.fecha) }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Horario:</span>
+              <span class="value">{{ cita.hora_inicio }} - {{ cita.hora_fin }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Duración:</span>
+              <span class="value">{{ cita.duracion }} minutos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modo Reagendar -->
+        <div class="seccion seccion-reagendar" *ngIf="modoReagendar">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+            </svg>
+            Reagendar Cita
+          </h3>
+          <div class="form-reagendar">
+            <div class="form-group">
+              <label>Nueva Fecha:</label>
+              <input type="date" [(ngModel)]="reagendarForm.fecha" class="form-control">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Hora Inicio:</label>
+                <input type="time" [(ngModel)]="reagendarForm.hora_inicio" class="form-control">
+              </div>
+              <div class="form-group">
+                <label>Hora Fin:</label>
+                <input type="time" [(ngModel)]="reagendarForm.hora_fin" class="form-control">
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" (click)="confirmarReagendar()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                Confirmar
+              </button>
+              <button class="btn-secondary" (click)="cancelarReagendar()">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Información del Paciente -->
+        <div class="seccion">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            Datos del Paciente
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ cita.paciente.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">RUT:</span>
+              <span class="value">{{ cita.paciente.rut }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Email:</span>
+              <span class="value">
+                <a [href]="'mailto:' + cita.paciente.email">{{ cita.paciente.email }}</a>
+              </span>
+            </div>
+            <div class="info-item" *ngIf="cita.paciente.telefono">
+              <span class="label">Teléfono:</span>
+              <span class="value">
+                <a [href]="'tel:' + cita.paciente.telefono">{{ cita.paciente.telefono }}</a>
+              </span>
+            </div>
+            <div class="info-item" *ngIf="cita.paciente.direccion">
+              <span class="label">Dirección:</span>
+              <span class="value">{{ cita.paciente.direccion }}</span>
+            </div>
+            <div class="info-item" *ngIf="cita.paciente.comuna">
+              <span class="label">Comuna:</span>
+              <span class="value">{{ cita.paciente.comuna }}</span>
+            </div>
+          </div>
+          <div class="notas-medicas" *ngIf="cita.paciente.notas_medicas">
+            <span class="label">Notas Médicas:</span>
+            <p>{{ cita.paciente.notas_medicas }}</p>
+          </div>
+        </div>
+
+        <!-- Sección: Paquete (si aplica) -->
+        <div class="seccion" *ngIf="cita.paquete">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+            </svg>
+            Paquete
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ cita.paquete.nombre }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Sesiones:</span>
+              <span class="value">{{ cita.paquete.sesiones }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Duración por sesión:</span>
+              <span class="value">{{ cita.paquete.duracion }} minutos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Notas de la Cita -->
+        <div class="seccion">
+          <h3>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+            </svg>
+            Notas
+            <button class="btn-editar-inline" (click)="activarEdicionNotas()" *ngIf="!modoEdicion">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+              </svg>
+            </button>
+          </h3>
+          <div *ngIf="!modoEdicion" class="notas-display">
+            <p *ngIf="cita.notas">{{ cita.notas }}</p>
+            <p *ngIf="!cita.notas" class="sin-notas">Sin notas</p>
+          </div>
+          <div *ngIf="modoEdicion" class="notas-edicion">
+            <textarea [(ngModel)]="notasEditadas" rows="4" class="form-control"></textarea>
+            <div class="form-actions">
+              <button class="btn-primary" (click)="guardarNotas()">Guardar</button>
+              <button class="btn-secondary" (click)="cancelarEdicionNotas()">Cancelar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Cambiar Estado -->
+        <div class="seccion">
+          <h3>Cambiar Estado</h3>
+          <div class="estados-grid">
+            <button 
+              *ngFor="let estado of estadosDisponibles"
+              class="estado-btn"
+              [class.activo]="cita.estado === estado.valor"
+              [style.border-color]="estado.color"
+              (click)="cambiarEstado(estado.valor)">
+              <span class="estado-dot" [style.background-color]="estado.color"></span>
+              {{ estado.etiqueta }}
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
