@@ -68,249 +68,61 @@
   }
 }
 
-/* Estilos para los controles de administración */
-.admin-editing {
-  border: 2px dashed #007bff;
-  padding: 10px;
-  margin: 5px 0;
-  background-color: rgba(0, 123, 255, 0.05);
-}
+.text-section h2 {font-size: 1.8rem; font-family: 'Playfair Display', serif; color: #9e9893; font-weight: 300;}
+.text-section p {font-size: 1rem; margin: 10px 0; color: #9e9893; font-weight: 300;}
 
-.admin-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  margin: 5px 0;
-  box-sizing: border-box;
-}
-
-.admin-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  margin: 5px 0;
-  min-height: 100px;
-  resize: vertical;
-  box-sizing: border-box;
-}
-
-.admin-contact-editor,
-.service-item-editor {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 5px 0;
-}
-
-.admin-link-editor {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.admin-btn {
+.cta-button {
+  background-color: #c8d7df;
+  color: white;
+  font-size: 1rem;
+  padding: 12px 24px;
   border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  transition: background-color 0.3s;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
 }
 
-.admin-btn:hover {
-  opacity: 0.8;
+.cta-button:hover {
+  background-color: #fae8da;
+  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
 
-.admin-btn.add-btn {
-  background-color: #28a745;
-  color: white;
-}
+.psychologist-card {width: 100%; padding: 3rem 2rem; background-color: white; margin-bottom: 0; position: relative; z-index: 2;}
+.psychologist-card video {width: 11%; height: auto; border-radius: 10px; max-width: 400px; min-width: 200px;}
+.psychologist-card-content {display: flex; align-items: center; padding: 1.5rem; gap: 20px; background-color: transparent; flex-wrap: wrap;}
 
-.admin-btn.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.admin-btn.delete-btn.small {
-  padding: 4px 8px;
-  font-size: 10px;
-}
-
-.delete-service-btn {
-  background-color: #dc3545;
-  color: white;
-  width: 100%;
-  margin-top: 10px;
-}
-
-.add-service-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 200px;
-  border: 2px dashed #007bff;
-  border-radius: 8px;
-  margin: 10px;
-}
-
-.add-service-btn {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 15px 30px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.contact-item-editor .admin-input {
-  flex: 1;
-}
-
-.admin-link-editor .admin-input {
-  flex: 1;
-}
-
- 
-
-  
-/* card de primer video */
-  .text-section h2 {
-    font-size: 1.8rem;
-    font-family: 'Playfair Display', serif;
-    color:#9e9893;
-    font-weight: 300; 
-  } 
-  .text-section p {
-    font-size: 1rem;
-    margin: 10px 0;
-    color:#9e9893;
-    font-weight: 300; /* Letras más delgadas */
-  }
-  
-  /* Botón atractivo */
-  .cta-button {
-    background-color:#c8d7df;
-    color: white;
-    font-size: 1rem;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .cta-button:hover {
-    background-color: #fae8da;
-    color: #333;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  }
-
-/* Primer card con video */
-.psychologist-card {
-  width: 100%;
-  padding: 3rem 2rem;
-  background-color: white;
-  margin-bottom: 0;
-  position: relative;
-  z-index: 2;
-}
-
-.psychologist-card video {
-  width: 11%; /* Cambiar de 11% a 50% */
-  height: auto; /* Ajusta la altura automáticamente para mantener la proporción */
-  border-radius: 10px; /* Opcional, si quieres bordes redondeados */
-  max-width: 400px; /* Añadir un ancho máximo */
-  min-width: 200px; /* Añadir un ancho mínimo */
-}
-
-/* Mejorar el contenedor del video */
-.psychologist-card-content {
-  display: flex;
-  align-items: center;
-  padding: 1.5rem;
-  gap: 20px;
-  background-color: transparent;
-  flex-wrap: wrap; /* Permitir que se ajuste en pantallas pequeñas */
-}
-
-/* Media query para tablets */
 @media (max-width: 1024px) {
-  .psychologist-card video {
-    width: 60%; /* Aumentar en tablets */
-    max-width: 500px;
-  }
+  .psychologist-card video {width: 60%; max-width: 500px;}
 }
 
 @media (max-width: 768px) {
-  .psychologist-card video {
-    width: 80%; /* Aumentar de 40% a 80% en pantallas más pequeñas */
-    max-width: 400px;
-    height: auto; /* Mantiene la proporción sin forzar la altura */
-  }
-  
-  .psychologist-card-content {
-    flex-direction: column; /* Cambiar a columna en móviles */
-    text-align: center;
-  }
+  .psychologist-card video {width: 80%; max-width: 400px; height: auto;}
+  .psychologist-card-content {flex-direction: column; text-align: center;}
 }
 
 @media (max-width: 480px) {
-  .psychologist-card video {
-    width: 95%; /* Aumentar de 40% a 95% en pantallas muy pequeñas */
-    max-width: 350px;
-    height: auto; /* Mantiene la proporción */
-  }
+  .psychologist-card video {width: 95%; max-width: 350px; height: auto;}
 }
 
-/* Estilos para el video de contacto también */
-.video-container {
-  flex: 1 1 30%; /* Acomoda el video a un 30% del contenedor */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 7%;
-}
+.video-container {flex: 1 1 30%; display: flex; justify-content: center; align-items: center; padding-top: 7%;}
+.video-container video {width: 100%; max-width: 450px; min-width: 250px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);}
 
-.video-container video {
-  width: 100%;
-  max-width: 450px; /* Aumentar de 350px a 450px */
-  min-width: 250px; /* Añadir ancho mínimo */
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive para video de contacto */
 @media (max-width: 768px) {
-  .video-container {
-    flex: 1 1 100%;
-    padding-top: 2%;
-  }
-  
-  .video-container video {
-    max-width: 400px;
-  }
+  .video-container {flex: 1 1 100%; padding-top: 2%;}
+  .video-container video {max-width: 400px;}
 }
 
 @media (max-width: 480px) {
-  .video-container video {
-    max-width: 300px;
-  }
+  .video-container video {max-width: 300px;}
 }
 
-/* Blog Section - Modern Design */
+/* Blog Section */
 .blog-section {
   padding: 4rem 2rem;
   background: #ffffff;
@@ -405,31 +217,12 @@
   pointer-events: none;
 }
 
-.card-content {
-  padding: 1rem;
-  flex: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.card-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-  flex-shrink: 0;
-}
-
-.card-date {
-  font-size: 0.8rem;
-  color: #007BBD;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+.modern-blog-card .card-content, 
+.modern-blog-card .card-meta, 
+.modern-blog-card .card-date, 
+.modern-blog-card .card-description, 
+.modern-blog-card .card-footer, 
+.modern-blog-card .read-more {display: none;}
 
 .card-title {
   font-size: 1.1rem;
@@ -457,57 +250,10 @@
   min-height: 3.5rem;
 }
 
-.card-description {
-  display: none;
-}
+.blog-section-footer {text-align: center; margin-top: 3rem;}
+.btn-view-all {display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; background: linear-gradient(135deg, #007BBD 0%, #005F8A 100%); color: white; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 1rem; box-shadow: 0 4px 12px rgba(0, 123, 189, 0.3); transition: transform 0.2s ease, box-shadow 0.2s ease, gap 0.2s ease;}
+.btn-view-all:hover {transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 123, 189, 0.4); gap: 1rem;}
 
-.card-footer {
-  padding-top: 0;
-  border-top: none;
-  flex-shrink: 0;
-}
-
-.read-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #007BBD;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: gap 0.2s ease;
-}
-
-.modern-blog-card:hover .read-more {
-  gap: 0.65rem;
-}
-
-.blog-section-footer {
-  text-align: center;
-  margin-top: 3rem;
-}
-
-.btn-view-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #007BBD 0%, #005F8A 100%);
-  color: white;
-  text-decoration: none;
-  border-radius: 50px;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 123, 189, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, gap 0.2s ease;
-}
-
-.btn-view-all:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 123, 189, 0.4);
-  gap: 1rem;
-}
-
-/* Responsive */
 @media (max-width: 768px) {
   .blog-section {
     padding: 2rem 1rem;
