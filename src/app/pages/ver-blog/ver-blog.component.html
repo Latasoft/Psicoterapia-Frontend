@@ -2,44 +2,87 @@
   <div class="blogs-container">
     <h2>Entradas del Blog</h2>
     
+    <!-- Mensaje de error -->
+    <div *ngIf="errorMessage" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Loading spinner -->
+    <div *ngIf="isLoading" class="loading-spinner">
+      Cargando blogs...
+    </div>
+
     <!-- Lista de Blogs -->
-    <div *ngFor="let blog of blogs" class="blog-titulo" (click)="seleccionarBlog(blog)">
-      <div class="info-arriba">
-        <img src="assets/h3.avif" alt="icono blog" />
-        <div class="info-texto">
-          <span class="sitio">emhpsicoterapiaonline.com</span>
+    <div *ngIf="!isLoading && !blogSeleccionado" class="blogs-grid">
+      <div *ngFor="let blog of blogs" class="blog-card" (click)="selectBlog(blog)">
+        <div class="info-arriba">
+          <img src="assets/h3.avif" alt="icono blog" />
+          <div class="info-texto">
+            <span class="sitio">emhpsicoterapiaonline.com</span>
+            <span class="fecha">{{ blog.createdAt | date: 'mediumDate' }}</span>
+          </div>
         </div>
+        <h3>{{ blog.title }}</h3>
+        <p class="blog-excerpt">{{ getExcerpt(blog.content) }}</p>
+        <img *ngIf="blog.imageUrl" [src]="blog.imageUrl" alt="Imagen del blog" class="blog-thumbnail" />
       </div>
-      <h3>{{ blog.titulo }}</h3>
+    </div>
+
+    <!-- Paginación -->
+    <div *ngIf="!isLoading && !blogSeleccionado && pagination" class="pagination">
+      <button 
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+        class="pagination-btn"
+      >
+        ← Anterior
+      </button>
+      
+      <span class="pagination-info">
+        Página {{ currentPage }} de {{ totalPages }}
+      </span>
+      
+      <button 
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        class="pagination-btn"
+      >
+        Siguiente →
+      </button>
     </div>
   
     <!-- Detalle del Blog Seleccionado -->
     <div *ngIf="blogSeleccionado" class="detalle-blog">
       <div class="detalle-contenido">
-        <button class="cerrar-btn" (click)="cerrarDetalle()">X</button>
+        <button class="cerrar-btn" (click)="closeDetail()">✕</button>
         
         <!-- Información del Blog -->
         <div class="info-arriba">
           <img src="assets/h3.avif" alt="icono blog" />
           <div class="info-texto">
             <span class="sitio">emhpsicoterapiaonline.com</span>
-            <span class="fecha">{{ blogSeleccionado.fecha | date: 'longDate' }}</span>
-
-
+            <span class="fecha">{{ blogSeleccionado.createdAt | date: 'longDate' }}</span>
+            <span *ngIf="blogSeleccionado.creator" class="autor">
+              Por: {{ blogSeleccionado.creator.username }}
+            </span>
           </div>
         </div>
-        <h3>{{ blogSeleccionado.titulo }}</h3>
-        <p>{{ blogSeleccionado.texto }}</p>
-        <img *ngIf="blogSeleccionado.imagen" [src]="blogSeleccionado.imagen" alt="Imagen del blog" />
+        
+        <h3>{{ blogSeleccionado.title }}</h3>
+        
+        <!-- Render HTML content safely -->
+        <div class="blog-content" [innerHTML]="getSafeHtml(blogSeleccionado.content)"></div>
+        
+        <!-- Video usando pipe -->
         <div *ngIf="blogSeleccionado.videoUrl" class="video-container">
-  <iframe
-    width="100%"
-    height="315"
-    [src]="sanitizarUrl(blogSeleccionado.videoUrl)"
-    frameborder="0"
-    allowfullscreen>
-  </iframe>
-</div>
+          <iframe
+            width="100%"
+            height="450"
+            [src]="blogSeleccionado.videoUrl | youtubeEmbed"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        </div>
 
       </div>
     </div>

@@ -1,21 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { BlogService } from '../../services/blog.service';
 import { CommonModule } from '@angular/common';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Blog, PaginationMeta } from '../../core/models/blog.model';
+import { YoutubeEmbedPipe } from '../../shared/pipes/youtube-embed.pipe';
 
 @Component({
   selector: 'app-ver-blog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, YoutubeEmbedPipe],
   templateUrl: './ver-blog.component.html',
   styleUrls: ['./ver-blog.component.css']
 })
 export class VerBlogComponent implements OnInit {
-  blogs: any[] = [];
-  blogSeleccionado: any = null;
-  errorMessage: string = '';
+  blogs: Blog[] = [];
+  blogSeleccionado: Blog | null = null;
+  
+  // Pagination
+  currentPage = 1;
+  pageSize = 9; // 9 blogs per page for better grid layout
+  pagination: PaginationMeta | null = null;
+
+  // State
+  isLoading = false;
+  errorMessage = '';
 
   constructor(
     private blogService: BlogService,
@@ -23,40 +31,78 @@ export class VerBlogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.blogService.obtenerBlogs().pipe(
-      catchError(error => {
-        this.errorMessage = 'Error al cargar los blogs';
-        console.error(error);
-        return of([]);
-      })
-    ).subscribe((data) => {
-      this.blogs = data;
+    this.loadBlogs();
+  }
+
+  loadBlogs(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.blogService.getBlogs({
+      page: this.currentPage,
+      limit: this.pageSize,
+      sortBy: 'created_at',
+      sortOrder: 'desc'
+    }).subscribe({
+      next: (response) => {
+        this.blogs = response.data;
+        this.pagination = response.pagination;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.errorMessage = error.message || 'Error al cargar los blogs';
+        this.isLoading = false;
+      }
     });
   }
 
-  seleccionarBlog(blog: any): void {
-    if (blog.fecha && blog.fecha._seconds) {
-      blog.fecha = new Date(blog.fecha._seconds * 1000);
-    }
+  selectBlog(blog: Blog): void {
     this.blogSeleccionado = blog;
   }
 
-  cerrarDetalle(): void {
+  closeDetail(): void {
     this.blogSeleccionado = null;
   }
 
-  sanitizarUrl(url: string): SafeResourceUrl | null {
-    if (!url) return null;
-    const videoId = this.extraerVideoId(url);
-    if (videoId) {
-      return this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${videoId}`);
+  goToPage(page: number): void {
+    if (page < 1 || (this.pagination && page > this.pagination.totalPages)) {
+      return;
     }
-    return null;
+    this.currentPage = page;
+    this.loadBlogs();
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  private extraerVideoId(url: string): string | null {
-    const regex = /(?:\?v=|\/embed\/|\.be\/|\/shorts\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
+  nextPage(): void {
+    if (this.pagination && this.currentPage < this.pagination.totalPages) {
+      this.goToPage(this.currentPage + 1);
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.goToPage(this.currentPage - 1);
+    }
+  }
+
+  get totalPages(): number {
+    return this.pagination?.totalPages || 0;
+  }
+
+  // Helper for content excerpt - strips HTML tags
+  getExcerpt(content: string, maxLength: number = 150): string {
+    if (!content) return '';
+    // Strip HTML tags for preview
+    const plainText = content.replace(/<[^>]*>/g, '');
+    if (plainText.length <= maxLength) {
+      return plainText;
+    }
+    return plainText.substring(0, maxLength).trim() + '...';
+  }
+
+  // Sanitize HTML content for safe rendering
+  getSafeHtml(content: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(content);
   }
 }

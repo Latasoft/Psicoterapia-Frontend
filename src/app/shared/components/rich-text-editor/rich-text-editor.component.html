@@ -1,0 +1,99 @@
+<div class="rich-editor-container">
+  <!-- Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-group">
+      <button type="button" (click)="execCommand('bold')" class="toolbar-btn" title="Negrita">
+        <strong>B</strong>
+      </button>
+      <button type="button" (click)="execCommand('italic')" class="toolbar-btn" title="Cursiva">
+        <em>I</em>
+      </button>
+      <button type="button" (click)="execCommand('underline')" class="toolbar-btn" title="Subrayado">
+        <u>U</u>
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" (click)="execCommand('formatBlock', 'h2')" class="toolbar-btn" title="Título">
+        H2
+      </button>
+      <button type="button" (click)="execCommand('formatBlock', 'h3')" class="toolbar-btn" title="Subtítulo">
+        H3
+      </button>
+      <button type="button" (click)="execCommand('formatBlock', 'p')" class="toolbar-btn" title="Párrafo">
+        P
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" (click)="execCommand('insertUnorderedList')" class="toolbar-btn" title="Lista">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      </button>
+      <button type="button" (click)="execCommand('insertOrderedList')" class="toolbar-btn" title="Lista numerada">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.242 5.992h12m-12 6.003H20.24m-12 5.999h12M4.117 7.495v-3.75H2.99m1.125 3.75H2.99m1.125 0H5.24m-1.92 2.577a1.125 1.125 0 11-1.44 1.44m1.44-1.44a1.125 1.125 0 10-1.44 1.44M2.99 15.745h1.125a1.125 1.125 0 010 2.25H3.74m0-.002h.375a1.125 1.125 0 010 2.25H2.99" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" (click)="openImageModal()" class="toolbar-btn" title="Insertar imagen">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <button type="button" (click)="execCommand('justifyLeft')" class="toolbar-btn" title="Alinear izquierda">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+        </svg>
+      </button>
+      <button type="button" (click)="execCommand('justifyCenter')" class="toolbar-btn" title="Centrar">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
+      <button type="button" (click)="execCommand('justifyRight')" class="toolbar-btn" title="Alinear derecha">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M12 17.25h8.25" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Editor Content -->
+  <div 
+    class="editor-content"
+    contenteditable="true"
+    [attr.disabled]="disabled ? true : null"
+    (input)="onContentChange($event)"
+    (paste)="onPaste($event)"
+    [style.min-height]="minHeight"
+    [attr.data-placeholder]="placeholder"
+  ></div>
+
+  <!-- Image Modal -->
+  <div *ngIf="showImageModal" class="modal-overlay" (click)="cancelImageModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h3>Insertar Imagen</h3>
+      <p class="modal-description">Ingresa la URL de la imagen que deseas insertar en el contenido</p>
+      
+      <input 
+        type="url" 
+        [(ngModel)]="imageUrl" 
+        placeholder="https://ejemplo.com/imagen.jpg"
+        class="modal-input"
+        (keyup.enter)="insertImage()"
+      />
+      
+      <div class="modal-actions">
+        <button type="button" (click)="insertImage()" class="btn-primary">Insertar</button>
+        <button type="button" (click)="cancelImageModal()" class="btn-secondary">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>

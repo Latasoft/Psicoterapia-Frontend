@@ -5,6 +5,8 @@ import { BlogService } from '../../services/blog.service';
 import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
 import { PageContentService } from '../../services/page-content.service';
+import { PaquetesService } from '../../services/paquetes.service';
+import { Paquete } from '../../interfaces/paquetes.interface';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { CommonModule } from '@angular/common';
@@ -60,19 +62,23 @@ export class InicioComponent implements OnInit {
   // Propiedades para los datos editables - se cargan del backend
   contactInfo: any = {};
   tarotText: any = {};
-  services: any[] = [];
+  services: any[] = []; // Deprecated - will be replaced with paquetes
+  paquetes: Paquete[] = [];
   conveniosInfo: any = {};
+  currentYear = new Date().getFullYear();
 
   constructor(
     private blogService: BlogService,
     private authService: AuthService,
     private imageService: ImageService,
     private pageContentService: PageContentService,
+    private paquetesService: PaquetesService,
     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
     this.cargarUltimosBlogs();
+    this.cargarPaquetes();
     this.checkAdminStatus();
     this.loadMediaFromStorage();
     this.loadPageContent();
@@ -80,16 +86,26 @@ export class InicioComponent implements OnInit {
   }
 
   cargarUltimosBlogs() {
-    this.blogService.obtenerBlogs().pipe(
-      catchError(error => {
+    this.blogService.getBlogs({ page: 1, limit: 4, sortBy: 'created_at', sortOrder: 'desc' }).subscribe({
+      next: (response) => {
+        this.ultimosBlogs = response.data;
+      },
+      error: (error) => {
         this.errorMessage = 'Error al cargar los blogs';
         console.error(error);
-        return of([]);
-      })
-    ).subscribe((data) => {
-      this.ultimosBlogs = data
-        .sort((a: any, b: any) => b.fecha._seconds - a.fecha._seconds)
-        .slice(0, 4);
+      }
+    });
+  }
+
+  cargarPaquetes() {
+    this.paquetesService.getPaquetes().subscribe({
+      next: (paquetes) => {
+        // Filtrar solo paquetes activos y destacados para mostrar en inicio
+        this.paquetes = paquetes.filter(p => p.activo).slice(0, 6);
+      },
+      error: (error) => {
+        console.error('Error al cargar paquetes:', error);
+      }
     });
   }
 
@@ -627,5 +643,16 @@ export class InicioComponent implements OnInit {
     } finally {
       this.uploadingItem = null;
     }
+  }
+
+  // Helper to strip HTML tags for blog preview
+  getPlainTextExcerpt(content: string, maxLength: number = 100): string {
+    if (!content) return '';
+    // Strip HTML tags
+    const plainText = content.replace(/<[^>]*>/g, '');
+    if (plainText.length <= maxLength) {
+      return plainText + '...';
+    }
+    return plainText.substring(0, maxLength).trim() + '...';
   }
 }

@@ -1,54 +1,220 @@
 <div class="admin-container">
   <h2>Administrar Blogs</h2>
+  
   <!-- Botón para crear nuevo blog -->
   <div class="crear-blog-container">
-    <button routerLink="/crear-blog" class="btn-crear-blog">
-      ➕ Crear nuevo blog
+    <button routerLink="/crear-blog" class="btn-crear-blog btn-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 20px; height: 20px;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Crear nuevo blog
     </button>
   </div>
 
+  <!-- Mensaje de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
 
-  <div *ngIf="mensaje" class="mensaje">{{ mensaje }}</div>
+  <!-- Mensaje de error -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
 
-  <div *ngFor="let blog of blogs" class="blog-item">
+  <!-- Loading spinner -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    Cargando blogs...
+  </div>
 
-    <!-- Vista normal del blog -->
-    <div *ngIf="blogEditando?.id !== blog.id" class="blog-view">
-      <h3 class="blog-titulo">{{ blog.titulo }}</h3>
-      <p class="blog-texto">{{ blog.texto }}</p>
+  <!-- Lista de blogs -->
+  <div *ngIf="!isLoading">
+    <div *ngFor="let blog of blogs" class="blog-item">
 
-      <img *ngIf="blog.imagen" [src]="blog.imagen" alt="Imagen del blog" class="imagen-blog" />
+      <!-- Vista normal del blog -->
+      <div *ngIf="blogEditando?.id !== blog.id" class="blog-view">
+        <h3 class="blog-titulo">{{ blog.title }}</h3>
+        
+        <!-- Content preview/full with expand/collapse -->
+        <div class="blog-content-container">
+          <div 
+            *ngIf="!isExpanded(blog.id)" 
+            class="blog-texto preview"
+          >
+            {{ getContentPreview(blog.content) }}
+          </div>
+          <div 
+            *ngIf="isExpanded(blog.id)" 
+            class="blog-texto full"
+            [innerHTML]="getSafeHtml(blog.content)"
+          ></div>
+          
+          <button 
+            *ngIf="blog.content.length > 200"
+            (click)="toggleExpand(blog.id)" 
+            class="btn-expand"
+          >
+            <ng-container *ngIf="!isExpanded(blog.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+              </svg>
+              Ver más
+            </ng-container>
+            <ng-container *ngIf="isExpanded(blog.id)">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+              </svg>
+              Ver menos
+            </ng-container>
+          </button>
+        </div>
 
-      <p *ngIf="blog.video">Enlace video: <a href="{{ blog.video }}" target="_blank" rel="noopener">{{ blog.video }}</a></p>
+        <img *ngIf="blog.imageUrl" [src]="blog.imageUrl" alt="Imagen del blog" class="imagen-blog" />
 
-      <div *ngIf="blog.videoUrl && getVideoEmbedUrl(blog.videoUrl)" class="video-blog">
-        <iframe
-          width="100%"
-          height="315"
-          [src]="getVideoEmbedUrl(blog.videoUrl)"
-          frameborder="0"
-          allowfullscreen>
-        </iframe>
+        <!-- Video embed usando pipe -->
+        <div *ngIf="blog.videoUrl" class="video-blog">
+          <iframe
+            width="100%"
+            height="315"
+            [src]="blog.videoUrl | youtubeEmbed"
+            frameborder="0"
+            allowfullscreen>
+          </iframe>
+        </div>
+
+        <div class="blog-meta">
+          <small>Creado: {{ blog.createdAt | date:'short' }}</small>
+          <small *ngIf="blog.creator">Por: {{ blog.creator.username }}</small>
+        </div>
+
+        <div class="acciones">
+          <button (click)="startEdit(blog)" class="btn-editar btn-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+            Editar
+          </button>
+          <button 
+            (click)="deleteBlog(blog.id)" 
+            class="btn-eliminar btn-icon"
+            [disabled]="isDeleting === blog.id"
+          >
+            <ng-container *ngIf="isDeleting !== blog.id">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+              Eliminar
+            </ng-container>
+            <ng-container *ngIf="isDeleting === blog.id">
+              <svg class="spinning" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Eliminando...
+            </ng-container>
+          </button>
+        </div>
       </div>
 
-      <div class="acciones">
-        <button (click)="editarBlog(blog)" class="btn-editar">✏️ Editar</button>
-        <button (click)="eliminarBlog(blog.id)" class="btn-eliminar">🗑️ Eliminar</button>
+      <!-- Modo edición del blog con Reactive Forms -->
+      <div *ngIf="blogEditando?.id === blog.id && editForm" class="form-edicion">
+        <form [formGroup]="editForm" (ngSubmit)="saveChanges()">
+          
+          <!-- Título -->
+          <div class="form-group">
+            <input 
+              formControlName="title"
+              placeholder="Título" 
+              class="input-edicion"
+              [class.error]="title?.invalid && title?.touched"
+            />
+            <div class="error-message" *ngIf="title?.invalid && title?.touched">
+              <span *ngIf="title?.errors?.['required']">El título es requerido</span>
+              <span *ngIf="title?.errors?.['minlength']">Mínimo 3 caracteres</span>
+              <span *ngIf="title?.errors?.['maxlength']">Máximo 255 caracteres</span>
+            </div>
+          </div>
+
+          <!-- Contenido con Rich Text Editor -->
+          <div class="form-group">
+            <label class="form-label">Contenido</label>
+            <app-rich-text-editor
+              formControlName="content"
+              placeholder="Contenido del blog..."
+              minHeight="250px"
+              [class.error]="content?.invalid && content?.touched"
+            ></app-rich-text-editor>
+            <div class="error-message" *ngIf="content?.invalid && content?.touched">
+              <span *ngIf="content?.errors?.['required']">El contenido es requerido</span>
+              <span *ngIf="content?.errors?.['minlength']">Mínimo 10 caracteres</span>
+            </div>
+          </div>
+
+          <!-- Imagen URL -->
+          <div class="form-group">
+            <input 
+              formControlName="imageUrl"
+              placeholder="URL Imagen (opcional)" 
+              class="input-edicion"
+            />
+          </div>
+
+          <!-- Video URL -->
+          <div class="form-group">
+            <input 
+              formControlName="videoUrl"
+              placeholder="URL Video YouTube (opcional)" 
+              class="input-edicion"
+            />
+          </div>
+
+          <div class="acciones">
+            <button 
+              type="submit" 
+              class="btn-guardar btn-icon"
+              [disabled]="editForm.invalid"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Guardar
+            </button>
+            <button 
+              type="button"
+              (click)="cancelEdit()" 
+              class="btn-cancelar btn-icon"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 18px; height: 18px;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Cancelar
+            </button>
+          </div>
+        </form>
       </div>
+
     </div>
 
-    <!-- Modo edición del blog -->
-    <div *ngIf="blogEditando?.id === blog.id" class="form-edicion">
-      <input [(ngModel)]="blogEditando.titulo" placeholder="Título" class="input-edicion" />
-      <textarea [(ngModel)]="blogEditando.texto" placeholder="Texto" class="textarea-edicion"></textarea>
-      <input [(ngModel)]="blogEditando.imagen" placeholder="URL Imagen" class="input-edicion" />
-      <input [(ngModel)]="blogEditando.videoUrl" placeholder="URL Video" class="input-edicion" />
-
-      <div class="acciones">
-        <button (click)="guardarCambios()" class="btn-guardar">💾 Guardar</button>
-        <button (click)="cancelarEdicion()" class="btn-cancelar">❌ Cancelar</button>
-      </div>
+    <!-- Paginación -->
+    <div *ngIf="pagination" class="pagination">
+      <button 
+        (click)="previousPage()"
+        [disabled]="currentPage === 1"
+        class="pagination-btn"
+      >
+        ← Anterior
+      </button>
+      
+      <span class="pagination-info">
+        Página {{ currentPage }} de {{ totalPages }} 
+        (Total: {{ pagination.total }} blogs)
+      </span>
+      
+      <button 
+        (click)="nextPage()"
+        [disabled]="currentPage === totalPages"
+        class="pagination-btn"
+      >
+        Siguiente →
+      </button>
     </div>
-
   </div>
 </div>

@@ -1,62 +1,169 @@
 <div class="form-container">
   <h2>Crear Nuevo Blog</h2>
 
-  <div *ngIf="mensajeExito" class="mensaje-exito">
-      {{ mensajeExito }}
+  <!-- Toggle Preview -->
+  <div class="preview-toggle">
+    <button type="button" (click)="togglePreview()" class="toggle-btn btn-icon">
+      <ng-container *ngIf="!showPreview">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Vista Previa
+      </ng-container>
+      <ng-container *ngIf="showPreview">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+        Editar
+      </ng-container>
+    </button>
   </div>
 
-  <form (ngSubmit)="crearBlog()">
+  <!-- Mensaje de éxito -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
+  </div>
+
+  <!-- Mensaje de error -->
+  <div *ngIf="errorMessage" class="alert alert-error">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Modo Edición -->
+  <form *ngIf="!showPreview" [formGroup]="blogForm" (ngSubmit)="onSubmit()">
+    <!-- Título -->
     <div class="form-group">
-      <label for="titulo">Título</label>
+      <label for="title">Título *</label>
       <input 
         type="text" 
-        id="titulo" 
-        [(ngModel)]="titulo" 
-        name="titulo" 
-        required 
+        id="title" 
+        formControlName="title"
         class="form-input"
+        [class.error]="title?.invalid && title?.touched"
+        placeholder="Título del blog (3-255 caracteres)"
       />
+      <div class="error-message" *ngIf="title?.invalid && title?.touched">
+        <span *ngIf="title?.errors?.['required']">El título es requerido</span>
+        <span *ngIf="title?.errors?.['minlength']">El título debe tener al menos 3 caracteres</span>
+        <span *ngIf="title?.errors?.['maxlength']">El título no puede exceder 255 caracteres</span>
+      </div>
     </div>
 
+    <!-- Contenido con Rich Text Editor -->
     <div class="form-group">
-      <label for="texto">Texto</label>
-      <textarea 
-        id="texto" 
-        [(ngModel)]="texto" 
-        name="texto" 
-        required 
-        class="form-input"
-      ></textarea>
+      <label for="content">Contenido *</label>
+      <app-rich-text-editor
+        formControlName="content"
+        placeholder="Escribe el contenido del blog. Puedes agregar formato, imágenes y más..."
+        [minHeight]="'400px'"
+      ></app-rich-text-editor>
+      <div class="error-message" *ngIf="content?.invalid && content?.touched">
+        <span *ngIf="content?.errors?.['required']">El contenido es requerido</span>
+        <span *ngIf="content?.errors?.['minlength']">El contenido debe tener al menos 10 caracteres</span>
+      </div>
+      <small class="form-hint">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px; display: inline; vertical-align: middle;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+        </svg>
+        Usa el editor para agregar imágenes directamente en el contenido donde las necesites
+      </small>
     </div>
 
+    <!-- Imagen URL (portada opcional) -->
     <div class="form-group">
-      <label for="imagen">URL Imagen (opcional)</label>
+      <label for="imageUrl">Imagen de Portada (opcional)</label>
       <input 
-        type="text" 
-        id="imagen" 
-        [(ngModel)]="imagen" 
-        name="imagen" 
+        type="url" 
+        id="imageUrl" 
+        formControlName="imageUrl"
         class="form-input"
+        placeholder="https://example.com/imagen.jpg"
       />
+      <small class="form-hint">URL de una imagen para mostrar como portada del blog</small>
     </div>
+
+    <!-- Video URL -->
     <div class="form-group">
-  <label for="video">Video (opcional)</label>
-  <input
-  type="text"
-  id="video"
-  class="form-input"
-  [(ngModel)]="videoUrl"
-  name="videoUrl "
-  placeholder="URL del video (ej: https://...)"
-/>
+      <label for="videoUrl">URL de Video YouTube (opcional)</label>
+      <input
+        type="url"
+        id="videoUrl"
+        formControlName="videoUrl"
+        class="form-input"
+        placeholder="https://www.youtube.com/watch?v=..."
+      />
+      <small class="form-hint">Se convertirá automáticamente a formato embed</small>
+    </div>
 
-</div>
-
-<div class="form-actions-row">
-  <button type="submit" class="submit-btn">Crear Blog</button>
-  <button type="button" class="cancel-btn" routerLink="/admin-blogs">Cancelar</button>
-</div>
-
-
+    <!-- Botones de acción -->
+    <div class="form-actions-row">
+      <button 
+        type="submit" 
+        class="submit-btn btn-icon" 
+        [disabled]="isSubmitting || blogForm.invalid"
+      >
+        <svg *ngIf="!isSubmitting" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <svg *ngIf="isSubmitting" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="spinning">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+        </svg>
+        <span *ngIf="!isSubmitting">Crear Blog</span>
+        <span *ngIf="isSubmitting">Creando...</span>
+      </button>
+      <button 
+        type="button" 
+        class="cancel-btn btn-icon" 
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Cancelar
+      </button>
+    </div>
   </form>
+
+  <!-- Modo Preview -->
+  <div *ngIf="showPreview" class="preview-container">
+    <div class="preview-header">
+      <h1>{{ getPreviewData().title }}</h1>
+    </div>
+    
+    <div class="preview-meta">
+      <span class="preview-date">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 16px; height: 16px; display: inline; vertical-align: middle; margin-right: 4px;">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+        </svg>
+        {{ 'now' | date:'medium' }}
+      </span>
+    </div>
+
+    <div *ngIf="getPreviewData().imageUrl" class="preview-cover-image">
+      <img [src]="getPreviewData().imageUrl" alt="Portada" />
+    </div>
+
+    <div class="preview-content" [innerHTML]="getSafeHtml(getPreviewData().content)"></div>
+
+    <div *ngIf="getPreviewData().videoUrl" class="preview-video">
+      <iframe
+        width="100%"
+        height="450"
+        [src]="getPreviewData().videoUrl | youtubeEmbed"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <div class="preview-actions">
+      <button type="button" (click)="togglePreview()" class="edit-btn btn-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+        </svg>
+        Volver a Editar
+      </button>
+    </div>
+  </div>
 </div>

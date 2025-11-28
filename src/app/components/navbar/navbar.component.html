@@ -13,8 +13,7 @@
     <li *ngIf="!isLoggedIn"><a routerLink="/sobremi">Sobre mí</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/formulario">Agendar Cita</a></li>
-    <li *ngIf="!isLoggedIn"><a routerLink="/taller">Talleres</a></li>
-    <li *ngIf="!isLoggedIn"><a routerLink="/login">Login</a></li>
+    <li *ngIf="!isLoggedIn"><a routerLink="/login">Iniciar Sesión</a></li>
 
     <!-- Opciones para ADMINISTRADOR -->
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/">Inicio</a></li>
@@ -38,7 +37,6 @@
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/formulario">Agendar Cita</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/mis-citas">Mis Citas</a></li>
-    <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/taller">Talleres</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/sobremi">Sobre mí</a></li>
     <li *ngIf="isLoggedIn && isUsuario()" class="logout-item">
       <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
