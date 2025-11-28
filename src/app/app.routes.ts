@@ -87,12 +87,6 @@ export const routes: Routes = [
         canActivate: [RoleGuard],
         data: { roles: ['admin'] }
       },
-      { 
-        path: 'horario', 
-        component: HorarioComponent,
-        canActivate: [RoleGuard],
-        data: { roles: ['admin'] }
-      },
       {
         path: 'tratamientos',
         component: TratamientosComponent,
