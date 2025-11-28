@@ -11,6 +11,7 @@
     <li *ngIf="!isLoggedIn"><a routerLink="/">Inicio</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/ver-blog">Blog</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/sobremi">Sobre mí</a></li>
+    <li *ngIf="!isLoggedIn"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/formulario">Agendar Cita</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/taller">Talleres</a></li>
     <li *ngIf="!isLoggedIn"><a routerLink="/login">Login</a></li>
@@ -18,10 +19,8 @@
     <!-- Opciones para ADMINISTRADOR -->
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/">Inicio</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/sobremi">Sobre mí</a></li>
-    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-citas">Citas</a></li>
+    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-blogs">Blogs</a></li>
-    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/tratamientos">Tratamientos</a></li>
-    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-taller">Talleres</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-horarios">Panel de Administrador</a></li>
     <li *ngIf="isLoggedIn && isAdmin()" class="logout-item">
       <button class="logout-btn" (click)="logout()" title="Cerrar sesión">
@@ -36,6 +35,7 @@
     <!-- Opciones para USUARIO regular -->
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/">Inicio</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/ver-blog">Blog</a></li>
+    <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/formulario">Agendar Cita</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/mis-citas">Mis Citas</a></li>
     <li *ngIf="isLoggedIn && isUsuario()"><a routerLink="/taller">Talleres</a></li>

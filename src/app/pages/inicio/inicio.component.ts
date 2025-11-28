@@ -12,6 +12,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../environments/environment';
 import { EditableContentDirective } from '../../directives/editable-content.directive';
 import { EditableImageDirective } from '../../directives/editable-image.directive';
+import { EditableVideoDirective } from '../../directives/editable-video.directive';
 import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
 
 interface MediaItem {
@@ -31,6 +32,7 @@ interface MediaItem {
       CommonModule,
       EditableContentDirective,
       EditableImageDirective,
+      EditableVideoDirective,
       EditModeIndicatorComponent
     ],
     templateUrl: './inicio.component.html',
@@ -571,6 +573,57 @@ export class InicioComponent implements OnInit {
     } catch (error) {
       console.error('Error uploading image:', error);
       alert('Error al subir la imagen. Por favor, inténtalo de nuevo.');
+    } finally {
+      this.uploadingItem = null;
+    }
+  }
+
+  // Método para manejar cambios de video
+  async onVideoChange(file: File, videoKey: string) {
+    if (!this.isAdmin) {
+      alert('Necesitas estar autenticado para subir archivos');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      return;
+    }
+
+    this.uploadingItem = videoKey;
+
+    try {
+      console.log(`🚀 Uploading video for ${videoKey}`);
+      
+      const uploadResponse = await this.imageService.uploadVideo(file, 'homepage-videos').toPromise();
+
+      if (uploadResponse && uploadResponse.success) {
+        // Actualizar el item de media
+        const item = this.mediaItems.find(m => m.id === videoKey);
+        if (item) {
+          // Eliminar video anterior si existe
+          if (item.publicId) {
+            try {
+              await this.imageService.deleteImage(item.publicId).toPromise();
+            } catch (deleteError) {
+              console.warn('Error deleting previous video:', deleteError);
+            }
+          }
+
+          // Actualizar con el nuevo video
+          item.src = uploadResponse.data.secure_url;
+          item.publicId = uploadResponse.data.public_id;
+          
+          this.saveMediaToStorage();
+          console.log('✅ Video updated successfully');
+        }
+      } else {
+        throw new Error('Upload failed');
+      }
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      alert('Error al subir el video. Por favor, inténtalo de nuevo.');
     } finally {
       this.uploadingItem = null;
     }

@@ -23,7 +23,11 @@
 <!-- Primer card. Video -->
 <div class="psychologist-card">
   <div class="psychologist-card-content">
-    <video controls>
+    <video controls
+           appEditableVideo
+           videoKey="hero-video"
+           pageId="inicio"
+           (videoChange)="onVideoChange($event, 'hero-video')">
       <source [src]="getMediaSrc('hero-video')" type="video/mp4" />
       Tu navegador no soporta la reproducción de video.
     </video>

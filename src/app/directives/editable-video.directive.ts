@@ -3,13 +3,13 @@ import { AdminModeService } from '../services/admin-mode.service';
 import { Subscription } from 'rxjs';
 
 @Directive({
-  selector: '[appEditableImage]',
+  selector: '[appEditableVideo]',
   standalone: true
 })
-export class EditableImageDirective implements OnInit, OnDestroy {
-  @Input() imageKey!: string;
+export class EditableVideoDirective implements OnInit, OnDestroy {
+  @Input() videoKey!: string;
   @Input() pageId!: string;
-  @Output() imageChange = new EventEmitter<File>();
+  @Output() videoChange = new EventEmitter<File>();
 
   private subscription?: Subscription;
   private overlayDiv?: HTMLElement;
@@ -23,9 +23,9 @@ export class EditableImageDirective implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription = this.adminModeService.isEditMode$.subscribe(isEditMode => {
       if (isEditMode) {
-        this.enableImageEditing();
+        this.enableVideoEditing();
       } else {
-        this.disableImageEditing();
+        this.disableVideoEditing();
       }
     });
   }
@@ -35,25 +35,22 @@ export class EditableImageDirective implements OnInit, OnDestroy {
     this.removeOverlay();
   }
 
-  private enableImageEditing(): void {
-    // Agregar clase de edición
-    this.renderer.addClass(this.el.nativeElement, 'editable-image');
+  private enableVideoEditing(): void {
+    this.renderer.addClass(this.el.nativeElement, 'editable-video');
     
-    // Envolver en contenedor si no está envuelto
     const parent = this.el.nativeElement.parentElement;
-    if (!parent?.classList.contains('image-edit-wrapper')) {
+    if (!parent?.classList.contains('video-edit-wrapper')) {
       const wrapper = this.renderer.createElement('div');
-      this.renderer.addClass(wrapper, 'image-edit-wrapper');
+      this.renderer.addClass(wrapper, 'video-edit-wrapper');
       this.renderer.insertBefore(parent, wrapper, this.el.nativeElement);
       this.renderer.appendChild(wrapper, this.el.nativeElement);
       
-      // Crear overlay persistente pero oculto
       this.createOverlay(wrapper);
     }
   }
 
-  private disableImageEditing(): void {
-    this.renderer.removeClass(this.el.nativeElement, 'editable-image');
+  private disableVideoEditing(): void {
+    this.renderer.removeClass(this.el.nativeElement, 'editable-video');
     this.removeOverlay();
   }
 
@@ -72,14 +69,12 @@ export class EditableImageDirective implements OnInit, OnDestroy {
   }
 
   private createOverlay(wrapper: HTMLElement): void {
-    // Crear overlay persistente
     this.overlayDiv = this.renderer.createElement('div');
-    this.renderer.addClass(this.overlayDiv, 'image-edit-overlay');
+    this.renderer.addClass(this.overlayDiv, 'video-edit-overlay');
     
-    // Botón de cambiar imagen
     const changeBtn = this.renderer.createElement('button');
-    changeBtn.innerHTML = 'Cambiar';
-    this.renderer.addClass(changeBtn, 'image-edit-btn');
+    changeBtn.innerHTML = '🎬 Cambiar Video';
+    this.renderer.addClass(changeBtn, 'video-edit-btn');
     this.renderer.addClass(changeBtn, 'change-btn');
     this.renderer.listen(changeBtn, 'click', (e) => {
       e.stopPropagation();
@@ -90,14 +85,9 @@ export class EditableImageDirective implements OnInit, OnDestroy {
     this.renderer.appendChild(this.overlayDiv, changeBtn);
     this.renderer.appendChild(wrapper, this.overlayDiv);
     
-    // Prevenir que el overlay desaparezca al hacer hover sobre él
     this.renderer.listen(this.overlayDiv, 'mouseenter', () => {
       this.renderer.addClass(this.overlayDiv!, 'visible');
     });
-  }
-
-  private showOverlay(): void {
-    // Método deprecado - ahora usamos createOverlay
   }
 
   private removeOverlay(): void {
@@ -110,31 +100,34 @@ export class EditableImageDirective implements OnInit, OnDestroy {
   private triggerFileInput(): void {
     const input = this.renderer.createElement('input');
     this.renderer.setAttribute(input, 'type', 'file');
-    this.renderer.setAttribute(input, 'accept', 'image/*');
+    this.renderer.setAttribute(input, 'accept', 'video/*');
     this.renderer.setStyle(input, 'display', 'none');
     
     this.renderer.listen(input, 'change', (event: any) => {
       const file = event.target.files?.[0];
       if (file) {
-        this.imageChange.emit(file);
+        // Verificar tamaño (max 50MB para videos)
+        if (file.size > 50 * 1024 * 1024) {
+          alert('El video es demasiado grande. Máximo 50MB.');
+          return;
+        }
+        
+        this.videoChange.emit(file);
         
         // Preview inmediato
         const reader = new FileReader();
         reader.onload = (e: any) => {
-          this.renderer.setAttribute(this.el.nativeElement, 'src', e.target.result);
+          const video = this.el.nativeElement;
+          const source = video.querySelector('source');
+          if (source) {
+            this.renderer.setAttribute(source, 'src', e.target.result);
+            video.load(); // Recargar el video
+          }
         };
         reader.readAsDataURL(file);
       }
     });
     
     input.click();
-  }
-
-  private deleteImage(): void {
-    if (confirm('¿Estás seguro de que quieres eliminar esta imagen?')) {
-      // Emitir evento o manejar eliminación
-      console.log('Eliminar imagen:', this.imageKey);
-      // Aquí puedes implementar la lógica de eliminación
-    }
   }
 }

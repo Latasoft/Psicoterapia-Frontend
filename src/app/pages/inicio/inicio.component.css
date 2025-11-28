@@ -1112,4 +1112,130 @@
   cursor: pointer;
 }
 
+/* ========== ESTILOS PARA SISTEMA DE AUTOEDICIÓN ========== */
+/* Zona editable de texto */
+.editable-zone {
+  border: 2px dashed transparent;
+  padding: 4px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.editable-zone:hover {
+  border-color: #667eea;
+  background-color: rgba(102, 126, 234, 0.05);
+}
+
+.editable-zone:focus {
+  outline: none;
+  border-color: #764ba2;
+  background-color: rgba(118, 75, 162, 0.05);
+}
+
+/* Wrapper para imágenes editables */
+.image-edit-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.image-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.image-edit-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.image-edit-btn {
+  background: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.image-edit-btn:hover {
+  transform: scale(1.05);
+  background: #f0f0f0;
+}
+
+.image-edit-btn.change-btn {
+  background: #667eea;
+  color: white;
+}
+
+.image-edit-btn.change-btn:hover {
+  background: #764ba2;
+}
+
+/* Wrapper para videos editables */
+.video-edit-wrapper {
+  position: relative;
+  display: block;
+}
+
+.video-edit-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.video-edit-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.video-edit-btn {
+  background: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.video-edit-btn:hover {
+  transform: scale(1.05);
+  background: #f0f0f0;
+}
+
+.video-edit-btn.change-btn {
+  background: #667eea;
+  color: white;
+}
+
+.video-edit-btn.change-btn:hover {
+  background: #764ba2;
+}
 
