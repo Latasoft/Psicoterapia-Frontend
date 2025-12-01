@@ -1,5 +1,5 @@
-// Producción - Render
+// Desarrollo local contra backend de producción
 export const environment = {
-    production: true,
+    production: false,
     apiUrl: 'https://psicoterapia-backend.onrender.com'
 };

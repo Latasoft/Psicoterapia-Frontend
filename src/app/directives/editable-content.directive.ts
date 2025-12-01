@@ -1,5 +1,6 @@
 import { Directive, ElementRef, HostListener, Input, OnInit, OnDestroy, Renderer2 } from '@angular/core';
 import { AdminModeService } from '../services/admin-mode.service';
+import { PageContentService } from '../services/page-content.service';
 import { Subscription } from 'rxjs';
 
 @Directive({
@@ -17,12 +18,13 @@ export class EditableContentDirective implements OnInit, OnDestroy {
   constructor(
     private el: ElementRef,
     private renderer: Renderer2,
-    private adminModeService: AdminModeService
+    private adminModeService: AdminModeService,
+    private pageContentService: PageContentService
   ) {}
 
   ngOnInit(): void {
-    // Guardar valor original
-    this.originalValue = this.el.nativeElement.innerText;
+    // Cargar contenido desde la BD
+    this.loadContent();
 
     // Suscribirse a cambios en el modo edición
     this.subscription = this.adminModeService.isEditMode$.subscribe(isEditMode => {
@@ -30,6 +32,31 @@ export class EditableContentDirective implements OnInit, OnDestroy {
         this.enableEditing();
       } else {
         this.disableEditing();
+      }
+    });
+  }
+
+  private loadContent(): void {
+    this.pageContentService.getPageContent(this.pageId).subscribe({
+      next: (content) => {
+        // Buscar el valor guardado para este contentId
+        if (content && content[this.contentId]) {
+          const savedValue = content[this.contentId];
+          if (this.contentType === 'html') {
+            this.renderer.setProperty(this.el.nativeElement, 'innerHTML', savedValue);
+          } else {
+            this.renderer.setProperty(this.el.nativeElement, 'innerText', savedValue);
+          }
+          this.originalValue = savedValue;
+        } else {
+          // Si no hay valor guardado, usar el del HTML
+          this.originalValue = this.el.nativeElement.innerText;
+        }
+      },
+      error: (err) => {
+        console.error(`Error loading content for ${this.contentId}:`, err);
+        // En caso de error, usar el valor del HTML
+        this.originalValue = this.el.nativeElement.innerText;
       }
     });
   }

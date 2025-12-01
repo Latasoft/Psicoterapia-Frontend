@@ -123,7 +123,10 @@ export class InicioComponent implements OnInit {
   }
 
   checkAdminStatus() {
-      this.isAdmin = this.authService.isLoggedIn();
+      const isAdmin = this.authService.isAdmin();
+      const role = localStorage.getItem('userRole');
+      console.log('🔍 Check Admin Status:', { isAdmin, role, isLoggedIn: this.authService.isLoggedIn() });
+      this.isAdmin = isAdmin;
   }
 
   toggleAdminMode() {
@@ -487,6 +490,11 @@ export class InicioComponent implements OnInit {
 
   // Guardar contenido de la página
   savePageContent() {
+    // Solo guardar si el usuario es admin y está en modo edición
+    if (!this.isAdmin) {
+      return;
+    }
+
     const content = {
       contactInfo: this.contactInfo,
       tarotText: this.tarotText,
@@ -506,6 +514,10 @@ export class InicioComponent implements OnInit {
 
   // Método para guardar cambios cuando el usuario termine de editar
   onContentChange() {
+    if (!this.isAdmin) {
+      return;
+    }
+    
     clearTimeout(this.saveTimeout);
     this.saveTimeout = setTimeout(() => {
       this.savePageContent();

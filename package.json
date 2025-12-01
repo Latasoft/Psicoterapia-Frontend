@@ -4,6 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --configuration=development",
+    "start:remote": "ng serve --configuration=remote",
     "start:prod": "ng serve --configuration=production",
     "build": "ng build --configuration=production",
     "build:dev": "ng build --configuration=development",
