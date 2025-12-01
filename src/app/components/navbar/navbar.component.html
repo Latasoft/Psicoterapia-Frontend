@@ -20,6 +20,7 @@
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/sobremi">Sobre mí</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/tarotista">Tarot</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-blogs">Blogs</a></li>
+    <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-comentarios">Comentarios</a></li>
     <li *ngIf="isLoggedIn && isAdmin()"><a routerLink="/admin-horarios">Panel de Administrador</a></li>
     <li *ngIf="isLoggedIn && isAdmin()" class="logout-item">
       <button class="logout-btn" (click)="logout()" title="Cerrar sesión">

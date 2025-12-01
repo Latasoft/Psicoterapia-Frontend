@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { ImageService } from '../../services/image.service';
 import { PageContentService } from '../../services/page-content.service';
 import { PaquetesService } from '../../services/paquetes.service';
+import { ComentariosService } from '../../services/comentarios.service';
 import { Paquete } from '../../interfaces/paquetes.interface';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -67,18 +68,30 @@ export class InicioComponent implements OnInit {
   conveniosInfo: any = {};
   currentYear = new Date().getFullYear();
 
+  // Comentarios
+  comentarios: any[] = [];
+  nuevoComentario = {
+    author_name: '',
+    comment_text: '',
+    rating: 5
+  };
+  enviandoComentario = false;
+  mensajeComentario = '';
+
   constructor(
     private blogService: BlogService,
     private authService: AuthService,
     private imageService: ImageService,
     private pageContentService: PageContentService,
     private paquetesService: PaquetesService,
+    private comentariosService: ComentariosService,
     private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit() {
     this.cargarUltimosBlogs();
     this.cargarPaquetes();
+    this.cargarComentarios();
     this.checkAdminStatus();
     this.loadMediaFromStorage();
     this.loadPageContent();
@@ -643,6 +656,65 @@ export class InicioComponent implements OnInit {
     } finally {
       this.uploadingItem = null;
     }
+  }
+
+  // ==========================================
+  // MÉTODOS DE COMENTARIOS
+  // ==========================================
+
+  cargarComentarios() {
+    console.log('🔍 Cargando comentarios desde la API...');
+    this.comentariosService.getComentarios().subscribe({
+      next: (response) => {
+        console.log('✅ Comentarios recibidos:', response);
+        // El backend ya filtra por is_approved = true, solo ordenar y limitar
+        this.comentarios = response.slice(0, 6); // Mostrar solo los últimos 6
+        console.log('📝 Comentarios a mostrar:', this.comentarios.length);
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar comentarios:', error);
+        this.comentarios = []; // Asegurar que sea un array vacío en caso de error
+      }
+    });
+  }
+
+  generarEstrellas(rating: number): string {
+    const estrellasLlenas = '★'.repeat(rating);
+    const estrellasVacias = '☆'.repeat(5 - rating);
+    return estrellasLlenas + estrellasVacias;
+  }
+
+  enviarComentario() {
+    if (!this.nuevoComentario.author_name.trim() || !this.nuevoComentario.comment_text.trim()) {
+      this.mensajeComentario = 'Por favor completa todos los campos';
+      return;
+    }
+
+    this.enviandoComentario = true;
+    this.mensajeComentario = '';
+
+    this.comentariosService.enviarComentario(this.nuevoComentario).subscribe({
+      next: (response) => {
+        this.mensajeComentario = '✅ Comentario enviado exitosamente. Será revisado antes de publicarse.';
+        // Limpiar formulario
+        this.nuevoComentario = {
+          author_name: '',
+          comment_text: '',
+          rating: 5
+        };
+        this.enviandoComentario = false;
+
+        // Ocultar mensaje después de 5 segundos
+        setTimeout(() => {
+          this.mensajeComentario = '';
+        }, 5000);
+      },
+      error: (error) => {
+        console.error('Error al enviar comentario:', error);
+        this.mensajeComentario = '❌ Error al enviar el comentario. Por favor intenta nuevamente.';
+        this.enviandoComentario = false;
+      }
+    });
   }
 
   // Helper to strip HTML tags for blog preview

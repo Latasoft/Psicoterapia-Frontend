@@ -199,26 +199,65 @@
   <div class="comentarios-card">
     <h2>Comentarios de Pacientes</h2>
 
-    <div class="comentario">
-      <p>"El psicólogo fue muy empático y me ayudó a ver las cosas desde otra perspectiva. Muy recomendado."</p>
+    <!-- Mensaje si no hay comentarios -->
+    <div *ngIf="comentarios.length === 0" class="comentario">
+      <p style="text-align: center; color: #666;">Aún no hay comentarios. ¡Sé el primero en dejar tu experiencia!</p>
+    </div>
+
+    <!-- Lista de comentarios desde Supabase -->
+    <div class="comentario" *ngFor="let comentario of comentarios">
+      <p>"{{ comentario.comment_text }}"</p>
       <div class="info">
-        <span>— Ana M.</span>
-        <span class="stars">★★★★★</span>
+        <span>— {{ comentario.author_name }}</span>
+        <span class="stars">{{ generarEstrellas(comentario.rating) }}</span>
       </div>
     </div>
 
-    <div class="comentario">
-      <p>"Me sentí escuchado y comprendido en cada sesión. Excelente profesional."</p>
-      <div class="info">
-        <span>— Carlos R.</span>
-        <span class="stars">★★★★☆</span>
-      </div>
-    </div>
-
+    <!-- Formulario para nuevo comentario -->
     <div class="nuevo-comentario">
       <h3>Deja tu comentario</h3>
-      <textarea placeholder="Escribe tu experiencia..."></textarea>
-      <button>Enviar</button>
+      
+      <!-- Mensaje de feedback -->
+      <div *ngIf="mensajeComentario" 
+           [class.success-message]="mensajeComentario.includes('✅')"
+           [class.error-message]="mensajeComentario.includes('❌')"
+           style="padding: 10px; margin-bottom: 15px; border-radius: 5px; font-size: 14px;">
+        {{ mensajeComentario }}
+      </div>
+
+      <input 
+        type="text" 
+        [(ngModel)]="nuevoComentario.author_name" 
+        placeholder="Tu nombre"
+        [disabled]="enviandoComentario"
+        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;"
+      />
+      
+      <div style="margin-bottom: 10px;">
+        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Calificación:</label>
+        <select 
+          [(ngModel)]="nuevoComentario.rating" 
+          [disabled]="enviandoComentario"
+          style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+          <option [value]="5">★★★★★ (5 estrellas)</option>
+          <option [value]="4">★★★★☆ (4 estrellas)</option>
+          <option [value]="3">★★★☆☆ (3 estrellas)</option>
+          <option [value]="2">★★☆☆☆ (2 estrellas)</option>
+          <option [value]="1">★☆☆☆☆ (1 estrella)</option>
+        </select>
+      </div>
+
+      <textarea 
+        [(ngModel)]="nuevoComentario.comment_text" 
+        placeholder="Escribe tu experiencia..."
+        [disabled]="enviandoComentario"
+      ></textarea>
+      
+      <button 
+        (click)="enviarComentario()"
+        [disabled]="enviandoComentario">
+        {{ enviandoComentario ? 'Enviando...' : 'Enviar' }}
+      </button>
     </div>
   </div>
 

@@ -18,6 +18,7 @@ import { RoleGuard } from './guards/role.guard';
 import { AdminBlogComponent } from './pages/admin-blog/admin-blog.component';
 import { CrearTallerComponent } from './pages/crear-taller/crear-taller.component';
 import { AdminTallerComponent } from './pages/admin-taller/admin-taller.component';
+import { AdminComentariosComponent } from './pages/admin-comentarios/admin-comentarios.component';
 import { AdminHorariosComponent } from './pages/admin-horarios/admin-horarios.component';
 import { HorarioComponent } from './pages/horario/horario.component';
 import { TratamientosComponent } from './pages/tratamientos/tratamientos.component';
@@ -84,6 +85,12 @@ export const routes: Routes = [
       { 
         path: 'admin-taller', 
         component: AdminTallerComponent,
+        canActivate: [RoleGuard],
+        data: { roles: ['admin'] }
+      },
+      { 
+        path: 'admin-comentarios', 
+        component: AdminComentariosComponent,
         canActivate: [RoleGuard],
         data: { roles: ['admin'] }
       },
