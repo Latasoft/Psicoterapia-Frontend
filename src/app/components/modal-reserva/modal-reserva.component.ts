@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Paquete, HorarioSlot, DatosPaciente, SesionSeleccionada } from '../../interfaces/paquetes.interface';
 import { PaquetesService } from '../../services/paquetes.service';
+import { WebpayService } from '../../services/webpay.service';
 import { CalendarioSemanalComponent } from './calendario-semanal.component';
 
 @Component({
@@ -40,7 +41,10 @@ export class ModalReservaComponent implements OnInit {
   metodoPago: 'webpay' | 'mercadopago' | 'klap' | 'prueba' | null = null;
   errorMessage = '';
 
-  constructor(private paquetesService: PaquetesService) {}
+  constructor(
+    private paquetesService: PaquetesService,
+    private webpayService: WebpayService
+  ) {}
 
   ngOnInit() {
     // Inicializar sesiones vacías según el paquete
@@ -141,11 +145,21 @@ export class ModalReservaComponent implements OnInit {
     // Desactivar modo de selección después de elegir
     this.modoSeleccionSesion = null;
     
-    // Scroll hacia arriba para ver las sesiones seleccionadas
+    // UX MEJORADA: Si es paquete de 1 sesión, hacer scroll al botón de siguiente paso
+    // Si es paquete de múltiples sesiones, scroll hacia arriba para ver las sesiones
     setTimeout(() => {
-      const selectorSesiones = document.querySelector('.sesiones-selector');
-      if (selectorSesiones) {
-        selectorSesiones.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (this.paquete && this.paquete.sesiones === 1) {
+        // Para paquetes de 1 sesión: scroll al botón de siguiente paso
+        const botonSiguiente = document.querySelector('.btn-primary');
+        if (botonSiguiente) {
+          botonSiguiente.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        // Para paquetes múltiples: scroll hacia arriba para ver sesiones
+        const selectorSesiones = document.querySelector('.sesiones-selector');
+        if (selectorSesiones) {
+          selectorSesiones.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
     }, 100);
     
@@ -286,10 +300,29 @@ export class ModalReservaComponent implements OnInit {
       return;
     }
 
+    // Si es Webpay, procesar con integración real
+    if (this.metodoPago === 'webpay') {
+      this.procesarPagoWebpay();
+      return;
+    }
+
+    // TODO: Implementar MercadoPago y Klap
+    if (this.metodoPago === 'mercadopago' || this.metodoPago === 'klap') {
+      alert(`Integración de ${this.metodoPago} en desarrollo`);
+      return;
+    }
+  }
+
+  /**
+   * Procesa el pago con Webpay (Transbank)
+   */
+  procesarPagoWebpay() {
+    if (!this.paquete) return;
+
     this.procesando = true;
     this.errorMessage = '';
 
-    const reservaData = {
+    const transaccionData = {
       paqueteId: this.paquete.id,
       sesiones: this.sesionesSeleccionadas.map(s => ({
         fecha: s.fecha,
@@ -304,26 +337,37 @@ export class ModalReservaComponent implements OnInit {
       direccion: this.datosPaciente.direccion,
       comuna: this.datosPaciente.comuna,
       modalidad: this.paquete.modalidad === 'ambas' ? 'online' : this.paquete.modalidad,
-      metodoPago: this.metodoPago,
       monto: this.paquete.precio_nacional
     };
 
-    this.paquetesService.reservarConPaquete(reservaData)
+    console.log('[MODAL-RESERVA] Iniciando pago con Webpay:', transaccionData);
+
+    this.webpayService.initTransaction(transaccionData)
       .subscribe({
         next: (response) => {
           this.procesando = false;
-          if (response.success) {
-            alert('¡Reserva confirmada! Recibirás un email con los detalles de todas las sesiones.');
-            this.reservaCompletada.emit(response);
-            this.cerrarModal();
+          
+          if (response.success && response.url && response.token) {
+            console.log('[MODAL-RESERVA] Transacción iniciada, redirigiendo a Webpay...');
+            console.log('   Token:', response.token);
+            console.log('   URL:', response.url);
+            
+            // Guardar información en localStorage para tracking (opcional)
+            localStorage.setItem('webpay_buy_order', response.buyOrder);
+            localStorage.setItem('webpay_timestamp', new Date().toISOString());
+            
+            // Redirigir a Webpay
+            window.location.href = response.url + '?token_ws=' + response.token;
           } else {
-            this.errorMessage = response.message || 'Error al procesar la reserva';
+            this.errorMessage = response.message || 'Error al iniciar transacción';
+            alert('Error al procesar el pago: ' + this.errorMessage);
           }
         },
         error: (err) => {
           this.procesando = false;
-          this.errorMessage = err.error?.error || 'Error al procesar la reserva';
-          console.error('Error:', err);
+          this.errorMessage = err.error?.error || 'Error al conectar con Webpay';
+          console.error('[MODAL-RESERVA] Error:', err);
+          alert('Error al procesar el pago: ' + this.errorMessage);
         }
       });
   }

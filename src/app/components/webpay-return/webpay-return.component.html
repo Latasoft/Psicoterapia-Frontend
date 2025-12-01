@@ -1,33 +1,139 @@
- <div class="webpay-return-container">
-      <div class="result-card" *ngIf="!loading">
-        <div class="result-icon" [ngClass]="success ? 'success' : 'error'">
-          <i [class]="success ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
-        </div>
-        
-        <h2>{{ success ? 'Pago Exitoso' : 'Pago Fallido' }}</h2>
-        
-        <div class="transaction-details" *ngIf="transactionResult">
-          <p><strong>Orden de Compra:</strong> {{ transactionResult.buyOrder }}</p>
-          <p><strong>Monto:</strong> ${{ transactionResult.amount | number:'1.0-0' }}</p>
-          <p><strong>Fecha:</strong> {{ transactionResult.transactionDate | date:'dd/MM/yyyy HH:mm' }}</p>
-          <p *ngIf="transactionResult.authorizationCode">
-            <strong>Código de Autorización:</strong> {{ transactionResult.authorizationCode }}
-          </p>
-        </div>
+<div class="webpay-return-container">
+  
+  <!-- LOADING -->
+  <div class="loading-card" *ngIf="loading">
+    <div class="spinner"></div>
+    <h2>Procesando tu pago...</h2>
+    <p>Por favor espera mientras confirmamos tu transacción con Webpay.</p>
+  </div>
 
-        <div class="actions">
-          <button class="btn btn-primary" (click)="volverInicio()">
-            Volver al Inicio
-          </button>
-          <button class="btn btn-secondary" (click)="nuevaCita()" *ngIf="success">
-            Agendar Nueva Cita
-          </button>
-        </div>
+  <!-- PAGO EXITOSO -->
+  <div class="result-card success-card" *ngIf="pagoExitoso && !loading">
+    <div class="icon-container success">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+
+    <h1>¡Pago Exitoso!</h1>
+    <p class="subtitle">Tu reserva ha sido confirmada</p>
+
+    <div class="transaction-details">
+      <h3>Detalles de la Transacción</h3>
+      <div class="detail-row">
+        <span class="label">Orden de Compra:</span>
+        <span class="value">{{ buyOrder }}</span>
       </div>
-
-      <div class="loading" *ngIf="loading">
-        <div class="spinner"></div>
-        <p>Procesando pago...</p>
+      <div class="detail-row">
+        <span class="label">Monto Pagado:</span>
+        <span class="value amount">{{ formatearMonto(amount) }}</span>
+      </div>
+      <div class="detail-row" *ngIf="authorizationCode">
+        <span class="label">Código de Autorización:</span>
+        <span class="value">{{ authorizationCode }}</span>
+      </div>
+      <div class="detail-row" *ngIf="transactionDate">
+        <span class="label">Fecha:</span>
+        <span class="value">{{ transactionDate }}</span>
       </div>
     </div>
-  
+
+    <div class="citas-info" *ngIf="citasCreadas.length > 0">
+      <h3>Sesiones Confirmadas</h3>
+      <p class="info-text">Se han creado {{ citasCreadas.length }} sesiones de {{ paquete?.nombre || 'tu paquete' }}</p>
+      
+      <div class="citas-list">
+        <div class="cita-item" *ngFor="let cita of citasCreadas; let i = index">
+          <div class="cita-numero">{{ i + 1 }}</div>
+          <div class="cita-info">
+            <div class="cita-fecha">{{ formatearFecha(cita.fecha) }}</div>
+            <div class="cita-hora">{{ cita.hora }} hrs ({{ cita.duracion }} min)</div>
+          </div>
+        </div>
+      </div>
+      
+      <p class="email-notice">
+        📧 Recibirás un email de confirmación con los detalles de todas tus sesiones.
+      </p>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="verMisCitas()">
+        Ver Mis Citas
+      </button>
+      <button class="btn btn-secondary" (click)="volverInicio()">
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGO RECHAZADO -->
+  <div class="result-card error-card" *ngIf="pagoRechazado && !loading">
+    <div class="icon-container error">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+      </svg>
+    </div>
+
+    <h1>Pago Rechazado</h1>
+    <p class="subtitle">{{ errorMessage }}</p>
+
+    <div class="transaction-details">
+      <div class="detail-row" *ngIf="buyOrder">
+        <span class="label">Orden de Compra:</span>
+        <span class="value">{{ buyOrder }}</span>
+      </div>
+      <div class="detail-row" *ngIf="amount">
+        <span class="label">Monto:</span>
+        <span class="value">{{ formatearMonto(amount) }}</span>
+      </div>
+    </div>
+
+    <div class="info-box warning">
+      <p><strong>¿Qué puedo hacer?</strong></p>
+      <ul>
+        <li>Verifica que tu tarjeta tenga fondos suficientes</li>
+        <li>Asegúrate de que los datos ingresados sean correctos</li>
+        <li>Contacta a tu banco si el problema persiste</li>
+        <li>Intenta nuevamente con otra tarjeta</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="nuevaReserva()">
+        Intentar Nuevamente
+      </button>
+      <button class="btn btn-secondary" (click)="volverInicio()">
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+
+  <!-- ERROR GENÉRICO -->
+  <div class="result-card error-card" *ngIf="error && !loading">
+    <div class="icon-container error">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+    </div>
+
+    <h1>Error al Procesar</h1>
+    <p class="subtitle">{{ errorMessage }}</p>
+
+    <div class="info-box error">
+      <p>Si realizaste el pago y ves este mensaje, no te preocupes:</p>
+      <ul>
+        <li>No se realizará ningún cobro adicional</li>
+        <li>Nuestro equipo verificará tu transacción</li>
+        <li>Te contactaremos si es necesario</li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="volverInicio()">
+        Volver al Inicio
+      </button>
+    </div>
+  </div>
+
+</div>
