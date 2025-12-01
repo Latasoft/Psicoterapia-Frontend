@@ -637,7 +637,7 @@ export class InicioComponent implements OnInit {
     try {
       console.log(`🚀 Uploading video for ${videoKey}`);
       
-      const uploadResponse = await this.imageService.uploadVideo(file, 'homepage-videos').toPromise();
+      const uploadResponse = await this.imageService.uploadVideo(file, 'homepage').toPromise();
 
       if (uploadResponse && uploadResponse.success) {
         // Actualizar el item de media
