@@ -19,6 +19,8 @@ export class AdminModeService {
   private pendingCount$ = new BehaviorSubject<number>(0);
   private saving$ = new BehaviorSubject<boolean>(false);
   private lastSaveStatus$ = new BehaviorSubject<'success' | 'error' | null>(null);
+  private contentCache = new Map<string, any>();
+  private cacheExpiry = 5 * 60 * 1000; // 5 minutos
 
   // Observables públicos
   public isEditMode$ = this.editMode$.asObservable();
@@ -36,6 +38,65 @@ export class AdminModeService {
 
     // Guardar en localStorage como backup
     this.saveToLocalStorage();
+    
+    // Cargar cache de localStorage al iniciar
+    this.loadCacheFromStorage();
+  }
+
+  /**
+   * Obtiene contenido desde cache si está disponible
+   */
+  getCachedContent(pageId: string): any | null {
+    const cached = this.contentCache.get(pageId);
+    if (cached && (Date.now() - cached.timestamp) < this.cacheExpiry) {
+      return cached.content;
+    }
+    return null;
+  }
+
+  /**
+   * Guarda contenido en cache
+   */
+  setCachedContent(pageId: string, content: any): void {
+    this.contentCache.set(pageId, {
+      content,
+      timestamp: Date.now()
+    });
+    this.saveCacheToStorage();
+  }
+
+  /**
+   * Carga cache desde localStorage
+   */
+  private loadCacheFromStorage(): void {
+    try {
+      const stored = localStorage.getItem('page_content_cache');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        Object.entries(parsed).forEach(([key, value]: [string, any]) => {
+          if (value && (Date.now() - value.timestamp) < this.cacheExpiry) {
+            this.contentCache.set(key, value);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error loading cache from storage:', error);
+    }
+  }
+
+  /**
+   * Guarda cache en localStorage
+   */
+  private saveCacheToStorage(): void {
+    try {
+      const cacheObj: any = {};
+      this.contentCache.forEach((value, key) => {
+        cacheObj[key] = value;
+      });
+      localStorage.setItem('page_content_cache', JSON.stringify(cacheObj));
+    } catch (error) {
+      console.error('Error saving cache to storage:', error);
+    }
   }
 
   toggleEditMode(): void {
@@ -94,6 +155,13 @@ export class AdminModeService {
       });
 
       await Promise.all(savePromises);
+
+      // Actualizar cache con los nuevos valores
+      changesByPage.forEach((updates, pageId) => {
+        const cached = this.getCachedContent(pageId) || {};
+        const updatedContent = { ...cached, ...updates };
+        this.setCachedContent(pageId, updatedContent);
+      });
 
       // Limpiar cola después de guardar exitosamente
       this.saveQueue.clear();

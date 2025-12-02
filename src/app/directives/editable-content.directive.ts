@@ -14,6 +14,7 @@ export class EditableContentDirective implements OnInit, OnDestroy {
 
   private subscription?: Subscription;
   private originalValue: string = '';
+  private isLoading = true;
 
   constructor(
     private el: ElementRef,
@@ -23,6 +24,10 @@ export class EditableContentDirective implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    // Agregar clase de loading y ocultar contenido temporalmente
+    this.renderer.addClass(this.el.nativeElement, 'content-loading');
+    this.renderer.setStyle(this.el.nativeElement, 'opacity', '0');
+    
     // Cargar contenido desde la BD
     this.loadContent();
 
@@ -37,28 +42,69 @@ export class EditableContentDirective implements OnInit, OnDestroy {
   }
 
   private loadContent(): void {
+    // Intentar cargar desde cache primero
+    const cached = this.adminModeService.getCachedContent(this.pageId);
+    
+    if (cached && cached[this.contentId]) {
+      // Aplicar contenido cacheado inmediatamente
+      this.applyContent(cached[this.contentId]);
+      this.showContent();
+      
+      // Seguir cargando desde BD en background para actualizar
+      this.loadFromDatabase(false);
+    } else {
+      // No hay cache, cargar desde BD
+      this.loadFromDatabase(true);
+    }
+  }
+
+  private loadFromDatabase(showAfterLoad: boolean): void {
     this.pageContentService.getPageContent(this.pageId).subscribe({
       next: (content) => {
+        // Guardar en cache
+        this.adminModeService.setCachedContent(this.pageId, content);
+        
         // Buscar el valor guardado para este contentId
         if (content && content[this.contentId]) {
-          const savedValue = content[this.contentId];
-          if (this.contentType === 'html') {
-            this.renderer.setProperty(this.el.nativeElement, 'innerHTML', savedValue);
-          } else {
-            this.renderer.setProperty(this.el.nativeElement, 'innerText', savedValue);
-          }
-          this.originalValue = savedValue;
+          this.applyContent(content[this.contentId]);
         } else {
           // Si no hay valor guardado, usar el del HTML
           this.originalValue = this.el.nativeElement.innerText;
         }
+        
+        if (showAfterLoad) {
+          this.showContent();
+        }
       },
       error: (err) => {
         console.error(`Error loading content for ${this.contentId}:`, err);
-        // En caso de error, usar el valor del HTML
+        // En caso de error, usar el valor del HTML y mostrar
         this.originalValue = this.el.nativeElement.innerText;
+        
+        if (showAfterLoad) {
+          this.showContent();
+        }
+        
+        // Agregar indicador visual de error
+        this.renderer.addClass(this.el.nativeElement, 'content-load-error');
       }
     });
+  }
+
+  private applyContent(value: string): void {
+    if (this.contentType === 'html') {
+      this.renderer.setProperty(this.el.nativeElement, 'innerHTML', value);
+    } else {
+      this.renderer.setProperty(this.el.nativeElement, 'innerText', value);
+    }
+    this.originalValue = value;
+  }
+
+  private showContent(): void {
+    this.isLoading = false;
+    this.renderer.removeClass(this.el.nativeElement, 'content-loading');
+    this.renderer.setStyle(this.el.nativeElement, 'opacity', '1');
+    this.renderer.setStyle(this.el.nativeElement, 'transition', 'opacity 0.3s ease-in-out');
   }
 
   ngOnDestroy(): void {
