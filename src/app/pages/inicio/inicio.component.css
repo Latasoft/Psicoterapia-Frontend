@@ -68,16 +68,16 @@
   pointer-events: all;
 }
 .logo-container {
-  position: absolute;
-  top: -9.5vw; /* Compensar el padding del contenedor */
-  right: -9.5vw; /* Compensar el padding del contenedor */
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
   z-index: 5;
 }
 
 .logo {
-  width: 50px; /* Ajusta el tamaño del logo */
-  height: auto; /* Mantiene la proporción del logo */
-  display: block; /* Asegura que sea un elemento de bloque */
+  width: 120px;
+  height: auto;
+  display: block;
 }
 
 /* Estilos específicos para el wrapper de imagen editable del logo */
@@ -92,12 +92,15 @@
 /* Contenedor para el título */
 .card-content {
   position: absolute;
-  right: 55%; /* Mueve el título a la izquierda */
-  top: 50%; /* Centra el título verticalmente */
-  transform: translateY(-50%); /* Ajusta el título al centro vertical */
+  right: 55%;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 2rem;
   line-height: 1.2; 
-  max-width: 50%; /* Ajusta el ancho del contenedor */
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center; /* Alinea el texto a la izquierda */
 }
 @media (max-width: 768px) {

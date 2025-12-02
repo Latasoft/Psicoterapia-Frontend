@@ -607,27 +607,62 @@ export class InicioComponent implements OnInit {
     try {
       console.log(`🚀 Uploading image for ${imageKey}`);
       
-      const uploadResponse = await this.imageService.uploadImage(file, 'homepage').toPromise();
+      // Determinar la carpeta según el imageKey
+      let folder = 'inicio';
+      if (imageKey.includes('hero')) {
+        folder = 'hero';
+      } else if (imageKey.includes('service')) {
+        folder = 'servicios';
+      } else if (imageKey.includes('tarot')) {
+        folder = 'general';
+      }
+      
+      const uploadResponse = await this.imageService.uploadImage(file, folder).toPromise();
 
       if (uploadResponse && uploadResponse.success) {
+        console.log('✅ Image uploaded to Supabase:', uploadResponse.data.url);
+        
         // Actualizar el item de media
         const item = this.mediaItems.find(m => m.id === imageKey);
         if (item) {
-          // Eliminar imagen anterior si existe
-          if (item.publicId) {
-            try {
-              await this.imageService.deleteImage(item.publicId).toPromise();
-            } catch (deleteError) {
-              console.warn('Error deleting previous image:', deleteError);
-            }
-          }
-
+          // Guardar URL anterior para posible rollback
+          const previousUrl = item.src;
+          const previousPublicId = item.publicId;
+          
           // Actualizar con la nueva imagen
-          item.src = uploadResponse.data.secure_url;
-          item.publicId = uploadResponse.data.public_id;
+          item.src = uploadResponse.data.url;
+          item.publicId = uploadResponse.data.path;
           
           this.saveMediaToStorage();
-          console.log('✅ Image updated successfully');
+          
+          // IMPORTANTE: Guardar en el backend usando batch update
+          const updateData: any = {};
+          updateData[imageKey] = uploadResponse.data.url;
+          
+          console.log(`💾 Saving to backend:`, updateData);
+          
+          try {
+            await this.pageContentService.batchUpdateContent('inicio', updateData).toPromise();
+            console.log('✅ Image URL saved to backend successfully');
+            alert('Imagen actualizada exitosamente');
+            
+            // Eliminar imagen anterior de Supabase si existe
+            if (previousPublicId && (previousPublicId.startsWith('inicio/') || previousPublicId.startsWith('hero/'))) {
+              try {
+                await this.imageService.deleteImage(previousPublicId).toPromise();
+                console.log('🗑️ Previous image deleted from Supabase');
+              } catch (deleteError) {
+                console.warn('⚠️ Could not delete previous image:', deleteError);
+              }
+            }
+          } catch (saveError) {
+            console.error('❌ Error saving to backend:', saveError);
+            // Rollback en caso de error
+            item.src = previousUrl;
+            item.publicId = previousPublicId;
+            this.saveMediaToStorage();
+            throw new Error('No se pudo guardar la imagen en el servidor');
+          }
         }
       } else {
         throw new Error('Upload failed');
@@ -658,27 +693,60 @@ export class InicioComponent implements OnInit {
     try {
       console.log(`🚀 Uploading video for ${videoKey}`);
       
-      const uploadResponse = await this.imageService.uploadVideo(file, 'homepage').toPromise();
+      // Determinar la carpeta según el videoKey
+      let folder = 'inicio';
+      if (videoKey.includes('hero')) {
+        folder = 'hero';
+      } else if (videoKey.includes('contact')) {
+        folder = 'general';
+      }
+      
+      const uploadResponse = await this.imageService.uploadVideo(file, folder).toPromise();
 
       if (uploadResponse && uploadResponse.success) {
+        console.log('✅ Video uploaded to Supabase:', uploadResponse.data.url);
+        
         // Actualizar el item de media
         const item = this.mediaItems.find(m => m.id === videoKey);
         if (item) {
-          // Eliminar video anterior si existe
-          if (item.publicId) {
-            try {
-              await this.imageService.deleteImage(item.publicId).toPromise();
-            } catch (deleteError) {
-              console.warn('Error deleting previous video:', deleteError);
-            }
-          }
-
+          // Guardar URL anterior para posible rollback
+          const previousUrl = item.src;
+          const previousPublicId = item.publicId;
+          
           // Actualizar con el nuevo video
-          item.src = uploadResponse.data.secure_url;
-          item.publicId = uploadResponse.data.public_id;
+          item.src = uploadResponse.data.url;
+          item.publicId = uploadResponse.data.path;
           
           this.saveMediaToStorage();
-          console.log('✅ Video updated successfully');
+          
+          // IMPORTANTE: Guardar en el backend usando batch update
+          const updateData: any = {};
+          updateData[videoKey] = uploadResponse.data.url;
+          
+          console.log(`💾 Saving to backend:`, updateData);
+          
+          try {
+            await this.pageContentService.batchUpdateContent('inicio', updateData).toPromise();
+            console.log('✅ Video URL saved to backend successfully');
+            alert('Video actualizado exitosamente');
+            
+            // Eliminar video anterior de Supabase si existe
+            if (previousPublicId && (previousPublicId.startsWith('inicio/') || previousPublicId.startsWith('hero/'))) {
+              try {
+                await this.imageService.deleteImage(previousPublicId).toPromise();
+                console.log('🗑️ Previous video deleted from Supabase');
+              } catch (deleteError) {
+                console.warn('⚠️ Could not delete previous video:', deleteError);
+              }
+            }
+          } catch (saveError) {
+            console.error('❌ Error saving to backend:', saveError);
+            // Rollback en caso de error
+            item.src = previousUrl;
+            item.publicId = previousPublicId;
+            this.saveMediaToStorage();
+            throw new Error('No se pudo guardar el video en el servidor');
+          }
         }
       } else {
         throw new Error('Upload failed');

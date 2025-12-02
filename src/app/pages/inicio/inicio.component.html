@@ -16,16 +16,16 @@
   
   <!-- Contenido del hero -->
   <div class="hero-content-wrapper">
-    <div class="logo-container">
-      <img [src]="getMediaSrc('hero-image')" 
-           alt="Logo" 
-           class="logo" 
-           appEditableImage
-           imageKey="hero-image"
-           pageId="inicio"
-           (imageChange)="onImageChange($event, 'hero-image')" />
-    </div>
     <div class="card-content">
+      <div class="logo-container">
+        <img [src]="getMediaSrc('hero-image')" 
+             alt="Logo" 
+             class="logo" 
+             appEditableImage
+             imageKey="hero-image"
+             pageId="inicio"
+             (imageChange)="onImageChange($event, 'hero-image')" />
+      </div>
       <h2 appEditableContent 
           pageId="inicio" 
           contentId="hero-title"
