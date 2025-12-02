@@ -1,8 +1,4 @@
 .image-card-4 {
-  background-image: url('/assets/f9.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   color: #9e9893;
   font-family: 'Playfair Display', serif;
   font-weight: 300;
@@ -16,16 +12,82 @@
   padding: 10vw;
   z-index: 1;
   margin-bottom: 0;
+  overflow: hidden;
+}
+
+/* Wrapper de la imagen de fondo - fuera del flujo */
+.hero-background-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* La imagen de fondo ocupa todo el wrapper */
+.hero-background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* El wrapper de edición de imagen debe ocupar todo el espacio */
+.hero-background-wrapper .image-edit-wrapper {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Permitir clicks en modo edición */
+.hero-background-wrapper .image-edit-wrapper,
+.hero-background-wrapper .image-edit-overlay {
+  pointer-events: all;
+}
+
+/* Wrapper del contenido - en el flujo flex */
+.hero-content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+/* Permitir interacción con elementos editables */
+.hero-content-wrapper .logo-container,
+.hero-content-wrapper .card-content,
+.hero-content-wrapper .image-edit-wrapper,
+.hero-content-wrapper .editable-zone {
+  pointer-events: all;
 }
 .logo-container {
-  position: absolute; /* Posiciona el logo dentro del contenedor */
-  top: 10px; /* Ajusta la distancia desde la parte superior */
-  right: 10px; /* Ajusta la distancia desde la parte izquierda */
+  position: absolute;
+  top: -9.5vw; /* Compensar el padding del contenedor */
+  right: -9.5vw; /* Compensar el padding del contenedor */
+  z-index: 5;
 }
 
 .logo {
   width: 50px; /* Ajusta el tamaño del logo */
   height: auto; /* Mantiene la proporción del logo */
+  display: block; /* Asegura que sea un elemento de bloque */
+}
+
+/* Estilos específicos para el wrapper de imagen editable del logo */
+.logo-container .image-edit-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.logo-container .image-edit-overlay {
+  border-radius: 4px;
 }
 /* Contenedor para el título */
 .card-content {

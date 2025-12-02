@@ -16,6 +16,7 @@ import { environment } from '../../environments/environment';
 import { EditableContentDirective } from '../../directives/editable-content.directive';
 import { EditableImageDirective } from '../../directives/editable-image.directive';
 import { EditableVideoDirective } from '../../directives/editable-video.directive';
+import { EditableLinkDirective } from '../../directives/editable-link.directive';
 import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
 
 interface MediaItem {
@@ -36,6 +37,7 @@ interface MediaItem {
       EditableContentDirective,
       EditableImageDirective,
       EditableVideoDirective,
+      EditableLinkDirective,
       EditModeIndicatorComponent
     ],
     templateUrl: './inicio.component.html',
@@ -49,6 +51,7 @@ export class InicioComponent implements OnInit {
   
   // Media items que se pueden editar
   mediaItems: MediaItem[] = [
+    { id: 'hero-background', type: 'image', src: 'assets/f9.jpg', alt: 'Fondo Hero', section: 'hero' },
     { id: 'hero-image', type: 'image', src: 'assets/h2.jpg', alt: 'Logo', section: 'hero' },
     { id: 'hero-video', type: 'video', src: 'assets/videos/si1.mp4', section: 'hero' },
     { id: 'service1-image', type: 'image', src: 'assets/h11.png', alt: 'Psicoterapia', section: 'services' },
@@ -377,6 +380,7 @@ export class InicioComponent implements OnInit {
 
   getDefaultMediaItem(itemId: string): MediaItem | undefined {
     const defaults: { [key: string]: string } = {
+      'hero-background': 'assets/f9.jpg',
       'hero-image': 'assets/h2.jpg',
       'hero-video': 'assets/videos/si1.mp4',
       'service1-image': 'assets/h11.png',
@@ -419,6 +423,7 @@ export class InicioComponent implements OnInit {
 
   private getDefaultImageForService(itemId: string): string {
     const defaults: { [key: string]: string } = {
+      'hero-background': 'assets/f9.jpg',
       'hero-image': 'assets/h2.jpg',
       'hero-video': 'assets/videos/si1.mp4',
       'service1-image': 'assets/h11.png',

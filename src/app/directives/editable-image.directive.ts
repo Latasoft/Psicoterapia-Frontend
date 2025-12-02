@@ -13,6 +13,7 @@ export class EditableImageDirective implements OnInit, OnDestroy {
 
   private subscription?: Subscription;
   private overlayDiv?: HTMLElement;
+  private isEditMode = false;
 
   constructor(
     private el: ElementRef,
@@ -22,6 +23,7 @@ export class EditableImageDirective implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription = this.adminModeService.isEditMode$.subscribe(isEditMode => {
+      this.isEditMode = isEditMode;
       if (isEditMode) {
         this.enableImageEditing();
       } else {
@@ -39,15 +41,19 @@ export class EditableImageDirective implements OnInit, OnDestroy {
     // Agregar clase de edición
     this.renderer.addClass(this.el.nativeElement, 'editable-image');
     
-    // Envolver en contenedor si no está envuelto
+    // Buscar o crear wrapper
     const parent = this.el.nativeElement.parentElement;
+    let wrapper = parent;
+    
     if (!parent?.classList.contains('image-edit-wrapper')) {
-      const wrapper = this.renderer.createElement('div');
+      wrapper = this.renderer.createElement('div');
       this.renderer.addClass(wrapper, 'image-edit-wrapper');
       this.renderer.insertBefore(parent, wrapper, this.el.nativeElement);
       this.renderer.appendChild(wrapper, this.el.nativeElement);
-      
-      // Crear overlay persistente pero oculto
+    }
+    
+    // Crear overlay si no existe (puede haber sido removido anteriormente)
+    if (!this.overlayDiv) {
       this.createOverlay(wrapper);
     }
   }
@@ -59,7 +65,7 @@ export class EditableImageDirective implements OnInit, OnDestroy {
 
   @HostListener('mouseenter')
   onMouseEnter(): void {
-    if (this.adminModeService.isEditMode() && this.overlayDiv) {
+    if (this.isEditMode && this.overlayDiv) {
       this.renderer.addClass(this.overlayDiv, 'visible');
     }
   }

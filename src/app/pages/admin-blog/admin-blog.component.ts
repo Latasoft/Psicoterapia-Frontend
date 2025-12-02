@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BlogService } from '../../services/blog.service';
+import { ToastService } from '../../services/toast.service';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -7,12 +8,14 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Blog, UpdateBlogDto, PaginationMeta } from '../../core/models/blog.model';
 import { YoutubeEmbedPipe } from '../../shared/pipes/youtube-embed.pipe';
 import { RichTextEditorComponent } from '../../shared/components/rich-text-editor/rich-text-editor.component';
+import { ToastContainerComponent } from '../../components/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-admin-blog',
-  imports: [ReactiveFormsModule, CommonModule, RouterModule, YoutubeEmbedPipe, RichTextEditorComponent],
+  imports: [ReactiveFormsModule, CommonModule, RouterModule, YoutubeEmbedPipe, RichTextEditorComponent, ToastContainerComponent],
   templateUrl: './admin-blog.component.html',
-  styleUrls: ['./admin-blog.component.css']
+  styleUrls: ['./admin-blog.component.css'],
+  standalone: true
 })
 export class AdminBlogComponent implements OnInit {
   blogs: Blog[] = [];
@@ -34,7 +37,8 @@ export class AdminBlogComponent implements OnInit {
   constructor(
     private blogService: BlogService,
     private formBuilder: FormBuilder,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -73,13 +77,12 @@ export class AdminBlogComponent implements OnInit {
 
     this.blogService.deleteBlog(id).subscribe({
       next: () => {
-        this.successMessage = 'Blog eliminado correctamente';
+        this.toastService.success('Blog eliminado correctamente');
         this.isDeleting = null;
         this.loadBlogs();
-        setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Error al eliminar el blog';
+        this.toastService.error(error.message || 'Error al eliminar el blog');
         this.isDeleting = null;
       }
     });
@@ -105,13 +108,12 @@ export class AdminBlogComponent implements OnInit {
 
     this.blogService.updateBlog(this.blogEditando.id, updateDto).subscribe({
       next: () => {
-        this.successMessage = 'Blog actualizado exitosamente';
+        this.toastService.success('Blog actualizado exitosamente');
         this.cancelEdit();
         this.loadBlogs();
-        setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (error) => {
-        this.errorMessage = error.message || 'Error al actualizar el blog';
+        this.toastService.error(error.message || 'Error al actualizar el blog');
       }
     });
   }

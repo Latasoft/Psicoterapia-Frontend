@@ -97,6 +97,70 @@
   background-color: rgba(33, 150, 243, 0.1);
 }
 
+/* Estilos para enlaces editables */
+.editable-link {
+  outline: 2px dashed #4CAF50 !important;
+  outline-offset: 2px;
+  transition: outline 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.editable-link:hover {
+  outline-color: #388E3C !important;
+  background-color: rgba(76, 175, 80, 0.05);
+}
+
+.link-edit-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.link-edit-overlay {
+  position: absolute;
+  top: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 1000;
+}
+
+.link-edit-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.link-edit-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+}
+
+.link-edit-btn:hover {
+  background: linear-gradient(135deg, #45a049 0%, #3d8b40 100%);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  transform: translateY(-2px);
+}
+
+.link-edit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
+
+.link-loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 /* ================================================
    FIN ESTILOS AUTOEDICIÓN
    ================================================ */
@@ -203,6 +267,12 @@
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
+  z-index: 10;
+}
+
+.image-edit-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
 }
 
 .image-edit-wrapper:hover .image-edit-overlay {

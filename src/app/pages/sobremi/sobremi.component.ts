@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { PageContentService } from '../../services/page-content.service';
 import { EditableContentDirective } from '../../directives/editable-content.directive';
 import { EditableImageDirective } from '../../directives/editable-image.directive';
+import { EditableLinkDirective } from '../../directives/editable-link.directive';
 import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
 import { ImageService } from '../../services/image.service';
 
@@ -16,6 +17,7 @@ import { ImageService } from '../../services/image.service';
     CommonModule,
     EditableContentDirective,
     EditableImageDirective,
+    EditableLinkDirective,
     EditModeIndicatorComponent
   ],
   templateUrl: './sobremi.component.html',

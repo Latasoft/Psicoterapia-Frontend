@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Subject, debounceTime } from 'rxjs';
 import { PageContentService } from './page-content.service';
+import { ToastService } from './toast.service';
 
 interface PendingChange {
   pageId: string;
@@ -28,7 +29,10 @@ export class AdminModeService {
   public isSaving$ = this.saving$.asObservable();
   public saveStatus$ = this.lastSaveStatus$.asObservable();
 
-  constructor(private pageContentService: PageContentService) {
+  constructor(
+    private pageContentService: PageContentService,
+    private toastService: ToastService
+  ) {
     // Configurar auto-guardado con debounce de 3 segundos
     this.saveSubject.pipe(
       debounceTime(3000)
@@ -63,6 +67,13 @@ export class AdminModeService {
       timestamp: Date.now()
     });
     this.saveCacheToStorage();
+  }
+
+  /**
+   * Obtiene el estado actual del modo edición
+   */
+  isEditMode(): boolean {
+    return this.editMode$.value;
   }
 
   /**
@@ -107,10 +118,6 @@ export class AdminModeService {
       // Al salir del modo edición, guardar cambios pendientes
       this.flushSaves();
     }
-  }
-
-  isEditMode(): boolean {
-    return this.editMode$.value;
   }
 
   /**
@@ -168,6 +175,10 @@ export class AdminModeService {
       this.pendingCount$.next(0);
       this.lastSaveStatus$.next('success');
       
+      // Mostrar notificación de éxito
+      const changesCount = Array.from(changesByPage.values()).reduce((acc, updates) => acc + Object.keys(updates).length, 0);
+      this.toastService.success(`${changesCount} cambio${changesCount > 1 ? 's' : ''} guardado${changesCount > 1 ? 's' : ''} exitosamente`);
+      
       // Auto-ocultar status después de 3 segundos
       setTimeout(() => {
         this.lastSaveStatus$.next(null);
@@ -177,6 +188,9 @@ export class AdminModeService {
     } catch (error) {
       console.error('❌ Error al guardar cambios:', error);
       this.lastSaveStatus$.next('error');
+      
+      // Mostrar notificación de error
+      this.toastService.error('Error al guardar cambios. Por favor, intenta nuevamente.');
       
       setTimeout(() => {
         this.lastSaveStatus$.next(null);
