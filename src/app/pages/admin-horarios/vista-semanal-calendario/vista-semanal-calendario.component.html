@@ -156,7 +156,115 @@
     (citaActualizada)="onCitaActualizada()"
   ></app-modal-detalle-cita>
 
-  <!-- ==================== MODAL EXCEPCIÓN ==================== -->
-  <!-- ... Tu modal existente de excepciones ... -->
+  <!-- ==================== MODAL EXCEPCIÓN/BLOQUEO ==================== -->
+  <div class="modal-overlay" *ngIf="mostrarModalExcepcion" (click)="cerrarModalExcepcion()">
+    <div class="modal-excepcion" (click)="$event.stopPropagation()" role="dialog" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h3 id="modal-title">{{ bloqueSeleccionado ? 'Editar Bloqueo' : 'Nuevo Bloqueo' }}</h3>
+        <button class="btn-cerrar" (click)="cerrarModalExcepcion()" aria-label="Cerrar modal">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="fecha-excepcion">Fecha:</label>
+            <input
+              type="date"
+              id="fecha-excepcion"
+              [(ngModel)]="excepcionForm.fecha"
+              name="fecha"
+              [disabled]="!!bloqueSeleccionado"
+              class="form-control"
+              required
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="hora-inicio-excepcion">Hora inicio:</label>
+              <input
+                type="time"
+                id="hora-inicio-excepcion"
+                [(ngModel)]="excepcionForm.hora_inicio"
+                name="hora_inicio"
+                [disabled]="!!bloqueSeleccionado"
+                class="form-control"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="hora-fin-excepcion">Hora fin:</label>
+              <input
+                type="time"
+                id="hora-fin-excepcion"
+                [(ngModel)]="excepcionForm.hora_fin"
+                name="hora_fin"
+                [disabled]="!!bloqueSeleccionado"
+                class="form-control"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tipo-excepcion">Tipo:</label>
+            <select
+              id="tipo-excepcion"
+              [(ngModel)]="excepcionForm.tipo"
+              name="tipo"
+              class="form-control"
+              required
+            >
+              <option value="bloqueo">Bloqueo</option>
+              <option value="feriado">Feriado</option>
+              <option value="ausencia">Ausencia</option>
+              <option value="mantenimiento">Mantenimiento</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="descripcion-excepcion">Descripción:</label>
+            <textarea
+              id="descripcion-excepcion"
+              [(ngModel)]="excepcionForm.descripcion"
+              name="descripcion"
+              rows="3"
+              class="form-control"
+              placeholder="Motivo del bloqueo (opcional)"
+            ></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          *ngIf="bloqueSeleccionado"
+          class="btn btn-danger"
+          (click)="eliminarBloqueo()"
+          [disabled]="eliminando"
+        >
+          {{ eliminando ? 'Eliminando...' : 'Eliminar' }}
+        </button>
+        
+        <div class="btn-group-right">
+          <button class="btn btn-secondary" (click)="cerrarModalExcepcion()">
+            Cancelar
+          </button>
+          <button
+            class="btn btn-primary"
+            (click)="guardarExcepcion()"
+            [disabled]="guardando"
+          >
+            {{ guardando ? 'Guardando...' : 'Guardar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
