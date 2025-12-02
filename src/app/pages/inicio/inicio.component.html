@@ -76,7 +76,7 @@
   </div>
   
   <div *ngIf="ultimosBlogs.length" class="blog-cards-grid">
-    <div *ngFor="let blog of ultimosBlogs.slice(0, 4)" class="modern-blog-card" [routerLink]="['/ver-blog']">
+    <div *ngFor="let blog of ultimosBlogs.slice(0, 4)" class="modern-blog-card" (click)="selectBlog(blog)" style="cursor: pointer;">
       <!-- Imagen destacada -->
       <div class="card-image-wrapper">
         <img 
@@ -443,4 +443,38 @@
   </div>
 </footer>
 
+<!-- Modal de detalle del blog -->
+<div *ngIf="blogSeleccionado" class="detalle-blog">
+  <div class="detalle-contenido">
+    <button class="cerrar-btn" (click)="closeDetail()">✕</button>
+    
+    <!-- Información del Blog -->
+    <div class="info-arriba">
+      <img src="assets/h3.avif" alt="icono blog" />
+      <div class="info-texto">
+        <span class="sitio">emhpsicoterapiaonline.com</span>
+        <span class="fecha">{{ blogSeleccionado.createdAt | date: 'longDate' }}</span>
+        <span *ngIf="blogSeleccionado.creator" class="autor">
+          Por: {{ blogSeleccionado.creator.username }}
+        </span>
+      </div>
+    </div>
+    
+    <h3>{{ blogSeleccionado.title }}</h3>
+    
+    <!-- Render HTML content safely -->
+    <div class="blog-content" [innerHTML]="getSafeHtml(blogSeleccionado.content)"></div>
+    
+    <!-- Video usando pipe -->
+    <div *ngIf="blogSeleccionado.videoUrl" class="video-container">
+      <iframe
+        width="100%"
+        height="450"
+        [src]="blogSeleccionado.videoUrl | youtubeEmbed"
+        frameborder="0"
+        allowfullscreen>
+      </iframe>
+    </div>
 
+  </div>
+</div>

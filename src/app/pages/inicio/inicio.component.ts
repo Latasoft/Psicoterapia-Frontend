@@ -18,6 +18,8 @@ import { EditableImageDirective } from '../../directives/editable-image.directiv
 import { EditableVideoDirective } from '../../directives/editable-video.directive';
 import { EditableLinkDirective } from '../../directives/editable-link.directive';
 import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
+import { YoutubeEmbedPipe } from '../../shared/pipes/youtube-embed.pipe';
+import { Blog } from '../../core/models/blog.model';
 
 interface MediaItem {
   id: string;
@@ -38,13 +40,15 @@ interface MediaItem {
       EditableImageDirective,
       EditableVideoDirective,
       EditableLinkDirective,
-      EditModeIndicatorComponent
+      EditModeIndicatorComponent,
+      YoutubeEmbedPipe
     ],
     templateUrl: './inicio.component.html',
     styleUrls: ['./inicio.component.css']
 })
 export class InicioComponent implements OnInit {
   ultimosBlogs: any[] = [];
+  blogSeleccionado: Blog | null = null;
   isAdmin: boolean = false;
   adminMode: boolean = false;
   errorMessage: string = '';
@@ -111,6 +115,18 @@ export class InicioComponent implements OnInit {
         console.error(error);
       }
     });
+  }
+
+  selectBlog(blog: Blog): void {
+    this.blogSeleccionado = blog;
+  }
+
+  closeDetail(): void {
+    this.blogSeleccionado = null;
+  }
+
+  getSafeHtml(content: string): any {
+    return this.sanitizer.bypassSecurityTrustHtml(content);
   }
 
   cargarPaquetes() {
