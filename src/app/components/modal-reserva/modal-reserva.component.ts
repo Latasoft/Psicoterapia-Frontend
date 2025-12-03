@@ -384,41 +384,6 @@ export class ModalReservaComponent implements OnInit {
     this.procesando = false;
     return;
   }
-      notas: this.datosPaciente.notas,
-      direccion: this.datosPaciente.direccion,
-      comuna: this.datosPaciente.comuna,
-      modalidad: this.paquete.modalidad === 'ambas' ? 'online' : this.paquete.modalidad,
-      metodoPago: 'prueba',
-      monto: 0, // Sin cargo
-      esPrueba: true // Flag para indicar que es prueba
-    };
-
-    console.log('[PAGO-PRUEBA] Procesando reserva de prueba:', reservaData);
-
-    this.paquetesService.reservarConPaquete(reservaData)
-      .subscribe({
-        next: (response) => {
-          this.procesando = false;
-          if (response.success) {
-            alert(
-              '✅ RESERVA DE PRUEBA CREADA\n\n' +
-              'Las citas se han creado en el sistema sin cargo.\n' +
-              'Recibirás un email con los detalles.'
-            );
-            this.reservaCompletada.emit(response);
-            this.cerrarModal();
-          } else {
-            this.errorMessage = response.message || 'Error al procesar la reserva';
-          }
-        },
-        error: (err) => {
-          this.procesando = false;
-          this.errorMessage = err.error?.error || 'Error al procesar la reserva';
-          console.error('[PAGO-PRUEBA] Error:', err);
-          alert('Error al crear la reserva de prueba: ' + this.errorMessage);
-        }
-      });
-  }
 
   // ==========================================
   // HELPERS
