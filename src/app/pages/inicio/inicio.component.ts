@@ -53,15 +53,15 @@ export class InicioComponent implements OnInit {
   adminMode: boolean = false;
   errorMessage: string = '';
   
-  // Media items que se pueden editar
+  // Media items que se pueden editar - inicialmente vacíos hasta que cargue el backend
   mediaItems: MediaItem[] = [
-    { id: 'hero-background', type: 'image', src: 'assets/f9.jpg', alt: 'Fondo Hero', section: 'hero' },
-    { id: 'hero-image', type: 'image', src: 'assets/h2.jpg', alt: 'Logo', section: 'hero' },
-    { id: 'hero-video', type: 'video', src: 'assets/videos/si1.mp4', section: 'hero' },
-    { id: 'service1-image', type: 'image', src: 'assets/h11.png', alt: 'Psicoterapia', section: 'services' },
-    { id: 'service2-image', type: 'image', src: 'assets/h12.avif', alt: 'Taller', section: 'services' },
-    { id: 'tarot-image', type: 'image', src: 'assets/tarot3.jpeg', alt: 'Tarot', section: 'tarot' },
-    { id: 'contact-video', type: 'video', src: 'assets/videos/si2.mp4', section: 'contact' }
+    { id: 'hero-background', type: 'image', src: '', alt: 'Fondo Hero', section: 'hero' },
+    { id: 'hero-image', type: 'image', src: '', alt: 'Logo', section: 'hero' },
+    { id: 'hero-video', type: 'video', src: '', section: 'hero' },
+    { id: 'service1-image', type: 'image', src: '', alt: 'Psicoterapia', section: 'services' },
+    { id: 'service2-image', type: 'image', src: '', alt: 'Taller', section: 'services' },
+    { id: 'tarot-image', type: 'image', src: '', alt: 'Tarot', section: 'tarot' },
+    { id: 'contact-video', type: 'video', src: '', section: 'contact' }
   ];
 
   selectedFile: File | null = null;
@@ -74,6 +74,9 @@ export class InicioComponent implements OnInit {
   paquetes: Paquete[] = [];
   conveniosInfo: any = {};
   currentYear = new Date().getFullYear();
+  
+  // Flag para controlar la carga inicial
+  contentLoaded = false;
 
   // Comentarios
   comentarios: any[] = [];
@@ -100,8 +103,10 @@ export class InicioComponent implements OnInit {
     this.cargarPaquetes();
     this.cargarComentarios();
     this.checkAdminStatus();
-    this.loadMediaFromStorage();
+    // ⚠️ IMPORTANTE: Cargar contenido del backend PRIMERO
+    // Esto asegura que los usuarios vean siempre la última versión
     this.loadPageContent();
+    // localStorage solo se usa como fallback temporal mientras carga
     this.testImageService(); // Añadir esta línea
   }
 
@@ -153,6 +158,7 @@ export class InicioComponent implements OnInit {
   }
 
   loadMediaFromStorage() {
+    console.log('⚠️ FALLBACK: Cargando media desde localStorage (backend no disponible)');
     const savedMedia = localStorage.getItem('homepage-media');
     if (savedMedia) {
       try {
@@ -161,6 +167,7 @@ export class InicioComponent implements OnInit {
           const saved = customMedia.find((saved: any) => saved.id === item.id);
           return saved ? { ...item, src: saved.src, publicId: saved.publicId } : item;
         });
+        console.log('✅ Media cargada desde localStorage (puede estar desactualizada)');
       } catch (error) {
         console.error('Error parsing saved media:', error);
       }
@@ -173,7 +180,18 @@ export class InicioComponent implements OnInit {
       src: item.src,
       publicId: item.publicId
     }));
+    
+    // Agregar timestamp para saber cuándo fue la última actualización
+    const dataToSave = {
+      media: mediaToSave,
+      lastUpdated: new Date().toISOString(),
+      version: '1.0' // Para futuras migraciones
+    };
+    
     localStorage.setItem('homepage-media', JSON.stringify(mediaToSave));
+    localStorage.setItem('homepage-media-timestamp', new Date().toISOString());
+    
+    console.log('💾 Media guardada en localStorage con timestamp:', dataToSave.lastUpdated);
   }
 
   onFileSelected(event: any, itemId: string) {
@@ -434,20 +452,14 @@ export class InicioComponent implements OnInit {
     
     // Para otros elementos multimedia (hero, tarot, contact), usar el sistema existente
     const item = this.mediaItems.find(m => m.id === itemId);
-    return item ? item.src : this.getDefaultImageForService(itemId);
+    // ⚠️ NO devolver fallback hardcodeado - devolver string vacío si no hay contenido del backend
+    return item ? item.src : '';
   }
 
+  // DEPRECATED: Ya no se usan valores por defecto hardcodeados
+  // El contenido SIEMPRE debe venir del backend
   private getDefaultImageForService(itemId: string): string {
-    const defaults: { [key: string]: string } = {
-      'hero-background': 'assets/f9.jpg',
-      'hero-image': 'assets/h2.jpg',
-      'hero-video': 'assets/videos/si1.mp4',
-      'service1-image': 'assets/h11.png',
-      'service2-image': 'assets/h12.avif',
-      'tarot-image': 'assets/tarot3.jpeg',
-      'contact-video': 'assets/videos/si2.mp4'
-    };
-    return defaults[itemId] || 'assets/h11.png'; // Imagen por defecto para servicios nuevos
+    return ''; // Siempre vacío - forzar carga desde backend
   }
 
   sanitizarUrl(url: string): SafeResourceUrl {
@@ -487,6 +499,10 @@ export class InicioComponent implements OnInit {
           url: error.url
         });
         
+        // Si falla el backend, intentar usar localStorage como fallback
+        console.log('⚠️ Intentando cargar desde localStorage como fallback...');
+        this.loadMediaFromStorage();
+        
         // Return default values as fallback
         return of({
           contactInfo: { title: 'Contacto', items: [] },
@@ -497,15 +513,113 @@ export class InicioComponent implements OnInit {
       })
     ).subscribe({
       next: (content) => {
-        console.log('✅ Page content loaded:', content);
+        console.log('✅ Page content loaded from backend:', content);
+        
+        // Actualizar datos de texto
         this.contactInfo = content.contactInfo || {};
         this.tarotText = content.tarotText || {};
         this.services = content.services || [];
         this.conveniosInfo = content.conveniosInfo || {};
+        
+        // ✅ SINCRONIZAR IMÁGENES DESDE EL BACKEND
+        // Prioridad: Backend > localStorage
+        this.syncMediaFromBackend(content);
+        
+        // ✅ Marcar contenido como cargado (evita parpadeo)
+        this.contentLoaded = true;
       },
-      error: (err) => console.error('💥 Unexpected error:', err),
+      error: (err) => {
+        console.error('💥 Unexpected error:', err);
+        // Incluso con error, marcar como cargado para mostrar defaults
+        this.contentLoaded = true;
+      },
       complete: () => console.log('🏁 Page content load complete')
     });
+  }
+
+  /**
+   * Sincroniza las imágenes del backend con los mediaItems locales
+   * Esto asegura que todos los usuarios vean la última versión
+   */
+  private syncMediaFromBackend(content: any) {
+    console.log('🔄 Sincronizando imágenes desde backend...');
+    
+    let imagenesSincronizadas = 0;
+    let cambiosDetectados = false;
+    
+    // Mapear las claves del backend a los IDs de mediaItems
+    const backendToMediaMap: { [key: string]: string } = {
+      'hero-background': 'hero-background',
+      'hero-image': 'hero-image',
+      'hero-video': 'hero-video',
+      'service1-image': 'service1-image',
+      'service2-image': 'service2-image',
+      'tarot-image': 'tarot-image',
+      'contact-video': 'contact-video'
+    };
+    
+    // Actualizar mediaItems con los valores del backend (SIN COPIAR EL ARRAY)
+    // Modificar in-place para que Angular no detecte referencia nueva
+    this.mediaItems.forEach((item, index) => {
+      const backendKey = backendToMediaMap[item.id];
+      
+      if (backendKey && content[backendKey]) {
+        const backendUrl = content[backendKey];
+        
+        // Actualizar con el valor del backend (incluso si es vacío)
+        // NUNCA usar fallbacks hardcodeados
+        if (backendUrl !== item.src) {
+          console.log(`✅ Actualizando ${item.id} desde backend:`, backendUrl || '(vacío)');
+          imagenesSincronizadas++;
+          cambiosDetectados = true;
+          
+          // Actualizar propiedades in-place (no crear nuevo objeto)
+          item.src = backendUrl;
+          item.publicId = backendUrl ? this.extractPublicId(backendUrl) : undefined;
+        }
+      } else if (backendKey) {
+        // Si la clave existe en el mapeo pero no tiene valor en el backend,
+        // limpiar el valor local (asegurar sincronización)
+        if (item.src !== '') {
+          console.log(`🧹 Limpiando ${item.id} (no hay valor en backend)`);
+          item.src = '';
+          item.publicId = undefined;
+          cambiosDetectados = true;
+        }
+      }
+    });
+    
+    if (imagenesSincronizadas > 0) {
+      console.log(`✅ ${imagenesSincronizadas} imágenes sincronizadas desde backend`);
+      // Actualizar localStorage con las URLs del backend
+      this.saveMediaToStorage();
+      
+      // ✅ FORZAR DETECCIÓN DE CAMBIOS solo si hubo actualizaciones
+      // Esto previene el parpadeo innecesario
+      console.log('🔄 Forzando actualización de vista con nuevas imágenes');
+    } else {
+      console.log('ℹ️ No hay imágenes personalizadas en el backend, usando defaults');
+    }
+  }
+
+  /**
+   * Verifica si una URL es una imagen por defecto (assets/)
+   */
+  private isDefaultImage(url: string): boolean {
+    return url.startsWith('assets/');
+  }
+
+  /**
+   * Extrae el publicId de una URL de Supabase Storage
+   */
+  private extractPublicId(url: string): string | undefined {
+    try {
+      // Extraer el path después de /storage/v1/object/public/images/
+      const match = url.match(/\/storage\/v1\/object\/public\/images\/(.+)$/);
+      return match ? match[1] : undefined;
+    } catch (error) {
+      return undefined;
+    }
   }
 
 

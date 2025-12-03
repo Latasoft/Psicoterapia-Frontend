@@ -1,3 +1,41 @@
+/* ============================================
+   PREVENCIÓN DE PARPADEO EN CARGA
+   ============================================ */
+/* Transición suave para cambios de imagen */
+.hero-background-image,
+.logo,
+img[appEditableImage],
+video[appEditableVideo] {
+  transition: opacity 0.4s ease-in-out;
+}
+
+/* Spinner de carga mientras se obtiene contenido del backend */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.2rem;
+  color: #666;
+  font-family: 'Playfair Display', serif;
+}
+
+.loading-spinner p {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   ESTILOS PRINCIPALES
+   ============================================ */
 .image-card-4 {
   color: #9e9893;
   font-family: 'Playfair Display', serif;

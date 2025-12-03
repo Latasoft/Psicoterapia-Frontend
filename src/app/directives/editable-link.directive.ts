@@ -107,6 +107,7 @@ export class EditableLinkDirective implements OnInit, OnDestroy {
   private showLink(): void {
     this.isLoading = false;
     this.renderer.removeClass(this.el.nativeElement, 'link-loading');
+    this.renderer.addClass(this.el.nativeElement, 'link-loaded');
   }
 
   ngOnDestroy(): void {

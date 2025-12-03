@@ -42,40 +42,53 @@
   background-color: rgba(244, 67, 54, 0.05);
 }
 
-/* Skeleton loader opcional para títulos */
-.content-loading.skeleton-title {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
+/* Skeleton loader con efecto pulse (respiración) */
+.content-loading {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: transparent !important;
+  user-select: none;
+  pointer-events: none;
   border-radius: 4px;
-  min-height: 1.2em;
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Skeleton loader para párrafos */
-.content-loading.skeleton-text {
+.content-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: linear-gradient(
     90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
   );
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-  border-radius: 4px;
-  min-height: 3em;
+  animation: skeleton-shimmer 2s infinite;
 }
 
-@keyframes skeleton-loading {
+/* Animación de respiración suave */
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  50% {
+    opacity: 0.7;
+    background-color: rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Animación de brillo que pasa */
+@keyframes skeleton-shimmer {
   0% {
-    background-position: 200% 0;
+    transform: translateX(-100%);
   }
   100% {
-    background-position: -200% 0;
+    transform: translateX(100%);
   }
 }
 
@@ -157,8 +170,40 @@
 }
 
 .link-loading {
-  opacity: 0.5;
+  background-color: rgba(0, 0, 0, 0.05);
+  color: transparent !important;
+  user-select: none;
   pointer-events: none;
+  border-radius: 4px;
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  min-width: 100px;
+  display: inline-block;
+}
+
+.link-loaded {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+/* Loading state para imágenes */
+.image-loading {
+  background-color: rgba(0, 0, 0, 0.05);
+  animation: skeleton-pulse 2s ease-in-out infinite;
+  min-height: 100px;
+  border-radius: 4px;
+}
+
+.image-loaded {
+  animation: fade-in 0.3s ease-in-out;
+}
+
+/* Animación de fade-in para cuando el contenido carga */
+@keyframes fade-in {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ================================================

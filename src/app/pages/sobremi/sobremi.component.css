@@ -1,3 +1,27 @@
+/* ========== SPINNER DE CARGA ========== */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  font-size: 1.2rem;
+  color: #666;
+  font-family: 'Playfair Display', serif;
+}
+
+.loading-spinner p {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* ========== PRESENTACIÓN PERSONAL ========== */
 .presentacion-card {
   background-color: white;

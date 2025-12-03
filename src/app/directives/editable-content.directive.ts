@@ -24,9 +24,8 @@ export class EditableContentDirective implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Agregar clase de loading y ocultar contenido temporalmente
+    // Agregar clase de loading con efecto skeleton
     this.renderer.addClass(this.el.nativeElement, 'content-loading');
-    this.renderer.setStyle(this.el.nativeElement, 'opacity', '0');
     
     // Cargar contenido desde la BD
     this.loadContent();
@@ -102,9 +101,9 @@ export class EditableContentDirective implements OnInit, OnDestroy {
 
   private showContent(): void {
     this.isLoading = false;
+    // Remover skeleton con transición suave
     this.renderer.removeClass(this.el.nativeElement, 'content-loading');
-    this.renderer.setStyle(this.el.nativeElement, 'opacity', '1');
-    this.renderer.setStyle(this.el.nativeElement, 'transition', 'opacity 0.3s ease-in-out');
+    this.renderer.addClass(this.el.nativeElement, 'content-loaded');
   }
 
   ngOnDestroy(): void {
@@ -136,6 +135,15 @@ export class EditableContentDirective implements OnInit, OnDestroy {
         this.adminModeService.queueSave(this.pageId, this.contentId, newValue);
         this.originalValue = newValue;
       }
+    }
+  }
+
+  @HostListener('click', ['$event'])
+  onClick(event: MouseEvent): void {
+    // Si está en modo edición, detener la propagación al elemento padre (como un <a>)
+    if (this.adminModeService.isEditMode()) {
+      event.stopPropagation();
+      event.preventDefault();
     }
   }
 

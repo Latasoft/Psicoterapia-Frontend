@@ -1,11 +1,12 @@
 <!-- Indicador de modo edición (visible solo para admins) -->
 <app-edit-mode-indicator></app-edit-mode-indicator>
 
-<!-- Portada -->
+<!-- Portada - Siempre visible, los elementos individuales manejan su loading -->
 <div class="image-card-4">
   <!-- Imagen de fondo editable (fuera del flujo flex) -->
   <div class="hero-background-wrapper">
-    <img [src]="getMediaSrc('hero-background')" 
+    <img *ngIf="getMediaSrc('hero-background')"
+         [src]="getMediaSrc('hero-background')" 
          alt="Fondo Hero" 
          class="hero-background-image" 
          appEditableImage
@@ -18,7 +19,8 @@
   <div class="hero-content-wrapper">
     <div class="card-content">
       <div class="logo-container">
-        <img [src]="getMediaSrc('hero-image')" 
+        <img *ngIf="getMediaSrc('hero-image')"
+             [src]="getMediaSrc('hero-image')" 
              alt="Logo" 
              class="logo" 
              appEditableImage
@@ -29,7 +31,7 @@
       <h2 appEditableContent 
           pageId="inicio" 
           contentId="hero-title"
-          contentType="text">Psicoterapia e Hipnoterapia Clínica Online</h2>
+          contentType="text"></h2>
     </div>
   </div>
 </div>
@@ -37,7 +39,8 @@
 <!-- Primer card. Video -->
 <div class="psychologist-card">
   <div class="psychologist-card-content">
-    <video controls
+    <video *ngIf="getMediaSrc('hero-video')"
+           controls
            appEditableVideo
            videoKey="hero-video"
            pageId="inicio"
@@ -50,11 +53,11 @@
       <h2 appEditableContent 
           pageId="inicio" 
           contentId="hero-subtitle"
-          contentType="text">Tu bienestar emocional es lo más importante</h2>
+          contentType="text"></h2>
       <p appEditableContent 
          pageId="inicio" 
          contentId="hero-description"
-         contentType="text">Agenda una cita con nuestro especialista y comienza tu camino hacia el equilibrio mental.</p>
+         contentType="text"></p>
       <a [routerLink]="'/formulario'" class="cta-button">Agendar cita</a>
     </div>
   </div>
@@ -67,12 +70,12 @@
         appEditableContent 
         pageId="inicio" 
         contentId="blog-section-title"
-        contentType="text">Últimas Publicaciones</h1>
+        contentType="text"></h1>
     <p class="blog-subtitle" 
        appEditableContent 
        pageId="inicio" 
        contentId="blog-section-subtitle"
-       contentType="text">Explora nuestros artículos más recientes sobre salud mental y bienestar</p>
+       contentType="text"></p>
   </div>
   
   <div *ngIf="ultimosBlogs.length" class="blog-cards-grid">
@@ -111,7 +114,6 @@
   </div>
 </div>
 
-<!-- Servicios -->
 <!-- Paquetes y Tratamientos -->
 <div class="paquetes-section">
   <div class="section-header">
@@ -119,12 +121,12 @@
         appEditableContent 
         pageId="inicio" 
         contentId="paquetes-section-title"
-        contentType="text">Nuestros Tratamientos</h1>
+        contentType="text"></h1>
     <p class="paquetes-subtitle" 
        appEditableContent 
        pageId="inicio" 
        contentId="paquetes-section-subtitle"
-       contentType="text">Elige el paquete que mejor se adapte a tus necesidades</p>
+       contentType="text"></p>
   </div>
   
   <div class="paquetes-grid">
@@ -195,11 +197,11 @@
           appEditableContent 
           pageId="inicio" 
           contentId="convenios-title"
-          contentType="text">Convenios</h1>
+          contentType="text"></h1>
       <p appEditableContent 
          pageId="inicio" 
          contentId="convenios-description"
-         contentType="html">Atención profesional con opciones de pago flexibles</p>
+         contentType="html"></p>
     </div>
   </div>
 </div>
@@ -213,17 +215,18 @@
           appEditableContent 
           pageId="inicio" 
           contentId="tarot-title"
-          contentType="text">Tarot</h1>
+          contentType="text"></h1>
       <p appEditableContent 
           pageId="inicio" 
           contentId="tarot-text"
-          contentType="html">Descubre tu camino con nuestras lecturas de tarot profesionales</p>
+          contentType="html"></p>
       <a href="/tarotista" class="btn">Ver más</a>
     </div>
   </div>
   
   <div class="image-section">
-    <img [src]="getMediaSrc('tarot-image')" 
+    <img *ngIf="getMediaSrc('tarot-image')"
+         [src]="getMediaSrc('tarot-image')" 
          alt="Imagen de Servicios" 
          appEditableImage
          imageKey="tarot-image"
@@ -371,10 +374,12 @@
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
           </svg>
-          <a appEditableLink
-             pageId="inicio" 
-             linkKey="contact-email"
-             href="mailto:contacto&#64;emhpsicoterapiaonline.com">contacto&#64;emhpsicoterapiaonline.com</a>
+          <a href="mailto:eduardo@emhpsicoterapia.cl">
+            <span appEditableContent 
+                  pageId="inicio" 
+                  contentId="contact-email-display"
+                  contentType="text">eduardo&#64;emhpsicoterapia.cl</span>
+          </a>
         </li>
         <li>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

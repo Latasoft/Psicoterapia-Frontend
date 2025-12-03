@@ -1,9 +1,15 @@
 <!-- Indicador de modo edición (visible solo para admins) -->
 <app-edit-mode-indicator></app-edit-mode-indicator>
 
-<!-- Card de presentación personal -->
-<div class="presentacion-card">
-    <img [src]="profileImageUrl" 
+<!-- Loader mientras carga el contenido -->
+<div *ngIf="!contentLoaded" class="loading-spinner">
+  <p>Cargando contenido...</p>
+</div>
+
+<!-- Card de presentación personal - Solo mostrar cuando contentLoaded es true -->
+<div class="presentacion-card" *ngIf="contentLoaded">
+    <img *ngIf="profileImageUrl"
+         [src]="profileImageUrl" 
          alt="Eduardo Márquez" 
          class="foto-perfil"
          appEditableImage
@@ -11,23 +17,26 @@
          pageId="sobremi"
          (imageChange)="onImageChange($event, 'profile-image')" />
     <div class="texto-perfil">
-      <h3 appEditableContent 
+      <h3 *ngIf="profileName"
+          appEditableContent 
           pageId="sobremi" 
           contentId="profile-name"
-          contentType="text">Eduardo Cristián Márquez Huerta</h3>
-      <p appEditableContent 
+          contentType="text">{{ profileName }}</h3>
+      <p *ngIf="profileTitle"
+         appEditableContent 
          pageId="sobremi" 
          contentId="profile-title"
-         contentType="text">Psicólogo e Hipnoterapéuta Clínico, Universidad Santo Tomás, Santiago de Chile, año 2002</p>
-      <p appEditableContent 
+         contentType="text">{{ profileTitle }}</p>
+      <p *ngIf="profileSubtitle"
+         appEditableContent 
          pageId="sobremi" 
          contentId="profile-subtitle"
-         contentType="text">Atención niños (8 a 10 años), adolescentes y adultos</p>
+         contentType="text">{{ profileSubtitle }}</p>
     </div>
   </div>
   
   <!-- Sección de links sociales -->
-  <div class="social-links">
+  <div class="social-links" *ngIf="contentLoaded">
     <a appEditableLink
        pageId="sobremi"
        linkKey="social-whatsapp"
@@ -70,33 +79,37 @@
     </a>
   </div>
 
-  <!-- Sección Sobre mí -->
-  <div class="about-me">
-    <h2 class="about-title"
+  <!-- Sección Sobre mí - Solo mostrar cuando contentLoaded es true -->
+  <div class="about-me" *ngIf="contentLoaded">
+    <h2 *ngIf="aboutTitle"
+        class="about-title"
         appEditableContent 
         pageId="sobremi" 
         contentId="about-title"
-        contentType="text">Sobre mí</h2>
-    <p class="about-description"
+        contentType="text">{{ aboutTitle }}</h2>
+    <p *ngIf="aboutDescription"
+       class="about-description"
        appEditableContent 
        pageId="sobremi" 
        contentId="about-description"
-       contentType="text">22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo. Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.</p>
+       contentType="text">{{ aboutDescription }}</p>
   </div>
 
-  <!-- Cards de características -->
-  <div class="cards-container">
+  <!-- Cards de características - Solo mostrar cuando contentLoaded es true -->
+  <div class="cards-container" *ngIf="contentLoaded">
     <div class="card" *ngFor="let card of cards; let i = index">
-      <h3 class="card-title"
+      <h3 *ngIf="card.title"
+          class="card-title"
           appEditableContent 
           pageId="sobremi" 
           [contentId]="'card-' + i + '-title'"
-          contentType="text">Título de característica</h3>
-      <p class="card-description"
+          contentType="text">{{ card.title }}</h3>
+      <p *ngIf="card.description"
+         class="card-description"
          appEditableContent 
          pageId="sobremi" 
          [contentId]="'card-' + i + '-description'"
-         contentType="text">Descripción de esta característica del servicio profesional.</p>
+         contentType="text">{{ card.description }}</p>
     </div>
   </div>
   

@@ -9,6 +9,7 @@ import { EditableImageDirective } from '../../directives/editable-image.directiv
 import { EditableLinkDirective } from '../../directives/editable-link.directive';
 import { EditModeIndicatorComponent } from '../../components/edit-mode-indicator/edit-mode-indicator.component';
 import { ImageService } from '../../services/image.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-sobremi',
@@ -28,28 +29,22 @@ export class SobremiComponent implements OnInit, OnDestroy {
   isAdmin = false;
   uploadingItem: string | null = null;
 
-  // Content properties - valores por defecto
-  profileName = 'Eduardo Cristián Márquez Huerta';
-  profileTitle = 'Psicólogo e Hipnoterapéuta Clínico, Universidad Santo Tomás, Santiago de Chile, año 2002';
-  profileSubtitle = 'Atención niños (8 a 10 años), adolescentes y adultos';
-  profileImageUrl = 'assets/h5.avif';
+  // Flag de carga - no mostrar contenido hasta que cargue del backend
+  contentLoaded = false;
+
+  // Content properties - inicialmente vacíos hasta que cargue el backend
+  profileName = '';
+  profileTitle = '';
+  profileSubtitle = '';
+  profileImageUrl = '';
   
-  aboutTitle = 'Sobre mí';
-  aboutDescription = '22 años de experiencia profesional en el área clínica, educacional y en relatorías avalan mi trabajo. Especialista en Hipnoterapia para trabajar estados depresivos, ansiosos, de angustia, duelos y crisis vitales.';
+  aboutTitle = '';
+  aboutDescription = '';
 
   cards = [
-    {
-      title: 'Confidencialidad',
-      description: 'Todo lo compartido en las sesiones se mantiene en total confidencialidad, garantizando un espacio seguro para tu desarrollo personal.'
-    },
-    {
-      title: 'Profesionalismo',
-      description: 'Cuento con la formación y experiencia necesarias para ofrecer un servicio de calidad, basado en el respeto y la ética profesional.'
-    },
-    {
-      title: 'Responsabilidad',
-      description: 'Me comprometo a ofrecerte la mejor atención, siguiendo los estándares más altos de profesionalismo y dedicación.'
-    }
+    { title: '', description: '' },
+    { title: '', description: '' },
+    { title: '', description: '' }
   ];
 
   // Social links
@@ -64,7 +59,8 @@ export class SobremiComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private pageContentService: PageContentService,
-    private imageService: ImageService
+    private imageService: ImageService,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -82,30 +78,28 @@ export class SobremiComponent implements OnInit, OnDestroy {
 
   async loadPageContent() {
     try {
+      console.log('📥 Cargando contenido desde backend...');
       const content = await lastValueFrom(this.pageContentService.getPageContent('sobremi'));
+      
       if (content && Object.keys(content).length > 0) {
-        // Mapear contenido desde el backend
-        this.profileName = content['profile-name'] || this.profileName;
-        this.profileTitle = content['profile-title'] || this.profileTitle;
-        this.profileSubtitle = content['profile-subtitle'] || this.profileSubtitle;
-        this.profileImageUrl = content['profile-image'] || this.profileImageUrl;
+        console.log('✅ Contenido del backend recibido:', content);
         
-        this.aboutTitle = content['about-title'] || this.aboutTitle;
-        this.aboutDescription = content['about-description'] || this.aboutDescription;
+        // Mapear contenido desde el backend - SIN fallbacks
+        this.profileName = content['profile-name'] || '';
+        this.profileTitle = content['profile-title'] || '';
+        this.profileSubtitle = content['profile-subtitle'] || '';
+        this.profileImageUrl = content['profile-image'] || '';
+        
+        this.aboutTitle = content['about-title'] || '';
+        this.aboutDescription = content['about-description'] || '';
         
         // Cards
-        if (content['card-0-title']) {
-          this.cards[0].title = content['card-0-title'];
-          this.cards[0].description = content['card-0-description'] || this.cards[0].description;
-        }
-        if (content['card-1-title']) {
-          this.cards[1].title = content['card-1-title'];
-          this.cards[1].description = content['card-1-description'] || this.cards[1].description;
-        }
-        if (content['card-2-title']) {
-          this.cards[2].title = content['card-2-title'];
-          this.cards[2].description = content['card-2-description'] || this.cards[2].description;
-        }
+        this.cards[0].title = content['card-0-title'] || '';
+        this.cards[0].description = content['card-0-description'] || '';
+        this.cards[1].title = content['card-1-title'] || '';
+        this.cards[1].description = content['card-1-description'] || '';
+        this.cards[2].title = content['card-2-title'] || '';
+        this.cards[2].description = content['card-2-description'] || '';
         
         // Social links
         if (content['social-whatsapp']) this.socialLinks.whatsapp = content['social-whatsapp'];
@@ -113,22 +107,28 @@ export class SobremiComponent implements OnInit, OnDestroy {
         if (content['social-facebook']) this.socialLinks.facebook = content['social-facebook'];
         if (content['social-linkedin']) this.socialLinks.linkedin = content['social-linkedin'];
         if (content['social-tiktok']) this.socialLinks.tiktok = content['social-tiktok'];
+      } else {
+        console.warn('⚠️ Backend no devolvió contenido para sobremi');
       }
     } catch (error) {
-      console.error('Error al cargar contenido:', error);
+      console.error('❌ Error al cargar contenido:', error);
+    } finally {
+      // Marcar como cargado SIEMPRE, incluso si hay error
+      this.contentLoaded = true;
+      console.log('🏁 Carga completada, contentLoaded =', this.contentLoaded);
     }
   }
 
   // Manejo de cambio de imagen de perfil
   async onImageChange(file: File, imageKey: string) {
     if (!this.isAdmin) {
-      alert('Necesitas estar autenticado como admin para subir archivos');
+      this.toastService.error('Necesitas estar autenticado como admin para subir archivos');
       return;
     }
 
     const token = localStorage.getItem('token');
     if (!token) {
-      alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+      this.toastService.error('Sesión expirada. Por favor, inicia sesión nuevamente.');
       return;
     }
 
@@ -141,21 +141,45 @@ export class SobremiComponent implements OnInit, OnDestroy {
         this.imageService.uploadImage(file, 'sobremi')
       );
 
-      if (uploadResponse && uploadResponse.success) {
-        // Actualizar URL de imagen
+      if (uploadResponse && uploadResponse.success && uploadResponse.data && uploadResponse.data.secure_url) {
+        // Actualizar URL de imagen localmente
         if (imageKey === 'profile-image') {
-          this.profileImageUrl = uploadResponse.url;
+          this.profileImageUrl = uploadResponse.data.secure_url;
         }
         
-        console.log('✅ Imagen subida exitosamente:', uploadResponse.url);
+        console.log('✅ Imagen subida exitosamente:', uploadResponse.data.secure_url);
+        
+        // 🔥 IMPORTANTE: Guardar la nueva URL en el backend
+        await this.saveImageToBackend(imageKey, uploadResponse.data.secure_url);
+        
+        this.toastService.success('Imagen actualizada correctamente');
       } else {
         throw new Error('Error en la respuesta de subida');
       }
     } catch (error) {
       console.error('❌ Error al subir imagen:', error);
-      alert('Error al subir la imagen. Por favor, intenta nuevamente.');
+      this.toastService.error('Error al subir la imagen. Por favor, intenta nuevamente.');
     } finally {
       this.uploadingItem = null;
+    }
+  }
+
+  // Guardar URL de imagen en el backend
+  private async saveImageToBackend(imageKey: string, imageUrl: string) {
+    try {
+      console.log(`💾 Guardando ${imageKey} en backend:`, imageUrl);
+      
+      const updateData: any = {};
+      updateData[imageKey] = imageUrl;
+      
+      await lastValueFrom(
+        this.pageContentService.updatePageContent('sobremi', updateData)
+      );
+      
+      console.log('✅ URL guardada en backend correctamente');
+    } catch (error) {
+      console.error('❌ Error al guardar en backend:', error);
+      // No lanzar error para no interrumpir el flujo
     }
   }
 }
