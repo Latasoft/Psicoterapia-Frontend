@@ -280,6 +280,11 @@ export class ModalReservaComponent implements OnInit {
   // ==========================================
 
   seleccionarMetodoPago(metodo: 'webpay' | 'mercadopago' | 'klap' | 'prueba') {
+    // Bloquear pago de prueba en producción
+    if (metodo === 'prueba') {
+      console.warn('[SECURITY] Intento de usar pago de prueba bloqueado');
+      return;
+    }
     this.metodoPago = metodo;
   }
 
@@ -373,31 +378,12 @@ export class ModalReservaComponent implements OnInit {
   }
 
   procesarPagoPrueba() {
-    if (!this.paquete) return;
-
-    const confirmar = confirm(
-      '🧪 PAGO DE PRUEBA\n\n' +
-      'Se creará la reserva SIN procesar ningún pago real.\n' +
-      'Esto es solo para desarrollo y testing.\n\n' +
-      '¿Continuar?'
-    );
-
-    if (!confirmar) return;
-
-    this.procesando = true;
-    this.errorMessage = '';
-
-    const reservaData = {
-      paqueteId: this.paquete.id,
-      sesiones: this.sesionesSeleccionadas.map(s => ({
-        fecha: s.fecha,
-        horaInicio: s.horario.inicio,
-        horaFin: s.horario.fin
-      })),
-      rutPaciente: this.datosPaciente.rut,
-      nombrePaciente: this.datosPaciente.nombre,
-      emailPaciente: this.datosPaciente.email,
-      telefonoPaciente: this.datosPaciente.telefono,
+    // Método deshabilitado - no se permite pago de prueba
+    console.error('[SECURITY] Intento de procesar pago de prueba bloqueado');
+    alert('⛔ Esta funcionalidad no está disponible');
+    this.procesando = false;
+    return;
+  }
       notas: this.datosPaciente.notas,
       direccion: this.datosPaciente.direccion,
       comuna: this.datosPaciente.comuna,
